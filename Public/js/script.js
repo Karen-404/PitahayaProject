@@ -187,31 +187,33 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =========================
-// BOT ASISTENTE
+// BOT ASISTENTE (IA)
 // =========================
-function responder() {
+async function responder() {
     const input = document.getElementById("userInput");
     const chat = document.getElementById("chatBox");
-    const texto = input.value.toLowerCase().trim();
-    if (texto === "") return;
-    chat.innerHTML += `<div class="mensaje usuario">${input.value}</div>`;
-    let respuesta = generarRespuesta(texto);
-    setTimeout(() => {
-        chat.innerHTML += `<div class="mensaje bot">${respuesta}</div>`;
-        chat.scrollTop = chat.scrollHeight;
-    }, 500);
+    const mensaje = input.value.trim();
+    if (!mensaje) return;
+    chat.innerHTML += `<div class="mensaje usuario">${mensaje}</div>`;
     input.value = "";
-}
-
-function generarRespuesta(texto) {
-    if (texto.includes("hola")) return "Hola 👋 ¿En qué puedo ayudarte sobre la pitahaya?";
-    if (texto.includes("precio")) return "El precio varía según el tipo. La pitahaya amarilla suele ser más costosa.";
-    if (texto.includes("beneficios")) return "La pitahaya es rica en fibra, vitamina C y antioxidantes 💪";
-    if (texto.includes("comprar") || texto.includes("pedido")) return "Puedes hacer tu pedido en la sección de consultas 🛒";
-    if (texto.includes("tipos")) return "Tenemos pitahaya roja, amarilla y blanca.";
-    if (texto.includes("ecuador")) return "Ecuador es uno de los principales exportadores de pitahaya 🌎";
-    if (texto.includes("gracias")) return "¡Con gusto! 😊";
-    return "No entendí tu pregunta 🤔 Intenta preguntar sobre precios, beneficios o tipos.";
+    chat.innerHTML += `<div class="mensaje bot" id="chatPensando"><i>Escribiendo...</i></div>`;
+    chat.scrollTop = chat.scrollHeight;
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mensaje })
+        });
+        const data = await res.json();
+        const pensando = document.getElementById('chatPensando');
+        if (pensando) pensando.remove();
+        chat.innerHTML += `<div class="mensaje bot">${data.respuesta}</div>`;
+    } catch (e) {
+        const pensando = document.getElementById('chatPensando');
+        if (pensando) pensando.remove();
+        chat.innerHTML += `<div class="mensaje bot">Error de conexi\u00f3n. Intenta de nuevo.</div>`;
+    }
+    chat.scrollTop = chat.scrollHeight;
 }
 
 document.getElementById("userInput")

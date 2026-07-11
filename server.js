@@ -350,6 +350,67 @@ app.get('/api/noticias/realtime', (req, res) => {
   req.on('close', () => clearInterval(interval));
 });
 
+// ==================== CHATBOT (Gemini) ====================
+app.post('/api/chat', async (req, res) => {
+  const { mensaje } = req.body;
+  if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    const respuestas = {
+      hola: 'Hola 👋 soy tu asistente de pitahaya. Pregúntame lo que quieras.',
+      precio: 'El precio de la pitahaya varía según tipo y temporada. La amarilla suele ser más cara que la roja.',
+      beneficio: 'La pitahaya es rica en fibra, vitamina C, antioxidantes y magnesio. Favorece la digestión y la salud cardiovascular 💪',
+      comprar: 'Puedes hacer pedidos desde la sección Pedidos del menú 🛒',
+      tipo: 'Las principales variedades: roja (Hylocereus undatus), amarilla (H. megalanthus) y blanca.',
+      ecuador: 'Ecuador es el 3er exportador mundial de pitahaya. Palora (Morona Santiago) es la zona productora líder 🌎',
+      gracias: '¡Con gusto! 😊 Vuelve cuando quieras.'
+    };
+    const txt = mensaje.toLowerCase();
+    for (const [key, val] of Object.entries(respuestas)) {
+      if (txt.includes(key)) return res.json({ respuesta: val });
+    }
+    return res.json({ respuesta: 'No entendí tu pregunta 🤔 Soy un asistente básico sin conexión a IA. Para respuestas más inteligentes, configura GEMINI_API_KEY.' });
+  }
+
+  try {
+    const https = require('https');
+    const body = JSON.stringify({
+      contents: [{
+        parts: [{ text: `Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa. Si la pregunta no es sobre estos temas, responde cordialmente que solo puedes ayudar con temas relacionados.\n\nUsuario: ${mensaje}\n\nAsistente:` }]
+      }]
+    });
+
+    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`);
+    const options = {
+      hostname: url.hostname,
+      path: url.pathname + url.search,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+    };
+
+    const data = await new Promise((resolve, reject) => {
+      const req2 = https.request(options, (res2) => {
+        let chunks = [];
+        res2.on('data', (c) => chunks.push(c));
+        res2.on('end', () => {
+          try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
+          catch (e) { reject(new Error('Error al parsear respuesta')); }
+        });
+      });
+      req2.on('error', reject);
+      req2.write(body);
+      req2.end();
+    });
+
+    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (texto) return res.json({ respuesta: texto });
+    res.json({ respuesta: 'Lo siento, no pude procesar tu pregunta. Intenta de nuevo.' });
+  } catch (e) {
+    res.json({ respuesta: 'Error al conectar con la IA. Intenta más tarde.' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
