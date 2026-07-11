@@ -30,9 +30,8 @@ app.use('/api', (req, res, next) => {
 // Helper: verify role
 async function requireRole(req, res, roles) {
   if (!supabase) return res.status(503).json({ error: 'Base de datos no disponible' });
-  const { usuario_id } = req.body;
-  if (!usuario_id && !req.query.usuario_id && !req.params.id) return res.status(401).json({ error: 'No autorizado' });
-  const uid = req.body.usuario_id || req.query.usuario_id || req.params.id;
+  const uid = parseInt(req.body.usuario_id || req.query.usuario_id || req.headers['x-usuario-id']);
+  if (!uid || isNaN(uid)) return res.status(401).json({ error: 'No autorizado' });
   const { data: user } = await supabase.from('usuarios').select('role').eq('id', uid).single();
   if (!user || !roles.includes(user.role)) return res.status(403).json({ error: 'Permiso denegado' });
   return user;
