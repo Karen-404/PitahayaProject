@@ -378,19 +378,19 @@ app.post('/api/chat', async (req, res) => {
   const { mensaje } = req.body;
   if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
 
-  // Try Gemini if available
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (geminiKey) {
+  // Try Groq AI (Llama 3) if available
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey) {
     try {
       const https = require('https');
-      const body = JSON.stringify({ contents: [{ parts: [{ text: `Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa, máximo 3 párrafos.\n\nUsuario: ${mensaje}\n\nAsistente:` }] }] });
+      const systemPrompt = 'Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa, máximo 3 párrafos. Si la pregunta no es sobre estos temas, responde cordialmente que solo puedes ayudar en temas relacionados con la pitahaya y la agricultura.';
+      const body = JSON.stringify({ model: 'llama3-70b-8192', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: mensaje }], temperature: 0.7, max_tokens: 500 });
       const data = await new Promise((resolve, reject) => {
-        const u = new URL(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${geminiKey}`);
-        const r = https.request({ hostname: u.hostname, path: u.pathname + u.search, method: 'POST', headers: { 'Content-Type': 'application/json' } }, (r2) => { let d = []; r2.on('data', c => d.push(c)); r2.on('end', () => { try { resolve(JSON.parse(Buffer.concat(d).toString())); } catch(e) { reject(e); } }); });
+        const r = https.request({ hostname: 'api.groq.com', path: '/openai/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` } }, (r2) => { let d = []; r2.on('data', c => d.push(c)); r2.on('end', () => { try { resolve(JSON.parse(Buffer.concat(d).toString())); } catch(e) { reject(e); } }); });
         r.on('error', reject); r.write(body); r.end();
       });
-      const t = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (t) return res.json({ respuesta: t });
+      const t = data?.choices?.[0]?.message?.content;
+      if (t) return res.json({ respuesta: t.trim() });
     } catch (e) { /* fallback */ }
   }
 
