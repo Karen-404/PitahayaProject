@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investigadores - Pitahaya Biotec</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page-container">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+          <i class="fas fa-users"></i>
+        </div>
+        <div>
+          <h1>Investigadores</h1>
+          <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Conoce a los profesionales que impulsan la investigacion en pitahaya</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUSCADOR Y FILTROS -->
+    <section class="content-card" style="margin-bottom:24px;">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
+        <div class="form-group" style="flex:2;min-width:200px;margin:0;">
+          <label><i class="fas fa-search"></i> Buscar</label>
+          <input type="text" id="buscadorInv" placeholder="Nombre, especialidad, institucion..." oninput="filtrarInvestigadores()">
+        </div>
+        <div class="form-group" style="flex:1;min-width:150px;margin:0;">
+          <label>Especialidad</label>
+          <select id="filtroEspecialidad" onchange="filtrarInvestigadores()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;min-width:150px;margin:0;">
+          <label>Institucion</label>
+          <select id="filtroInstitucion" onchange="filtrarInvestigadores()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;min-width:150px;margin:0;">
+          <label>Area de Investigacion</label>
+          <select id="filtroArea" onchange="filtrarInvestigadores()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRILLA DE INVESTIGADORES -->
+    <div id="investigadoresGrid" class="empty-state" style="grid-column:1/-1;">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Cargando investigadores...</p>
+    </div>
+
+    <!-- MODAL PERFIL COMPLETO -->
+    <div id="perfilModal" class="modal" style="display:none;">
+      <div class="modal-content" style="max-width:720px;max-height:90vh;overflow-y:auto;">
+        <span class="modal-close" onclick="cerrarModalPerfil()">&times;</span>
+        <div id="perfilCompleto"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="chat-flotante">
+    <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-container oculto" id="chatContainer">
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Escribe...">
+        <button onclick="responder()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    const uid = localStorage.getItem('userId');
+    if (!uid) window.location.href = 'index.html';
+
+    let investigadoresData = [];
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+      });
+    }
+
+    async function cargarInvestigadores() {
+      const grid = document.getElementById('investigadoresGrid');
+      try {
+        const res = await fetch('/api/investigadores');
+        investigadoresData = await res.json();
+        if (!investigadoresData || investigadoresData.length === 0) {
+          grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users"></i><p>No hay investigadores registrados aun</p></div>';
+          return;
+        }
+        // Populate filters
+        const especialidades = [...new Set(investigadoresData.map(i => i.especialidad).filter(Boolean))];
+        const instituciones = [...new Set(investigadoresData.map(i => i.institucion).filter(Boolean))];
+        const areas = [...new Set(investigadoresData.flatMap(i => (i.areas_investigacion||'').split(',').map(s=>s.trim()).filter(Boolean)))];
+
+        poblarSelect('filtroEspecialidad', especialidades);
+        poblarSelect('filtroInstitucion', instituciones);
+        poblarSelect('filtroArea', areas);
+
+        renderizarGrilla(investigadoresData);
+      } catch(err) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--color-danger);"></i><p>Error al cargar investigadores</p></div>';
+      }
+    }
+
+    function poblarSelect(id, valores) {
+      const sel = document.getElementById(id);
+      const actual = sel.value;
+      sel.innerHTML = '<option value="">' + sel.options[0].text + '</option>';
+      valores.sort().forEach(v => {
+        sel.innerHTML += '<option value="' + escapeHTML(v) + '">' + escapeHTML(v) + '</option>';
+      });
+      sel.value = actual;
+    }
+
+    function renderizarGrilla(data) {
+      const grid = document.getElementById('investigadoresGrid');
+      if (data.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-search"></i><p>No se encontraron investigadores con esos filtros</p></div>';
+        return;
+      }
+      grid.style.display = 'grid';
+      grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+      grid.style.gap = '20px';
+
+      grid.innerHTML = data.map(inv => {
+        const nombreCompleto = [inv.nombres, inv.apellidos].filter(Boolean).join(' ') || 'Investigador';
+        const iniciales = (inv.nombres ? inv.nombres.charAt(0) : '') + (inv.apellidos ? inv.apellidos.charAt(0) : '');
+        const fotoHtml = inv.foto_url
+          ? '<img src="' + escapeHTML(inv.foto_url) + '" alt="' + escapeHTML(nombreCompleto) + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">'
+          : '<div style="width:80px;height:80px;border-radius:50%;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:var(--color-primary);font-weight:700;">' + escapeHTML(iniciales) + '</div>';
+        const bio = inv.biografia ? inv.biografia.substring(0, 120) + (inv.biografia.length > 120 ? '...' : '') : '';
+
+        return '<div class="content-card" style="cursor:pointer;padding:24px;text-align:center;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform=\'translateY(-4px)\';this.style.boxShadow=\'var(--shadow-lg)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\';" onclick="abrirPerfil(' + inv.id + ')">'
+          + '<div style="display:flex;justify-content:center;margin-bottom:12px;">' + fotoHtml + '</div>'
+          + '<h3 style="margin:0 0 4px 0;font-size:1.05rem;">' + escapeHTML(nombreCompleto) + '</h3>'
+          + (inv.titulo ? '<p style="margin:0 0 4px 0;font-size:0.85rem;color:var(--color-primary);font-weight:600;">' + escapeHTML(inv.titulo) + '</p>' : '')
+          + (inv.especialidad ? '<p style="margin:0 0 4px 0;font-size:0.85rem;color:var(--color-text-secondary);">' + escapeHTML(inv.especialidad) + '</p>' : '')
+          + (inv.institucion ? '<p style="margin:0 0 8px 0;font-size:0.8rem;color:var(--color-text-muted);"><i class="fas fa-building"></i> ' + escapeHTML(inv.institucion) + '</p>' : '')
+          + (bio ? '<p style="margin:0;font-size:0.85rem;color:var(--color-text-muted);">' + escapeHTML(bio) + '</p>' : '')
+          + '</div>';
+      }).join('');
+    }
+
+    function filtrarInvestigadores() {
+      const q = document.getElementById('buscadorInv').value.toLowerCase().trim();
+      const esp = document.getElementById('filtroEspecialidad').value;
+      const inst = document.getElementById('filtroInstitucion').value;
+      const area = document.getElementById('filtroArea').value;
+
+      const filtrados = investigadoresData.filter(inv => {
+        const fullName = [inv.nombres, inv.apellidos].filter(Boolean).join(' ').toLowerCase();
+        const matchSearch = !q || fullName.includes(q) || (inv.especialidad||'').toLowerCase().includes(q) || (inv.institucion||'').toLowerCase().includes(q) || (inv.biografia||'').toLowerCase().includes(q);
+        const matchEsp = !esp || inv.especialidad === esp;
+        const matchInst = !inst || inv.institucion === inst;
+        const invAreas = (inv.areas_investigacion||'').split(',').map(s => s.trim().toLowerCase());
+        const matchArea = !area || invAreas.includes(area.toLowerCase());
+        return matchSearch && matchEsp && matchInst && matchArea;
+      });
+      renderizarGrilla(filtrados);
+    }
+
+    // ---- Perfil completo modal ----
+    async function abrirPerfil(id) {
+      const container = document.getElementById('perfilCompleto');
+      container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--color-primary);"></i><p style="margin-top:12px;color:var(--color-text-muted);">Cargando perfil...</p></div>';
+      document.getElementById('perfilModal').style.display = 'flex';
+
+      try {
+        const res = await fetch('/api/investigadores/' + id);
+        const inv = await res.json();
+        if (!inv) { container.innerHTML = '<p>Error al cargar perfil</p>'; return; }
+
+        const nombreCompleto = [inv.nombres, inv.apellidos].filter(Boolean).join(' ') || 'Investigador';
+        const iniciales = (inv.nombres ? inv.nombres.charAt(0) : '') + (inv.apellidos ? inv.apellidos.charAt(0) : '');
+        const fotoHtml = inv.foto_url
+          ? '<img src="' + escapeHTML(inv.foto_url) + '" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid var(--color-primary-soft);">'
+          : '<div style="width:120px;height:120px;border-radius:50%;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;font-size:2.8rem;color:var(--color-primary);font-weight:700;border:3px solid var(--color-primary-soft);">' + escapeHTML(iniciales) + '</div>';
+
+        let enlacesHtml = '';
+        const enlaces = [
+          { url: inv.enlace_orcid, icon: 'fab fa-orcid', color: '#A6CE39', label: 'ORCID' },
+          { url: inv.enlace_google_scholar, icon: 'fas fa-graduation-cap', color: '#4285F4', label: 'Google Scholar' },
+          { url: inv.enlace_researchgate, icon: 'fas fa-flask', color: '#FF6600', label: 'ResearchGate' },
+          { url: inv.enlace_linkedin, icon: 'fab fa-linkedin', color: '#0A66C2', label: 'LinkedIn' }
+        ];
+        enlaces.forEach(e => {
+          if (e.url) enlacesHtml += '<a href="' + escapeHTML(e.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1px solid var(--color-border);text-decoration:none;color:var(--color-text-primary);font-size:0.85rem;"><i class="' + e.icon + '" style="color:' + e.color + ';"></i> ' + e.label + '</a>';
+        });
+
+        // Parse JSON arrays
+        let titulos = [], logros = [], reconocimientos = [], publicaciones = [], proyectos = [];
+        try { titulos = JSON.parse(inv.titulos_obtenidos || '[]'); } catch(e) {}
+        try { logros = JSON.parse(inv.logros || '[]'); } catch(e) {}
+        try { reconocimientos = JSON.parse(inv.reconocimientos || '[]'); } catch(e) {}
+        try { publicaciones = JSON.parse(inv.publicaciones || '[]'); } catch(e) {}
+        try { proyectos = JSON.parse(inv.proyectos || '[]'); } catch(e) {}
+
+        const renderList = (items, fields) => {
+          if (!items || items.length === 0) return '<p style="color:var(--color-text-muted);font-size:0.9rem;">No registrado</p>';
+          return items.map(item => {
+            let html = '<div style="padding:8px 12px;background:var(--color-surface-secondary);border-radius:var(--radius-sm);margin-bottom:6px;">';
+            fields.forEach(f => {
+              if (item[f.key]) html += '<div style="font-size:0.9rem;margin-bottom:1px;"><strong>' + f.label + ':</strong> ' + escapeHTML(String(item[f.key])) + '</div>';
+            });
+            html += '</div>';
+            return html;
+          }).join('');
+        };
+
+        const invLabel = { en_curso:'En curso', finalizada:'Finalizada', publicada:'Publicada' };
+        const invColor = { en_curso:'#ff9800', finalizada:'#4caf50', publicada:'#2196f3' };
+
+        let investigacionesHtml = '';
+        if (inv.investigaciones && inv.investigaciones.length > 0) {
+          investigacionesHtml = inv.investigaciones.map(inv => {
+            return '<div style="display:flex;gap:12px;padding:12px;background:var(--color-surface-secondary);border-radius:var(--radius-sm);margin-bottom:8px;">'
+              + (inv.imagen_url ? '<img src="' + escapeHTML(inv.imagen_url) + '" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;">' : '')
+              + '<div><h4 style="margin:0 0 4px 0;font-size:0.95rem;">' + escapeHTML(inv.titulo) + '</h4>'
+              + (inv.descripcion ? '<p style="margin:0 0 4px 0;font-size:0.85rem;color:var(--color-text-secondary);">' + escapeHTML(inv.descripcion.substring(0,200)) + '</p>' : '')
+              + '<div style="display:flex;gap:12px;font-size:0.8rem;color:var(--color-text-muted);flex-wrap:wrap;">'
+              + (inv.area_investigacion ? '<span><strong>Area:</strong> ' + escapeHTML(inv.area_investigacion) + '</span>' : '')
+              + '<span><strong>Estado:</strong> <span style="color:' + (invColor[inv.estado]||'#999') + '">' + (invLabel[inv.estado]||inv.estado) + '</span></span>'
+              + (inv.fecha ? '<span><strong>Fecha:</strong> ' + inv.fecha + '</span>' : '')
+              + (inv.documento_url ? '<a href="' + escapeHTML(inv.documento_url) + '" target="_blank" rel="noopener" style="color:var(--color-primary);"><i class="fas fa-external-link-alt"></i> Documento</a>' : '')
+              + '</div></div></div>';
+          }).join('');
+        } else {
+          investigacionesHtml = '<p style="color:var(--color-text-muted);font-size:0.9rem;">No registrado</p>';
+        }
+
+        container.innerHTML = ''
+          + '<div style="text-align:center;margin-bottom:24px;">'
+          + fotoHtml
+          + '<h2 style="margin:12px 0 4px 0;">' + escapeHTML(nombreCompleto) + '</h2>'
+          + (inv.titulo ? '<p style="margin:0 0 4px 0;color:var(--color-primary);font-weight:600;">' + escapeHTML(inv.titulo) + '</p>' : '')
+          + (inv.especialidad ? '<p style="margin:0 0 4px 0;color:var(--color-text-secondary);">' + escapeHTML(inv.especialidad) + '</p>' : '')
+          + (inv.institucion ? '<p style="margin:0 0 4px 0;color:var(--color-text-muted);"><i class="fas fa-building"></i> ' + escapeHTML(inv.institucion) + '</p>' : '')
+          + (inv.ubicacion ? '<p style="margin:0 0 12px 0;color:var(--color-text-muted);"><i class="fas fa-map-marker-alt"></i> ' + escapeHTML(inv.ubicacion) + '</p>' : '')
+          + (inv.correo_contacto ? '<p style="margin:0 0 12px 0;"><i class="fas fa-envelope"></i> <a href="mailto:' + escapeHTML(inv.correo_contacto) + '" style="color:var(--color-primary);">' + escapeHTML(inv.correo_contacto) + '</a></p>' : '')
+          + (enlacesHtml ? '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">' + enlacesHtml + '</div>' : '')
+          + '</div>'
+
+          + (inv.biografia ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-user"></i> Biografia</div><p style="margin:0;font-size:0.9rem;color:var(--color-text-secondary);">' + escapeHTML(inv.biografia) + '</p></section>' : '')
+
+          + (inv.areas_investigacion ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-microscope"></i> Areas de Investigacion</div><p style="margin:0;font-size:0.9rem;color:var(--color-text-secondary);">' + escapeHTML(inv.areas_investigacion) + '</p></section>' : '')
+
+          + (titulos.length > 0 ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-award"></i> Titulos Obtenidos</div>' + renderList(titulos, [{key:'titulo',label:'Titulo'},{key:'institucion',label:'Institucion'},{key:'anio',label:'Año'}]) + '</section>' : '')
+
+          + (logros.length > 0 ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-trophy"></i> Logros</div>' + renderList(logros, [{key:'descripcion',label:''}]) + '</section>' : '')
+
+          + (reconocimientos.length > 0 ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-medal"></i> Reconocimientos</div>' + renderList(reconocimientos, [{key:'nombre',label:'Nombre'},{key:'entidad',label:'Entidad'},{key:'anio',label:'Año'}]) + '</section>' : '')
+
+          + (publicaciones.length > 0 ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-file-alt"></i> Publicaciones</div>' + renderList(publicaciones, [{key:'titulo',label:'Titulo'},{key:'revista',label:'Revista'},{key:'anio',label:'Año'},{key:'doi',label:'DOI'}]) + '</section>' : '')
+
+          + (proyectos.length > 0 ? '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-project-diagram"></i> Proyectos</div>' + renderList(proyectos, [{key:'titulo',label:'Titulo'},{key:'descripcion',label:'Descripcion'},{key:'fecha_inicio',label:'Inicio'},{key:'fecha_fin',label:'Fin'},{key:'estado',label:'Estado'}]) + '</section>' : '')
+
+          + '<section class="content-card" style="padding:16px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;"><i class="fas fa-microscope"></i> Investigaciones</div>' + investigacionesHtml + '</section>'
+
+          + '<div style="text-align:center;margin-top:16px;"><button class="btn btn-secondary" onclick="cerrarModalPerfil()"><i class="fas fa-times"></i> Cerrar</button></div>';
+      } catch(err) {
+        container.innerHTML = '<p style="text-align:center;color:var(--color-danger);">Error al cargar el perfil</p>';
+      }
+    }
+
+    function cerrarModalPerfil() {
+      document.getElementById('perfilModal').style.display = 'none';
+    }
+
+    // Close modal on outside click
+    document.getElementById('perfilModal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModalPerfil();
+    });
+
+    cargarInvestigadores();
+  </script>
+</body>
+</html>

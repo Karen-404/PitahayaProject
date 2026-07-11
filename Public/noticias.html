@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noticias - Pitahaya Biotec</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page-container">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        <div>
+          <h1>Noticias e Investigaciones</h1>
+        </div>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" id="btnNuevaNoticia" style="display:none" onclick="abrirModal()">
+          <i class="fas fa-plus"></i> Nueva Noticia
+        </button>
+      </div>
+    </div>
+
+    <div id="noticiasContainer" class="noticias-grid"></div>
+
+    <div id="noticiaModal" class="modal" style="display:none">
+      <div class="modal-content">
+        <span class="modal-close" onclick="cerrarModal()">&times;</span>
+        <h2 id="modalTitle">Nueva Noticia</h2>
+        <form id="noticiaForm">
+          <input type="hidden" id="noticiaId">
+          <div class="form-group">
+            <label>Titulo</label>
+            <input type="text" id="noticiaTitulo" required>
+          </div>
+          <div class="form-group">
+            <label>Contenido</label>
+            <textarea id="noticiaContenido" rows="6" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Imagen (URL)</label>
+            <input type="url" id="noticiaImagen" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>O sube una imagen</label>
+            <input type="file" id="noticiaFile" accept="image/*" onchange="previewImagen(event)" style="height:auto;padding:8px 0;border:none;">
+            <img id="previewImg" style="max-width:200px;margin-top:10px;display:none;border-radius:8px">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;" id="btnGuardarNoticia">Publicar</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <div class="chat-flotante">
+    <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-container oculto" id="chatContainer">
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Escribe...">
+        <button onclick="responder()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    const userId = localStorage.getItem('userId');
+    const userRole = localStorage.getItem('userRole');
+    if (!userId) window.location.href = 'index.html';
+
+    if (userRole === 'admin' || userRole === 'tecnico' || userRole === 'investigador') {
+      document.getElementById('btnNuevaNoticia').style.display = 'inline-flex';
+    }
+
+    function abrirModal(noticia) {
+      document.getElementById('noticiaModal').style.display = 'flex';
+      if (noticia) {
+        document.getElementById('modalTitle').textContent = 'Editar Noticia';
+        document.getElementById('btnGuardarNoticia').textContent = 'Actualizar';
+        document.getElementById('noticiaId').value = noticia.id;
+        document.getElementById('noticiaTitulo').value = noticia.titulo;
+        document.getElementById('noticiaContenido').value = noticia.contenido;
+        document.getElementById('noticiaImagen').value = noticia.imagen_url || '';
+      } else {
+        document.getElementById('modalTitle').textContent = 'Nueva Noticia';
+        document.getElementById('btnGuardarNoticia').textContent = 'Publicar';
+        document.getElementById('noticiaForm').reset();
+        document.getElementById('noticiaId').value = '';
+        document.getElementById('previewImg').style.display = 'none';
+      }
+    }
+
+    function cerrarModal() { document.getElementById('noticiaModal').style.display = 'none'; }
+
+    function previewImagen(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('previewImg').src = ev.target.result;
+        document.getElementById('previewImg').style.display = 'block';
+        document.getElementById('noticiaImagen').value = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('noticiaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        titulo: document.getElementById('noticiaTitulo').value,
+        contenido: document.getElementById('noticiaContenido').value,
+        imagen_url: document.getElementById('noticiaImagen').value || null,
+        usuario_id: parseInt(userId)
+      };
+      const id = document.getElementById('noticiaId').value;
+      const url = id ? '/api/noticias/' + id : '/api/noticias';
+      const method = id ? 'PUT' : 'POST';
+      try {
+        const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+        const result = await res.json();
+        if (!res.ok) { alert('Error: ' + result.error); return; }
+        cerrarModal();
+        cargarNoticias();
+      } catch(err) { alert('Error de conexion'); }
+    });
+
+    async function eliminarNoticia(id) {
+      if (!confirm('Eliminar esta noticia?')) return;
+      try {
+        const res = await fetch('/api/noticias/' + id, {
+          method: 'DELETE',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ usuario_id: parseInt(userId) })
+        });
+        if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+        cargarNoticias();
+      } catch(err) { alert('Error de conexion'); }
+    }
+
+    async function toggleLike(noticiaId) {
+      try {
+        const res = await fetch('/api/noticias/' + noticiaId + '/like', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ usuario_id: parseInt(userId) })
+        });
+        const data = await res.json();
+        cargarNoticias();
+      } catch(err) {}
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+      });
+    }
+
+    async function cargarNoticias() {
+      const container = document.getElementById('noticiasContainer');
+      try {
+        const res = await fetch('/api/noticias?usuario_id=' + userId);
+        const noticias = await res.json();
+        container.innerHTML = noticias.map(n => {
+          const fecha = new Date(n.fecha).toLocaleDateString('es-EC', { year:'numeric', month:'long', day:'numeric' });
+          const likesCount = n.likes ? n.likes.length : 0;
+          const puedeEditar = (userRole === 'admin' || userRole === 'tecnico' || userRole === 'investigador');
+          const imgHtml = n.imagen_url
+            ? '<img src="' + escapeHTML(n.imagen_url) + '" alt="' + escapeHTML(n.titulo) + '" class="noticia-img">'
+            : '<div class="noticia-img-placeholder"><i class="fas fa-leaf"></i></div>';
+          const autor = n.usuarios ? n.usuarios.nombre : 'Anonimo';
+          const noticiaJson = escapeHTML(JSON.stringify(n));
+          return '<div class="noticia-card">'
+            + imgHtml
+            + '<div class="noticia-body">'
+            + '<div class="noticia-meta">'
+            + '<span><i class="far fa-calendar-alt"></i> ' + fecha + '</span>'
+            + '<span><i class="far fa-user"></i> ' + escapeHTML(autor) + '</span>'
+            + '</div>'
+            + '<h3>' + escapeHTML(n.titulo) + '</h3>'
+            + '<p>' + escapeHTML(n.contenido.replace(/\n/g, '<br>')) + '</p>'
+            + '<div class="noticia-actions">'
+            + '<button class="btn-like' + (n.liked ? ' liked' : '') + '" onclick="toggleLike(' + n.id + ')">'
+            + '<i class="fas fa-heart"></i> ' + likesCount
+            + '</button>'
+            + (puedeEditar ? '<button class="btn-edit" onclick="abrirModal(' + noticiaJson + ')"><i class="fas fa-edit"></i></button>' : '')
+            + (puedeEditar ? '<button class="btn-delete" onclick="eliminarNoticia(' + n.id + ')"><i class="fas fa-trash"></i></button>' : '')
+            + '</div></div></div>';
+        }).join('');
+      } catch(err) {
+        container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Error al cargar noticias</p>';
+      }
+    }
+
+    function conectarRealtime() {
+      const source = new EventSource('/api/noticias/realtime');
+      source.onmessage = function(e) {
+        if (document.getElementById('noticiasContainer')) cargarNoticias();
+      };
+      source.onerror = function() { setTimeout(conectarRealtime, 3000); };
+    }
+
+    cargarNoticias();
+    conectarRealtime();
+  </script>
+</body>
+</html>

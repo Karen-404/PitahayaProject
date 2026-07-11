@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Pitahaya Biotec</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page-container">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div>
+          <h1>Panel de Administracion</h1>
+        </div>
+      </div>
+    </div>
+
+    <section class="content-card">
+      <div class="section-title"><i class="fas fa-users"></i> Usuarios</div>
+      <div class="table-responsive">
+        <table class="data-table" id="usuariosTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="usuariosBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="content-card">
+      <div class="section-title"><i class="fas fa-seedling"></i> Solicitudes de Semillas</div>
+      <div class="table-responsive">
+        <table class="data-table" id="semillasTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Variedad</th>
+              <th>Cantidad</th>
+              <th>Direccion</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Accion</th>
+            </tr>
+          </thead>
+          <tbody id="semillasBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="content-card">
+      <div class="section-title"><i class="fas fa-truck"></i> Pedidos de Clientes</div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="pedidosAdminBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="chat-flotante">
+    <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-container oculto" id="chatContainer">
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Escribe...">
+        <button onclick="responder()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    const userRole = localStorage.getItem('userRole');
+    const userId = localStorage.getItem('userId');
+    if (!userId || userRole !== 'admin') { window.location.href = 'inicio.html'; }
+
+    async function cargarUsuarios() {
+      const tbody = document.getElementById('usuariosBody');
+      try {
+        const res = await fetch('/api/usuarios');
+        const usuarios = await res.json();
+        tbody.innerHTML = usuarios.map(u => {
+          const roles = ['admin','tecnico','investigador','productor'];
+          const opts = roles.map(r => '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + r.charAt(0).toUpperCase() + r.slice(1) + '</option>').join('');
+          return '<tr>'
+            + '<td>' + u.id + '</td>'
+            + '<td>' + u.nombre + '</td>'
+            + '<td>' + u.correo + '</td>'
+            + '<td><select class="role-select" data-id="' + u.id + '" onchange="cambiarRol(' + u.id + ', this.value)">' + opts + '</select></td>'
+            + '<td>' + new Date(u.created_at).toLocaleDateString() + '</td>'
+            + '<td><button class="btn btn-sm btn-danger" onclick="eliminarUsuario(' + u.id + ')"><i class="fas fa-trash"></i></button></td>'
+            + '</tr>';
+        }).join('');
+      } catch(err) { tbody.innerHTML = '<tr><td colspan="6">Error al cargar</td></tr>'; }
+    }
+
+    async function cambiarRol(id, role) {
+      try {
+        const res = await fetch('/api/usuarios/' + id + '/role', {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ role })
+        });
+        if (!res.ok) alert('Error al cambiar rol');
+      } catch(err) { alert('Error de conexion'); }
+    }
+
+    async function eliminarUsuario(id) {
+      if (!confirm('Eliminar usuario ID ' + id + '?')) return;
+      try {
+        const res = await fetch('/api/usuarios/' + id, { method: 'DELETE' });
+        if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+        cargarUsuarios();
+      } catch(err) { alert('Error de conexion'); }
+    }
+
+    async function cargarSemillas() {
+      const tbody = document.getElementById('semillasBody');
+      try {
+        const res = await fetch('/api/semillas');
+        const semillas = await res.json();
+        tbody.innerHTML = semillas.map(s => {
+          const estados = ['pendiente','aprobado','rechazado','enviado'];
+          const opts = estados.map(e => '<option value="' + e + '"' + (s.estado === e ? ' selected' : '') + '>' + e.charAt(0).toUpperCase() + e.slice(1) + '</option>').join('');
+          return '<tr>'
+            + '<td>' + s.id + '</td>'
+            + '<td>' + (s.usuarios ? s.usuarios.nombre : '-') + '</td>'
+            + '<td>' + s.variedad + '</td>'
+            + '<td>' + s.cantidad + '</td>'
+            + '<td>' + (s.direccion || '-') + '</td>'
+            + '<td><select class="role-select" onchange="actualizarEstadoSemilla(' + s.id + ', this.value)">' + opts + '</select></td>'
+            + '<td>' + new Date(s.created_at).toLocaleDateString() + '</td>'
+            + '<td><button class="btn btn-sm btn-danger" onclick="eliminarSemilla(' + s.id + ')"><i class="fas fa-trash"></i></button></td>'
+            + '</tr>';
+        }).join('');
+      } catch(err) { tbody.innerHTML = '<tr><td colspan="8">Error al cargar</td></tr>'; }
+    }
+
+    async function actualizarEstadoSemilla(id, estado) {
+      try {
+        const res = await fetch('/api/semillas/' + id, {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ estado })
+        });
+      } catch(err) {}
+    }
+
+    async function eliminarSemilla(id) {
+      try {
+        await fetch('/api/semillas/' + id, { method: 'DELETE' });
+        cargarSemillas();
+      } catch(err) {}
+    }
+
+    async function cargarPedidosAdmin() {
+      const tbody = document.getElementById('pedidosAdminBody');
+      try {
+        const res = await fetch('/api/pedidos');
+        const pedidos = await res.json();
+        const estados = ['pendiente','aceptado','enviado'];
+        tbody.innerHTML = pedidos.map(p => {
+          const opts = estados.map(e => '<option value="' + e + '"' + (p.estado === e ? ' selected' : '') + '>' + e.charAt(0).toUpperCase() + e.slice(1) + '</option>').join('');
+          return '<tr>'
+            + '<td>' + p.id + '</td>'
+            + '<td>' + (p.usuarios ? p.usuarios.nombre : '-') + '</td>'
+            + '<td>' + p.producto + '</td>'
+            + '<td>' + p.cantidad + '</td>'
+            + '<td><select class="role-select" onchange="actualizarEstadoPedido(' + p.id + ', this.value)">' + opts + '</select></td>'
+            + '<td>' + new Date(p.created_at).toLocaleDateString() + '</td>'
+            + '</tr>';
+        }).join('');
+      } catch(err) { tbody.innerHTML = '<tr><td colspan="6">Error al cargar</td></tr>'; }
+    }
+
+    async function actualizarEstadoPedido(id, estado) {
+      try {
+        await fetch('/api/pedidos/' + id + '/estado', {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ estado })
+        });
+      } catch(err) {}
+    }
+
+    cargarUsuarios();
+    cargarSemillas();
+    cargarPedidosAdmin();
+  </script>
+</body>
+</html>

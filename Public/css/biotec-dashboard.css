@@ -1,0 +1,597 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-green: #19783A;
+  --dark-green: #155F2E;
+  --deep-green: #0F4F27;
+  --yellow-accent: #F4D40A;
+  --background: #F4F7FB;
+  --surface: #FFFFFF;
+  --card-bg: #F7F8FC;
+  --text-primary: #121B32;
+  --text-secondary: #5F6878;
+  --border-color: #DDE3EA;
+  --mint-bg: #DDFBE7;
+  --blue-accent: #1F5FD1;
+  --pink-accent: #D91B87;
+  --gold-accent: #C58A00;
+  --footer-dark: #101A2C;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+* { box-sizing: border-box; }
+
+body.biotec-body {
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  margin: 0;
+  background: var(--background);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== STICKY NAV ========== */
+.biotec-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--primary-green);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.biotec-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.biotec-nav-logo-icon {
+  color: var(--yellow-accent);
+  font-size: 1.4rem;
+}
+
+.biotec-nav-logo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.biotec-nav-logo span { color: white; }
+.biotec-nav-logo .yellow { color: var(--yellow-accent); }
+
+.biotec-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.biotec-nav-right a {
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 6px 0;
+  transition: 0.2s;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.biotec-nav-right a:hover,
+.biotec-nav-right a.active {
+  color: white;
+  border-bottom-color: var(--yellow-accent);
+}
+
+.biotec-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* ========== WRAPPER ========== */
+.biotec-wrapper {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 50px;
+}
+
+/* ========== ATLAS CARD ========== */
+.atlas-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  padding: 32px;
+  margin-top: 40px;
+}
+
+.atlas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.atlas-header-left { flex: 1; min-width: 200px; }
+
+.atlas-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--dark-green);
+  letter-spacing: 2px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.atlas-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 6px 0 0 0;
+  font-weight: 400;
+}
+
+.atlas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--mint-bg);
+  color: var(--dark-green);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 8px 18px;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+
+.atlas-badge i { font-size: 0.9rem; }
+
+/* ========== STRATEGIC CARDS ========== */
+.strategic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.strategic-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: 20px 18px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.strategic-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.strategic-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+}
+
+.strategic-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+}
+
+.strategic-card p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  flex: 1;
+}
+
+.strategic-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin-bottom: 10px;
+}
+
+.strategic-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.strategic-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* ========== DISTRIBUCION ========== */
+.distribucion-section {
+  background: var(--dark-green);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  margin: 32px 0 40px 0;
+}
+
+.distribucion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.distribucion-header i {
+  color: var(--yellow-accent);
+  font-size: 1.3rem;
+}
+
+.distribucion-header h2 {
+  color: var(--yellow-accent);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.distribucion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.distribucion-col h3 {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.distribucion-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 10px;
+}
+
+.distribucion-col p {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ========== LOWER SECTION ========== */
+.lower-section {
+  display: grid;
+  grid-template-columns: 68% 32%;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+/* ========== INVENTARIO TABLE ========== */
+.inventario-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.inventario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.inventario-header h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inventario-header h2 i { color: var(--primary-green); }
+
+.inventario-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: var(--mint-bg);
+  color: var(--dark-green);
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.inventario-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.inventario-table th {
+  text-align: left;
+  padding: 12px 18px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.inventario-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f0f1f3;
+  color: var(--text-secondary);
+  transition: background 0.2s;
+}
+
+.inventario-table tr:hover td { background: #f8f9fb; }
+
+.inventario-table .codigo {
+  font-family: 'SF Mono', 'Consolas', monospace;
+  color: var(--primary-green);
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.inventario-table .cursiva { font-style: italic; }
+
+.inventario-table .ubicacion { color: var(--text-secondary); }
+
+.tag {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.tag-export { background: #E3EEFF; color: var(--blue-accent); }
+.tag-premium { background: #FFF3D6; color: var(--gold-accent); }
+
+/* ========== LABORATORIO VIRTUAL ========== */
+.laboratorio-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid #C8E6C9;
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+.laboratorio-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.laboratorio-header i {
+  color: var(--primary-green);
+  font-size: 1.3rem;
+}
+
+.laboratorio-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.laboratorio-form { display: flex; flex-direction: column; gap: 16px; }
+
+.lab-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.lab-input {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: 0.2s;
+  outline: none;
+}
+
+.lab-input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(25,120,58,0.12); }
+
+.lab-btn {
+  width: 100%;
+  height: 48px;
+  background: var(--primary-green);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 3px 8px rgba(25,120,58,0.25);
+  transition: 0.2s;
+}
+
+.lab-btn:hover { background: var(--dark-green); }
+.lab-btn:active { transform: scale(0.98); }
+.lab-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ========== PEDIDOS STATUS ========== */
+.pedidos-section {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  padding: 24px 28px;
+  margin-bottom: 40px;
+}
+
+.pedidos-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pedidos-section h2 i { color: var(--primary-green); }
+
+.pedidos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.pedidos-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pedidos-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-pendiente { background: #FFF3CD; color: #856404; }
+.status-aceptado { background: #D4EDDA; color: #155724; }
+.status-enviado { background: #CCE5FF; color: #004085; }
+
+.status-select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  font-family: inherit;
+  background: white;
+}
+
+/* ========== FOOTER ========== */
+.biotec-footer {
+  background: var(--footer-dark);
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 20px;
+  font-size: 0.82rem;
+  margin-top: 40px;
+}
+
+.biotec-footer span { color: var(--yellow-accent); }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .strategic-grid { grid-template-columns: repeat(2, 1fr); }
+  .lower-section { grid-template-columns: 1fr; }
+  .biotec-wrapper { padding: 0 30px; }
+}
+
+@media (max-width: 768px) {
+  .biotec-nav { padding: 0 20px; }
+
+  .biotec-nav-toggle { display: block; }
+
+  .biotec-nav-right {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: var(--primary-green);
+    flex-direction: column;
+    padding: 12px 20px;
+    gap: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .biotec-nav-right.open { display: flex; }
+
+  .biotec-nav-right a {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    width: 100%;
+  }
+
+  .biotec-nav-right a:last-child { border-bottom: none; }
+
+  .biotec-wrapper { padding: 0 18px; }
+
+  .atlas-card { padding: 20px; margin-top: 24px; }
+  .atlas-title { font-size: 1.35rem; }
+  .atlas-badge { margin-top: 4px; }
+
+  .strategic-grid { grid-template-columns: 1fr; }
+
+  .distribucion-grid { grid-template-columns: 1fr; gap: 20px; }
+  .distribucion-section { padding: 20px; }
+
+  .lower-section { grid-template-columns: 1fr; }
+
+  .laboratorio-card { padding: 20px; }
+
+  .pedidos-table { font-size: 0.78rem; }
+  .pedidos-table th, .pedidos-table td { padding: 8px 10px; }
+}
+
+@media (max-width: 480px) {
+  .biotec-nav { padding: 0 12px; }
+  .biotec-nav-logo { font-size: 1rem; }
+  .atlas-title { font-size: 1.1rem; letter-spacing: 1px; }
+}

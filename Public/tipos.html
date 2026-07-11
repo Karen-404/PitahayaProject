@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos de Pitahaya - Pitahaya Biotec</title>
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div>
+                    <h1>Variedades de Pitahaya</h1>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Descubre las principales variedades cultivadas en Ecuador</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="buscador" style="margin-bottom:24px;">
+            <input type="text" id="buscar" placeholder="Buscar variedad..." style="width:100%;max-width:400px;">
+        </div>
+
+        <div class="contenedor" id="contenedor" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('tipos/roja.html')">
+                <img src="img/pitahaya-rosa.png" alt="Pitahaya Roja" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
+                <h3 style="margin:0;">Pitahaya Roja</h3>
+            </div>
+            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('rosa.html')">
+                <img src="img/pitahaya-roja.png" alt="Pitahaya Rosa" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
+                <h3 style="margin:0;">Pitahaya Rosa</h3>
+            </div>
+            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('amarilla.html')">
+                <img src="img/pitahaya-amarilla.png" alt="Pitahaya Amarilla" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
+                <h3 style="margin:0;">Pitahaya Amarilla Palora</h3>
+            </div>
+            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('golden.html')">
+                <img src="img/pitahaya-golden.png" alt="Pitahaya Golden" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
+                <h3 style="margin:0;">Pitahaya Golden</h3>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script src="js/nav.js"></script>
+</body>
+</html>

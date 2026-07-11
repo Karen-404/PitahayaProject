@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Biotec - Pitahaya</title>
+  <link rel="stylesheet" href="css/biotec-dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="biotec-body">
+
+  <!-- ===== NAV ===== -->
+  <nav class="biotec-nav" role="navigation" aria-label="Navegacion principal">
+    <div class="biotec-nav-left">
+      <i class="fas fa-leaf biotec-nav-logo-icon"></i>
+      <div class="biotec-nav-logo">
+        <span>PITAHAYA</span> <span class="yellow">BIOTEC</span>
+      </div>
+    </div>
+    <button class="biotec-nav-toggle" onclick="toggleBiotecMenu()" aria-label="Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <ul class="biotec-nav-right" id="biotecMenu">
+      <li><a href="biotec-dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="inicio.html">Atlas Ecuador</a></li>
+      <li><a href="admin.html">Inventario FAO</a></li>
+      <li><a href="#laboratorio" onclick="document.getElementById('laboratorio').scrollIntoView({behavior:'smooth'}); return false;">Analizador</a></li>
+    </ul>
+  </nav>
+
+  <div class="biotec-wrapper">
+
+    <!-- ===== ATLAS CARD ===== -->
+    <section class="atlas-card" aria-label="Atlas de la Pitahaya">
+      <div class="atlas-header">
+        <div class="atlas-header-left">
+          <h1 class="atlas-title">ATLAS DE LA PITAHAYA ECUATORIANA</h1>
+          <p class="atlas-subtitle">Informaci&oacute;n estrat&eacute;gica y situacional a nivel nacional</p>
+        </div>
+        <span class="atlas-badge"><i class="fas fa-map-marker-alt"></i> Producci&oacute;n Nacional 2026</span>
+      </div>
+
+      <!-- ===== STRATEGIC CARDS ===== -->
+      <div class="strategic-grid">
+        <div class="strategic-card">
+          <div class="strategic-icon-wrap" style="background:#FCE4EC;color:var(--pink-accent);">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <h3>Consumo Interno</h3>
+          <p>Pas&oacute; de ser una fruta medicinal a un producto base en la gastronom&iacute;a ecuatoriana (helados, yogurt y pulpa congelada).</p>
+          <div class="strategic-divider"></div>
+          <div class="strategic-label">TENDENCIA</div>
+          <div class="strategic-value" style="color:var(--primary-green);">+25% crecimiento anual</div>
+        </div>
+
+        <div class="strategic-card">
+          <div class="strategic-icon-wrap" style="background:#FFF8E1;color:var(--gold-accent);">
+            <i class="fas fa-camera"></i>
+          </div>
+          <h3>Potencial Tur&iacute;stico</h3>
+          <p>Consolidaci&oacute;n de la &ldquo;Ruta de la Pitahaya&rdquo; en Palora y Orellana, integrando turismo cient&iacute;fico y agroturismo.</p>
+          <div class="strategic-divider"></div>
+          <div class="strategic-label">PUNTOS CLAVE</div>
+          <div class="strategic-value" style="color:var(--gold-accent);">Palora, El Coca, Naranjal</div>
+        </div>
+
+        <div class="strategic-card">
+          <div class="strategic-icon-wrap" style="background:#E3F2FD;color:var(--blue-accent);">
+            <i class="fas fa-ship"></i>
+          </div>
+          <h3>Mercado Global</h3>
+          <p>Ecuador exporta a m&aacute;s de 50 destinos. Estados Unidos y Hong Kong representan el 80% de la demanda total.</p>
+          <div class="strategic-divider"></div>
+          <div class="strategic-label">VALOR</div>
+          <div class="strategic-value" style="color:var(--blue-accent);">3er producto no tradicional</div>
+        </div>
+
+        <div class="strategic-card">
+          <div class="strategic-icon-wrap" style="background:#E8F5E9;color:var(--primary-green);">
+            <i class="fas fa-dna"></i>
+          </div>
+          <h3>Biotecnolog&iacute;a</h3>
+          <p>Aplicaci&oacute;n de descriptores FAO para trazabilidad gen&eacute;tica y mejora de la resistencia post-cosecha.</p>
+          <div class="strategic-divider"></div>
+          <div class="strategic-label">EST&Aacute;NDAR</div>
+          <div class="strategic-value" style="color:var(--primary-green);">WIEWS-FAO Compliance</div>
+        </div>
+      </div>
+
+      <!-- ===== DISTRIBUCION ===== -->
+      <div class="distribucion-section">
+        <div class="distribucion-header">
+          <i class="fas fa-chart-bar"></i>
+          <h2>Distribuci&oacute;n Productiva en Ecuador</h2>
+        </div>
+        <div class="distribucion-grid">
+          <div class="distribucion-col">
+            <h3>Regi&oacute;n Amaz&oacute;nica</h3>
+            <div class="distribucion-divider"></div>
+            <p>L&iacute;der en Pitahaya Amarilla (Palora). Alta concentraci&oacute;n de grados Brix (18-22&deg;). Suelos ricos en materia org&aacute;nica.</p>
+          </div>
+          <div class="distribucion-col">
+            <h3>Regi&oacute;n Litoral</h3>
+            <div class="distribucion-divider"></div>
+            <p>Predominio de Pitahaya Roja. Adaptaci&oacute;n clim&aacute;tica en Santa Elena y Manab&iacute;. Mayor infraestructura de empacadoras.</p>
+          </div>
+          <div class="distribucion-col">
+            <h3>Zonas de Conservaci&oacute;n</h3>
+            <div class="distribucion-divider"></div>
+            <p>Bancos de germoplasma en Orellana para preservar variedades silvestres (Hylocereus spp) con potencial gen&eacute;tico.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LOWER SECTION ===== -->
+    <div class="lower-section">
+      <!-- ===== INVENTARIO ===== -->
+      <section class="inventario-card" aria-label="Inventario de Accesiones">
+        <div class="inventario-header">
+          <h2><i class="fas fa-database"></i> Inventario de Accesiones</h2>
+          <span class="inventario-badge">PROTOCOLO MCPD</span>
+        </div>
+        <div class="table-wrap">
+          <table class="inventario-table">
+            <thead>
+              <tr>
+                <th>C&Oacute;DIGO</th>
+                <th>ESPECIE / VARIEDAD</th>
+                <th>UBICACI&Oacute;N DE COLECTA</th>
+                <th>CALIDAD TE&Oacute;RICA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="codigo">EI-PIT-26-001</td>
+                <td><span class="cursiva">H. undatus</span> (Roja)</td>
+                <td class="ubicacion">Orellana, 5 km sur El Coca</td>
+                <td><span class="tag tag-export">EXPORTACI&Oacute;N</span></td>
+              </tr>
+              <tr>
+                <td class="codigo">EI-PIT-26-002</td>
+                <td><span class="cursiva">H. megalanthus</span> (Amarilla)</td>
+                <td class="ubicacion">Palora, Morona Santiago</td>
+                <td><span class="tag tag-premium">PREMIUM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== LABORATORIO ===== -->
+      <section class="laboratorio-card" id="laboratorio" aria-label="Laboratorio Virtual">
+        <div class="laboratorio-header">
+          <i class="fas fa-microscope"></i>
+          <h2>Laboratorio Virtual</h2>
+        </div>
+        <div class="laboratorio-form">
+          <div>
+            <label class="lab-label" for="pesoFruto">PESO DEL FRUTO [G]</label>
+            <input
+              type="text"
+              inputmode="decimal"
+              id="pesoFruto"
+              class="lab-input"
+              placeholder="Ej: 375"
+              autocomplete="off"
+              aria-label="Peso del fruto en gramos"
+            >
+          </div>
+          <button class="lab-btn" id="btnClasificar" onclick="clasificarMuestra()">
+            <i class="fas fa-play-circle"></i> Clasificar Muestra
+          </button>
+          <div id="resultadoLab" style="font-size:0.88rem;color:var(--text-secondary);min-height:24px;"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===== PEDIDOS STATUS ===== -->
+    <section class="pedidos-section" aria-label="Estado de mis pedidos">
+      <h2><i class="fas fa-truck"></i> Estado de mis Pedidos</h2>
+      <div class="table-wrap">
+        <table class="pedidos-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="pedidosStatusBody">
+            <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="biotec-footer">
+    &copy; 2026 <span>Pitahaya Biotec</span> &mdash; ESPOCH / INIAP &mdash; Proyecto de Gesti&oacute;n Biotecnol&oacute;gica
+  </footer>
+
+  <script>
+    // Menu toggle for mobile
+    function toggleBiotecMenu() {
+      document.getElementById('biotecMenu').classList.toggle('open');
+    }
+
+    // Close menu on link click (mobile)
+    document.querySelectorAll('.biotec-nav-right a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        document.getElementById('biotecMenu').classList.remove('open');
+      });
+    });
+
+    // ===== LABORATORIO VIRTUAL =====
+    function clasificarMuestra() {
+      const input = document.getElementById('pesoFruto');
+      const resultado = document.getElementById('resultadoLab');
+      const valor = input.value.trim();
+
+      if (valor === '' || isNaN(Number(valor)) || Number(valor) <= 0 || !isFinite(Number(valor))) {
+        window.alert('Por favor, ingrese un peso v\u00e1lido.');
+        input.focus();
+        resultado.textContent = '';
+        return;
+      }
+
+      const peso = parseFloat(valor);
+      resultado.innerHTML = '<span style="color:var(--primary-green);font-weight:600;"><i class="fas fa-check-circle"></i> Muestra clasificada: ' + peso.toFixed(1) + ' g</span>';
+    }
+
+    // Allow Enter key to trigger classification
+    document.getElementById('pesoFruto').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') clasificarMuestra();
+    });
+
+    // ===== PEDIDOS STATUS =====
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      fetch('/api/pedidos/' + userId)
+        .then(function(r) { return r.json(); })
+        .then(function(pedidos) {
+          var tbody = document.getElementById('pedidosStatusBody');
+          if (!pedidos || pedidos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">No tienes pedidos realizados</td></tr>';
+            return;
+          }
+          var estados = { pendiente: 'Pendiente', aceptado: 'Aceptado', enviado: 'Enviado' };
+          var colores = { pendiente: 'status-pendiente', aceptado: 'status-aceptado', enviado: 'status-enviado' };
+          var html = '';
+          pedidos.forEach(function(p) {
+            var est = p.estado || 'pendiente';
+            html += '<tr>'
+              + '<td>' + (p.producto || '-') + '</td>'
+              + '<td>' + (p.cantidad || 0) + '</td>'
+              + '<td>' + new Date(p.created_at).toLocaleDateString('es-EC') + '</td>'
+              + '<td><span class="status-badge ' + (colores[est] || 'status-pendiente') + '">' + (estados[est] || est) + '</span></td>'
+              + '</tr>';
+          });
+          tbody.innerHTML = html;
+        })
+        .catch(function() {
+          document.getElementById('pedidosStatusBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Error al cargar pedidos</td></tr>';
+        });
+    }
+  </script>
+</body>
+</html>

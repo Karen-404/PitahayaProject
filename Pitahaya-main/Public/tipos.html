@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+    <nav class="top-nav">
+        <div class="logo">SISTEMA PITAHAYA</div>
+
+        <ul class="menu">
+            <li><a href="inicio.html">Inicio</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
+            <li><a href="bioproductos.html">Bioproductos</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="perfil.html">Perfil</a></li>
+            <li><a href="tipos.html">Tipos</a></li>
+        </ul>
+
+        <button id="logoutBtn">Salir</button>
+    </nav>
+
+    
+    <h1>Nuestra Pitahaya</h1> <!-- BUSCADOR -->
+
+        <div class="buscador">
+            <input type="text" id="buscar" placeholder="Buscar pitahaya...">
+        </div> <!-- CONTENEDOR -->
+
+
+        <div class="contenedor" id="contenedor">
+            <div class="card" onclick="ir('tipos/roja.html')">
+                <img src="img/pitahaya-rosa.png" alt="Pitahaya Roja">
+                <h3>Pitahaya Roja</h3>
+
+            </div>
+            <div class="card" onclick="ir('rosa.html')">
+                <img src="img/pitahaya-roja.png" alt="Pitahaya Rosa">
+                <h3>Pitahaya Rosa</h3>
+
+            </div>
+            <div class="card" onclick="ir('amarilla.html')">
+                <img src="img/pitahaya-amarilla.png" alt="Pitahaya Amarilla">
+                <h3>Pitahaya Amarilla Palora</h3>
+
+            </div>
+            <div class="card" onclick="ir('golden.html')">
+                <img src="img/pitahaya-golden.png" alt="Pitahaya Golden">
+                <h3>Pitahaya Golden</h3>
+
+            </div>
+        </div>
+    
+</body>
+<script src="js/script.js"></script>
+
+</html>

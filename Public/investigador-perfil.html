@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil Profesional - Pitahaya Biotec</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page-container">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <div>
+          <h1>Mi Perfil Profesional</h1>
+          <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Completa tu trayectoria como investigador</p>
+        </div>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" onclick="guardarPerfil()"><i class="fas fa-save"></i> Guardar Perfil</button>
+      </div>
+    </div>
+
+    <form id="perfilForm" onsubmit="event.preventDefault();guardarPerfil();">
+      <!-- DATOS BASICOS -->
+      <section class="content-card">
+        <div class="section-title"><i class="fas fa-id-card"></i> Datos Basicos</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start;">
+          <div style="text-align:center;">
+            <div id="fotoPreview" style="width:120px;height:120px;border-radius:50%;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:8px;font-size:3rem;color:var(--color-primary);">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <label class="btn btn-sm btn-secondary" style="cursor:pointer;font-size:0.8rem;">
+              <i class="fas fa-camera"></i> Foto
+              <input type="file" accept="image/*" onchange="previewFoto(event)" style="display:none;">
+            </label>
+            <input type="hidden" id="foto_url" name="foto_url">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label>Nombres</label>
+              <input type="text" id="nombres" name="nombres" required>
+            </div>
+            <div class="form-group">
+              <label>Apellidos</label>
+              <input type="text" id="apellidos" name="apellidos" required>
+            </div>
+            <div class="form-group">
+              <label>Titulo Profesional / Academico</label>
+              <input type="text" id="titulo" name="titulo" placeholder="Ej: PhD. en Biotecnologia Vegetal">
+            </div>
+            <div class="form-group">
+              <label>Especialidad</label>
+              <input type="text" id="especialidad" name="especialidad" placeholder="Ej: Mejoramiento genetico">
+            </div>
+            <div class="form-group">
+              <label>Institucion</label>
+              <input type="text" id="institucion" name="institucion" placeholder="Ej: ESPOCH">
+            </div>
+            <div class="form-group">
+              <label>Correo de Contacto</label>
+              <input type="email" id="correo_contacto" name="correo_contacto" placeholder="investigador@instituto.edu.ec">
+            </div>
+            <div class="form-group" style="grid-column:span 2;">
+              <label>Ubicacion</label>
+              <input type="text" id="ubicacion" name="ubicacion" placeholder="Ej: Riobamba, Ecuador">
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>Biografia / Descripcion Profesional</label>
+          <textarea id="biografia" name="biografia" rows="4" placeholder="Cuentanos sobre tu trayectoria..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Areas y Lineas de Investigacion</label>
+          <input type="text" id="areas_investigacion" name="areas_investigacion" placeholder="Ej: Biotecnologia, Mejoramiento genetico, Fisiologia vegetal">
+        </div>
+      </section>
+
+      <!-- ENLACES PROFESIONALES -->
+      <section class="content-card" style="margin-top:20px;">
+        <div class="section-title"><i class="fas fa-link"></i> Enlaces Profesionales</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label><i class="fab fa-orcid" style="color:#A6CE39;"></i> ORCID</label>
+            <input type="url" id="enlace_orcid" name="enlace_orcid" placeholder="https://orcid.org/0000-0000-0000-0000">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-graduation-cap" style="color:#4285F4;"></i> Google Scholar</label>
+            <input type="url" id="enlace_google_scholar" name="enlace_google_scholar" placeholder="https://scholar.google.com/...">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-flask" style="color:#FF6600;"></i> ResearchGate</label>
+            <input type="url" id="enlace_researchgate" name="enlace_researchgate" placeholder="https://researchgate.net/profile/...">
+          </div>
+          <div class="form-group">
+            <label><i class="fab fa-linkedin" style="color:#0A66C2;"></i> LinkedIn</label>
+            <input type="url" id="enlace_linkedin" name="enlace_linkedin" placeholder="https://linkedin.com/in/...">
+          </div>
+        </div>
+      </section>
+
+      <!-- TITULOS OBTENIDOS -->
+      <section class="content-card" style="margin-top:20px;">
+        <div class="section-title"><i class="fas fa-award"></i> Titulos Obtenidos</div>
+        <div id="titulosContainer"></div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarItem('titulos')"><i class="fas fa-plus"></i> Agregar Titulo</button>
+      </section>
+
+      <!-- LOGROS -->
+      <section class="content-card" style="margin-top:20px;">
+        <div class="section-title"><i class="fas fa-trophy"></i> Logros</div>
+        <div id="logrosContainer"></div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarItem('logros')"><i class="fas fa-plus"></i> Agregar Logro</button>
+      </section>
+
+      <!-- RECONOCIMIENTOS -->
+      <section class="content-card" style="margin-top:20px;">
+        <div class="section-title"><i class="fas fa-medal"></i> Reconocimientos</div>
+        <div id="reconocimientosContainer"></div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarItem('reconocimientos')"><i class="fas fa-plus"></i> Agregar Reconocimiento</button>
+      </section>
+
+      <!-- PUBLICACIONES -->
+      <section class="content-card" style="margin-top:20px;">
+        <div class="section-title"><i class="fas fa-file-alt"></i> Publicaciones</div>
+        <div id="publicacionesContainer"></div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarItem('publicaciones')"><i class="fas fa-plus"></i> Agregar Publicacion</button>
+      </section>
+
+      <!-- PROYECTOS -->
+      <section class="content-card" style="margin-top:20px;">
+        <div class="section-title"><i class="fas fa-project-diagram"></i> Proyectos Desarrollados</div>
+        <div id="proyectosContainer"></div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarItem('proyectos')"><i class="fas fa-plus"></i> Agregar Proyecto</button>
+      </section>
+    </form>
+
+    <!-- INVESTIGACIONES -->
+    <section class="content-card" style="margin-top:20px;">
+      <div class="section-title"><i class="fas fa-microscope"></i> Investigaciones Realizadas / En Curso</div>
+      <div id="investigacionesContainer"></div>
+      <button class="btn btn-primary" onclick="agregarInvestigacion()"><i class="fas fa-plus"></i> Nueva Investigacion</button>
+    </section>
+
+    <div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end;">
+      <button class="btn btn-primary" onclick="guardarPerfil()"><i class="fas fa-save"></i> Guardar Perfil</button>
+    </div>
+
+    <div id="mensajePerfil" style="margin-top:16px;"></div>
+  </main>
+
+  <!-- MODAL INVESTIGACION -->
+  <div id="investigacionModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:600px;">
+      <span class="modal-close" onclick="cerrarModalInvestigacion()">&times;</span>
+      <h2 id="modalInvTitle">Nueva Investigacion</h2>
+      <form id="investigacionForm" onsubmit="event.preventDefault();guardarInvestigacion();">
+        <input type="hidden" id="invId">
+        <div class="form-group">
+          <label>Titulo *</label>
+          <input type="text" id="invTitulo" required>
+        </div>
+        <div class="form-group">
+          <label>Descripcion</label>
+          <textarea id="invDescripcion" rows="4"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" id="invFecha">
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="invEstado">
+              <option value="en_curso">En curso</option>
+              <option value="finalizada">Finalizada</option>
+              <option value="publicada">Publicada</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Area de Investigacion</label>
+          <input type="text" id="invArea" placeholder="Ej: Biotecnologia molecular">
+        </div>
+        <div class="form-group">
+          <label>Participantes</label>
+          <input type="text" id="invParticipantes" placeholder="Nombres de los participantes">
+        </div>
+        <div class="form-group">
+          <label>Documento / Enlace relacionado</label>
+          <input type="url" id="invDocumento" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>Imagen</label>
+          <input type="file" accept="image/*" onchange="previewInvImagen(event)" style="height:auto;padding:8px 0;border:none;">
+          <img id="invPreviewImg" style="max-width:200px;margin-top:8px;display:none;border-radius:8px;">
+          <input type="hidden" id="invImagen">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Guardar Investigacion</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="chat-flotante">
+    <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-container oculto" id="chatContainer">
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Escribe...">
+        <button onclick="responder()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    const usuarioId = localStorage.getItem('userId');
+    const userRole = localStorage.getItem('userRole');
+    if (!usuarioId) window.location.href = 'index.html';
+    if (userRole !== 'investigador') { window.location.href = 'inicio.html'; alert('Solo los investigadores pueden acceder a esta seccion.'); }
+
+    let perfilId = null;
+    let investigaciones = [];
+
+    // ---- foto ----
+    function previewFoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('foto_url').value = ev.target.result;
+        document.getElementById('fotoPreview').innerHTML = '<img src="' + ev.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ---- items arrays (titulos, logros, reconocimientos, publicaciones, proyectos) ----
+    const itemConfig = {
+      titulos: { label: 'Titulo', fields: [
+        { key: 'titulo', label: 'Titulo', type: 'text', placeholder: 'Ej: Magister en Ciencias' },
+        { key: 'institucion', label: 'Institucion', type: 'text', placeholder: 'Ej: ESPOCH' },
+        { key: 'anio', label: 'Año', type: 'number', placeholder: '2024' }
+      ]},
+      logros: { label: 'Logro', fields: [
+        { key: 'descripcion', label: 'Descripcion', type: 'textarea', placeholder: 'Describe tu logro' }
+      ]},
+      reconocimientos: { label: 'Reconocimiento', fields: [
+        { key: 'nombre', label: 'Nombre', type: 'text', placeholder: 'Ej: Premio Nacional de Ciencia' },
+        { key: 'entidad', label: 'Entidad', type: 'text', placeholder: 'Ej: SENESCYT' },
+        { key: 'anio', label: 'Año', type: 'number', placeholder: '2024' }
+      ]},
+      publicaciones: { label: 'Publicacion', fields: [
+        { key: 'titulo', label: 'Titulo', type: 'text', placeholder: 'Titulo del articulo' },
+        { key: 'revista', label: 'Revista / Medio', type: 'text', placeholder: 'Ej: Revista Cientifica' },
+        { key: 'anio', label: 'Año', type: 'number', placeholder: '2024' },
+        { key: 'doi', label: 'DOI / Enlace', type: 'url', placeholder: 'https://doi.org/...' }
+      ]},
+      proyectos: { label: 'Proyecto', fields: [
+        { key: 'titulo', label: 'Titulo', type: 'text', placeholder: 'Nombre del proyecto' },
+        { key: 'descripcion', label: 'Descripcion', type: 'textarea', placeholder: 'Describe el proyecto' },
+        { key: 'fecha_inicio', label: 'Fecha inicio', type: 'date' },
+        { key: 'fecha_fin', label: 'Fecha fin', type: 'date' },
+        { key: 'estado', label: 'Estado', type: 'select', options: ['planificado','en_curso','finalizado','en_pausa'] }
+      ]}
+    };
+
+    function renderItems(type, data) {
+      const container = document.getElementById(type + 'Container');
+      const cfg = itemConfig[type];
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-plus-circle"></i><p>No has agregado ' + type + ' aun</p></div>';
+        return;
+      }
+      container.innerHTML = data.map((item, idx) => {
+        let html = '<div class="item-card" style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 16px;background:var(--color-surface-secondary);border-radius:var(--radius-sm);margin-bottom:8px;">';
+        html += '<div style="flex:1;">';
+        cfg.fields.forEach(f => {
+          const val = item[f.key] || '';
+          if (val) html += '<div style="font-size:0.9rem;margin-bottom:2px;"><strong>' + f.label + ':</strong> ' + escapeHTML(val) + '</div>';
+        });
+        html += '</div>';
+        html += '<button type="button" class="btn btn-sm btn-danger" onclick="eliminarItem(\'' + type + '\',' + idx + ')" style="flex-shrink:0;"><i class="fas fa-trash"></i></button>';
+        html += '</div>';
+        return html;
+      }).join('');
+    }
+
+    function agregarItem(type) {
+      const cfg = itemConfig[type];
+      let html = '<div class="item-form" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;">';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+      cfg.fields.forEach(f => {
+        html += '<div class="form-group" style="margin:0;">';
+        html += '<label style="font-size:0.85rem;">' + f.label + '</label>';
+        if (f.type === 'textarea') {
+          html += '<textarea class="item-field" data-key="' + f.key + '" rows="2" placeholder="' + (f.placeholder||'') + '" style="width:100%;padding:8px;border:1px solid var(--color-border);border-radius:6px;font-family:inherit;"></textarea>';
+        } else if (f.type === 'select') {
+          html += '<select class="item-field" data-key="' + f.key + '" style="width:100%;padding:8px;border:1px solid var(--color-border);border-radius:6px;font-family:inherit;">';
+          (f.options||[]).forEach(o => html += '<option value="' + o + '">' + o.replace(/_/g,' ') + '</option>');
+          html += '</select>';
+        } else {
+          html += '<input type="' + f.type + '" class="item-field" data-key="' + f.key + '" placeholder="' + (f.placeholder||'') + '" style="width:100%;padding:8px;border:1px solid var(--color-border);border-radius:6px;font-family:inherit;">';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:8px;display:flex;gap:8px;">';
+      html += '<button type="button" class="btn btn-primary btn-sm" onclick="guardarItemForm(this,\'' + type + '\')"><i class="fas fa-check"></i> Agregar</button>';
+      html += '<button type="button" class="btn btn-secondary btn-sm" onclick="this.closest(\'.item-form\').remove()">Cancelar</button>';
+      html += '</div></div>';
+      // Insert at the top
+      const container = document.getElementById(type + 'Container');
+      const empty = container.querySelector('.empty-state');
+      if (empty) empty.remove();
+      container.insertAdjacentHTML('afterbegin', html);
+    }
+
+    function guardarItemForm(btn, type) {
+      const form = btn.closest('.item-form');
+      const fields = form.querySelectorAll('.item-field');
+      const item = {};
+      fields.forEach(f => { item[f.dataset.key] = f.value; });
+      if (!window._tempItems) window._tempItems = {};
+      if (!window._tempItems[type]) window._tempItems[type] = [];
+      window._tempItems[type].push(item);
+      form.remove();
+      renderItems(type, window._tempItems[type]);
+    }
+
+    function eliminarItem(type, idx) {
+      if (!window._tempItems) window._tempItems = {};
+      if (!window._tempItems[type]) window._tempItems[type] = [];
+      window._tempItems[type].splice(idx, 1);
+      renderItems(type, window._tempItems[type]);
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+      });
+    }
+
+    // ---- Investigaciones ----
+    function renderInvestigaciones() {
+      const container = document.getElementById('investigacionesContainer');
+      if (!investigaciones || investigaciones.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-microscope"></i><p>No has registrado investigaciones aun</p></div>';
+        return;
+      }
+      container.innerHTML = investigaciones.map(inv => {
+        const estadoLabels = { en_curso:'En curso', finalizada:'Finalizada', publicada:'Publicada' };
+        const estadoColors = { en_curso:'#ff9800', finalizada:'#4caf50', publicada:'#2196f3' };
+        const imgHtml = inv.imagen_url ? '<img src="' + escapeHTML(inv.imagen_url) + '" style="width:80px;height:80px;border-radius:8px;object-fit:cover;margin-right:12px;">' : '';
+        return '<div class="item-card" style="display:flex;align-items:flex-start;padding:16px;background:var(--color-surface-secondary);border-radius:var(--radius-sm);margin-bottom:8px;">'
+          + imgHtml
+          + '<div style="flex:1;">'
+          + '<h4 style="margin:0 0 4px 0;font-size:1rem;">' + escapeHTML(inv.titulo) + '</h4>'
+          + '<p style="margin:0 0 4px 0;font-size:0.9rem;color:var(--color-text-secondary);">' + escapeHTML((inv.descripcion||'').substring(0,150)) + '</p>'
+          + '<div style="display:flex;gap:12px;font-size:0.8rem;color:var(--color-text-muted);flex-wrap:wrap;">'
+          + '<span><strong>Area:</strong> ' + escapeHTML(inv.area_investigacion||'-') + '</span>'
+          + '<span><strong>Estado:</strong> <span style="color:' + (estadoColors[inv.estado]||'#999') + ';">' + (estadoLabels[inv.estado]||inv.estado) + '</span></span>'
+          + (inv.fecha ? '<span><strong>Fecha:</strong> ' + inv.fecha + '</span>' : '')
+          + '</div>'
+          + '</div>'
+          + '<div style="display:flex;gap:4px;flex-shrink:0;">'
+          + '<button class="btn btn-sm btn-secondary" onclick="editarInvestigacion(' + inv.id + ')"><i class="fas fa-edit"></i></button>'
+          + '<button class="btn btn-sm btn-danger" onclick="eliminarInvestigacion(' + inv.id + ')"><i class="fas fa-trash"></i></button>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    function agregarInvestigacion() {
+      document.getElementById('modalInvTitle').textContent = 'Nueva Investigacion';
+      document.getElementById('invId').value = '';
+      document.getElementById('investigacionForm').reset();
+      document.getElementById('invPreviewImg').style.display = 'none';
+      document.getElementById('invImagen').value = '';
+      document.getElementById('invFecha').value = new Date().toISOString().split('T')[0];
+      document.getElementById('investigacionModal').style.display = 'flex';
+    }
+
+    function editarInvestigacion(id) {
+      const inv = investigaciones.find(i => i.id === id);
+      if (!inv) return;
+      document.getElementById('modalInvTitle').textContent = 'Editar Investigacion';
+      document.getElementById('invId').value = inv.id;
+      document.getElementById('invTitulo').value = inv.titulo || '';
+      document.getElementById('invDescripcion').value = inv.descripcion || '';
+      document.getElementById('invFecha').value = inv.fecha ? inv.fecha.split('T')[0] : '';
+      document.getElementById('invEstado').value = inv.estado || 'en_curso';
+      document.getElementById('invArea').value = inv.area_investigacion || '';
+      document.getElementById('invParticipantes').value = inv.participantes || '';
+      document.getElementById('invDocumento').value = inv.documento_url || '';
+      document.getElementById('invImagen').value = inv.imagen_url || '';
+      if (inv.imagen_url) {
+        document.getElementById('invPreviewImg').src = inv.imagen_url;
+        document.getElementById('invPreviewImg').style.display = 'block';
+      } else {
+        document.getElementById('invPreviewImg').style.display = 'none';
+      }
+      document.getElementById('investigacionModal').style.display = 'flex';
+    }
+
+    function cerrarModalInvestigacion() {
+      document.getElementById('investigacionModal').style.display = 'none';
+    }
+
+    function previewInvImagen(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('invImagen').value = ev.target.result;
+        document.getElementById('invPreviewImg').src = ev.target.result;
+        document.getElementById('invPreviewImg').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function guardarInvestigacion() {
+      const id = document.getElementById('invId').value;
+      const data = {
+        perfil_id: perfilId,
+        titulo: document.getElementById('invTitulo').value,
+        descripcion: document.getElementById('invDescripcion').value,
+        fecha: document.getElementById('invFecha').value,
+        estado: document.getElementById('invEstado').value,
+        area_investigacion: document.getElementById('invArea').value,
+        participantes: document.getElementById('invParticipantes').value,
+        documento_url: document.getElementById('invDocumento').value,
+        imagen_url: document.getElementById('invImagen').value
+      };
+      try {
+        let res;
+        if (id) {
+          res = await fetch('/api/investigador/investigaciones/' + id, {
+            method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+          });
+        } else {
+          res = await fetch('/api/investigador/investigaciones', {
+            method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+          });
+        }
+        const result = await res.json();
+        if (!res.ok) { alert('Error: ' + result.error); return; }
+        cerrarModalInvestigacion();
+        await cargarPerfil();
+        mostrarMensaje('Investigacion guardada correctamente', 'success');
+      } catch(err) { alert('Error de conexion'); }
+    }
+
+    async function eliminarInvestigacion(id) {
+      if (!confirm('Eliminar esta investigacion?')) return;
+      try {
+        await fetch('/api/investigador/investigaciones/' + id, { method: 'DELETE' });
+        await cargarPerfil();
+        mostrarMensaje('Investigacion eliminada', 'success');
+      } catch(err) {}
+    }
+
+    // ---- Guardar perfil completo ----
+    function recolectarItems(type) {
+      if (window._tempItems && window._tempItems[type]) return window._tempItems[type];
+      return [];
+    }
+
+    async function guardarPerfil() {
+      const fields = {
+        foto_url: document.getElementById('foto_url').value,
+        nombres: document.getElementById('nombres').value,
+        apellidos: document.getElementById('apellidos').value,
+        titulo: document.getElementById('titulo').value,
+        especialidad: document.getElementById('especialidad').value,
+        institucion: document.getElementById('institucion').value,
+        correo_contacto: document.getElementById('correo_contacto').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        biografia: document.getElementById('biografia').value,
+        areas_investigacion: document.getElementById('areas_investigacion').value,
+        enlace_orcid: document.getElementById('enlace_orcid').value,
+        enlace_google_scholar: document.getElementById('enlace_google_scholar').value,
+        enlace_researchgate: document.getElementById('enlace_researchgate').value,
+        enlace_linkedin: document.getElementById('enlace_linkedin').value,
+        titulos_obtenidos: JSON.stringify(recolectarItems('titulos')),
+        logros: JSON.stringify(recolectarItems('logros')),
+        reconocimientos: JSON.stringify(recolectarItems('reconocimientos')),
+        publicaciones: JSON.stringify(recolectarItems('publicaciones')),
+        proyectos: JSON.stringify(recolectarItems('proyectos'))
+      };
+      try {
+        const res = await fetch('/api/investigador/perfil', {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ usuario_id: parseInt(usuarioId), ...fields })
+        });
+        const result = await res.json();
+        if (!res.ok) { alert('Error: ' + result.error); return; }
+        mostrarMensaje('Perfil guardado exitosamente', 'success');
+        await cargarPerfil();
+      } catch(err) { alert('Error de conexion'); }
+    }
+
+    function mostrarMensaje(texto, tipo) {
+      const el = document.getElementById('mensajePerfil');
+      el.innerHTML = '<div class="alert-' + tipo + '"><i class="fas fa-check-circle"></i> ' + texto + '</div>';
+      setTimeout(() => el.innerHTML = '', 4000);
+    }
+
+    // ---- Cargar perfil ----
+    async function cargarPerfil() {
+      try {
+        const res = await fetch('/api/investigador/perfil/' + usuarioId);
+        const perfil = await res.json();
+        if (!perfil) return;
+        perfilId = perfil.id;
+        document.getElementById('foto_url').value = perfil.foto_url || '';
+        if (perfil.foto_url) {
+          document.getElementById('fotoPreview').innerHTML = '<img src="' + perfil.foto_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        }
+        document.getElementById('nombres').value = perfil.nombres || '';
+        document.getElementById('apellidos').value = perfil.apellidos || '';
+        document.getElementById('titulo').value = perfil.titulo || '';
+        document.getElementById('especialidad').value = perfil.especialidad || '';
+        document.getElementById('institucion').value = perfil.institucion || '';
+        document.getElementById('correo_contacto').value = perfil.correo_contacto || '';
+        document.getElementById('ubicacion').value = perfil.ubicacion || '';
+        document.getElementById('biografia').value = perfil.biografia || '';
+        document.getElementById('areas_investigacion').value = perfil.areas_investigacion || '';
+        document.getElementById('enlace_orcid').value = perfil.enlace_orcid || '';
+        document.getElementById('enlace_google_scholar').value = perfil.enlace_google_scholar || '';
+        document.getElementById('enlace_researchgate').value = perfil.enlace_researchgate || '';
+        document.getElementById('enlace_linkedin').value = perfil.enlace_linkedin || '';
+
+        // Parse JSON arrays
+        window._tempItems = {};
+        ['titulos','logros','reconocimientos','publicaciones','proyectos'].forEach(key => {
+          try { window._tempItems[key] = JSON.parse(perfil[key] || '[]'); } catch(e) { window._tempItems[key] = []; }
+          renderItems(key, window._tempItems[key]);
+        });
+
+        // Investigaciones
+        investigaciones = perfil.investigaciones || [];
+        renderInvestigaciones();
+      } catch(err) {}
+    }
+
+    cargarPerfil();
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioproductos - Pitahaya Biotec</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div>
+                    <h1>Bioproductos Disponibles</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card content-card" style="max-width:500px;margin:0 auto;">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                <img src="https://via.placeholder.com/80" alt="" style="width:80px;height:80px;border-radius:12px;object-fit:cover;">
+                <div>
+                    <h3 style="margin:0 0 4px 0;">Pitahaya Roja</h3>
+                    <p style="margin:0;color:var(--color-text-muted);">Fruta tropical cultivada org&aacute;nicamente.</p>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="toggleFicha(this)" style="width:100%;margin-bottom:12px;">
+                <i class="fas fa-file-alt"></i> Ver ficha t&eacute;cnica
+            </button>
+
+            <div class="ficha oculto" style="margin-bottom:12px;">
+                <table class="data-table">
+                    <tr><th>C&oacute;digo</th><td>EI</td></tr>
+                    <tr><th>N&uacute;mero de acceso</th><td>EI-PIT-26-001</td></tr>
+                    <tr><th>N&uacute;mero de colecta</th><td>RT-001</td></tr>
+                    <tr><th>G&eacute;nero</th><td>Hylocereus</td></tr>
+                    <tr><th>Especie</th><td>undatus</td></tr>
+                    <tr><th>Subtaxa</th><td>american beauty</td></tr>
+                    <tr><th>Nombre com&uacute;n</th><td>Pitahaya roja</td></tr>
+                    <tr><th>Nombre de la accesi&oacute;n</th><td>Pitahaya Roja Orellana</td></tr>
+                    <tr><th>Fecha adquisici&oacute;n</th><td>2024-01-15</td></tr>
+                    <tr><th>Pa&iacute;s</th><td>Ecuador</td></tr>
+                    <tr><th>Ubicaci&oacute;n</th><td>Orellana, 5 km sur El Coca</td></tr>
+                    <tr><th>Latitud</th><td>005025S</td></tr>
+                    <tr><th>Longitud</th><td>0763005W</td></tr>
+                    <tr><th>Altitud</th><td>250 m</td></tr>
+                    <tr><th>Estado biol&oacute;gico</th><td>Silvestre</td></tr>
+                    <tr><th>Fuente de colecta</th><td>Campo agr&iacute;cola</td></tr>
+                </table>
+            </div>
+
+            <p style="font-size:1.4rem;font-weight:700;color:var(--color-primary);margin:0 0 12px 0;">$10.00</p>
+
+            <button class="btn btn-primary" onclick="irPedido('Pitahaya Roja')" style="width:100%;">
+                <i class="fas fa-shopping-cart"></i> Solicitar
+            </button>
+        </div>
+    </main>
+
+    <div class="chat-flotante">
+        <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+        <div class="chat-container oculto" id="chatContainer">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe...">
+                <button onclick="responder()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/nav.js"></script>
+</body>
+</html>

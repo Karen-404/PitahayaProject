@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Pitahaya | Gestión Biotecnológica</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <nav>
+        <div class="logo">SISTEMA PITAHAYA</div>
+        <div class="nav-right">
+            <div class="info-inst">Proyecto ESPOCH / INIAP</div>
+            <select id="langSelect" class="lang-dropdown" onchange="changeLanguage(this.value)">
+                <optgroup label="Global">
+                    <option value="es" selected>Español</option>
+                    <option value="en">English</option>
+                    <option value="pt">Português</option>
+                    <option value="it">Italiano</option>
+                </optgroup>
+                <optgroup label="Lenguas Indígenas (Ecuador)">
+                    <option value="kic">Kichwa</option>
+                    <option value="shuar">Shuar Chicham</option>
+                    <option value="achuar">Achuar Chicham</option>
+                    <option value="tsafiki">Tsafiki (Tsáchila)</option>
+                    <option value="awapit">Awapit (Awá)</option>
+                    <option value="chapalaa">Cha'palaa (Chachi)</option>
+                    <option value="siapedee">Sia Pedee (Eperara)</option>
+                    <option value="paicoca">Paicoca (Siona/Secoya)</option>
+                    <option value="aingae">A'ingae (Cofán)</option>
+                    <option value="waotededo">Wao Terero (Waorani)</option>
+                    <option value="shiwiar">Shiwiar Chicham</option>
+                    <option value="sapara">Sapara</option>
+                    <option value="andwa">Andwa</option>
+                    <option value="shimigae">Shimigae</option>
+                    <option value="caiapi">Cai api</option>
+                    <option value="cofan">Cofán variant</option>
+                </optgroup>
+            </select>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1 data-key="hero_title">Gestión Sostenible de la Pitahaya</h1>
+        <p data-key="hero_subtitle">Conservación, Mejora y Agroindustria (Hylocereus spp)</p>
+    </header>
+
+    <main>
+        <section class="login-container">
+            <h2 data-key="login_title">Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email" data-key="label_email">Correo Electrónico</label>
+                    <input type="text" id="email" placeholder="ejemplo@correo.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" data-key="label_pass">Contraseña</label>
+                    <input type="password" id="password" placeholder="********" required>
+                </div>
+                <button type="submit" data-key="btn_login">Ingresar al Sistema</button>
+            </form>
+            <p class="reg-link">
+                <span data-key="reg_text">¿Eres un nuevo productor?</span> 
+                <a href="registro.html" data-key="reg_link">Regístrate aquí</a>
+            </p>
+        </section>
+    </main>
+
+    <footer class="footer-logos">
+        <p data-key="footer_fao">© 2026 Proyecto Pitahaya - Gestión de Estrés Biótico y Caracterización FAO</p>
+        <p data-key="footer_data">Integración de Datos: OLTP (Operativo) & Data Warehouse (Analítico)</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

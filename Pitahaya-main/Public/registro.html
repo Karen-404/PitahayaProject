@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Sistema Pitahaya</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav class="top-nav">
+        <div class="logo">SISTEMA PITAHAYA</div>
+
+        <ul class="menu">
+            <li><a href="inicio.html">Inicio</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
+            <li><a href="bioproductos.html">Bioproductos</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="perfil.html">Perfil</a></li>
+            <li><a href="tipos.html">Tipos</a></li>
+        </ul>
+
+        <button id="logoutBtn">Salir</button>
+    </nav>
+
+
+    <main class="login-container-registro">
+        <h2>Registro de Usuario</h2>
+
+        <form id="registroForm">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label>Correo</label>
+                <input type="email" id="correo" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="passwordReg" required>
+            </div>
+
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <p class="reg-link">
+            ¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a>
+        </p>
+
+
+        <div class="chat-flotante">
+
+            <div class="chat-boton" onclick="toggleChat()">
+                🤖
+            </div>
+
+            <div class="chat-container oculto" id="chatContainer">
+                <div id="chatBox" class="chat-box"></div>
+
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="Escribe...">
+                    <button onclick="responder()">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

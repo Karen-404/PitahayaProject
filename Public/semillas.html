@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semillas Gratis - Pitahaya Biotec</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page-container">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+          <i class="fas fa-seedling"></i>
+        </div>
+        <div>
+          <h1>Solicitud de Semillas Gratuitas</h1>
+          <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Programa de apoyo al productor - ESPOCH / INIAP</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="semillas-content">
+      <div class="content-card flex-1">
+        <div class="section-title">Solicitar Semillas</div>
+        <form id="semillaForm">
+          <div class="form-group">
+            <label>Variedad de Pitahaya</label>
+            <select id="semillaVariedad" required>
+              <option value="">Seleccione una variedad</option>
+              <option value="Pitahaya Roja">Pitahaya Roja (Hylocereus undatus)</option>
+              <option value="Pitahaya Amarilla">Pitahaya Amarilla (Hylocereus megalanthus)</option>
+              <option value="Pitahaya Blanca">Pitahaya Blanca (Hylocereus undatus)</option>
+              <option value="Pitahaya Rosa">Pitahaya Rosa (Hylocereus polyrhizus)</option>
+              <option value="Pitahaya Golden">Pitahaya Golden</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Cantidad (plantas)</label>
+            <input type="number" id="semillaCantidad" min="1" max="100" value="10" required>
+          </div>
+          <div class="form-group">
+            <label>Direccion de entrega</label>
+            <textarea id="semillaDireccion" rows="3" placeholder="Provincia, canton, direccion exacta" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-paper-plane"></i> Enviar Solicitud</button>
+        </form>
+        <div id="semillaRespuesta" class="semilla-respuesta"></div>
+      </div>
+
+      <div class="content-card" style="flex:0 0 auto;width:320px;">
+        <div class="section-title"><i class="fas fa-info-circle"></i> Informacion del Programa</div>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li style="padding:8px 0;border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:8px;"><i class="fas fa-check-circle" style="color:var(--color-primary);"></i> Semillas 100% gratuitas para productores registrados</li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:8px;"><i class="fas fa-check-circle" style="color:var(--color-primary);"></i> Variedades certificadas por INIAP</li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:8px;"><i class="fas fa-check-circle" style="color:var(--color-primary);"></i> Entrega en todo el territorio ecuatoriano</li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:8px;"><i class="fas fa-check-circle" style="color:var(--color-primary);"></i> Asesoria tecnica incluida</li>
+          <li style="padding:8px 0;display:flex;align-items:center;gap:8px;"><i class="fas fa-check-circle" style="color:var(--color-primary);"></i> Limite: 100 plantas por solicitud</li>
+        </ul>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--color-border);">
+          <p style="margin:4px 0;"><i class="fas fa-phone"></i> ESPOCH - Depto. de Biotecnologia</p>
+          <p style="margin:4px 0;"><i class="fas fa-envelope"></i> semillas@espoch.edu.ec</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="content-card" style="margin-top:24px;">
+      <div class="section-title"><i class="fas fa-history"></i> Mis Solicitudes</div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr><th>#</th><th>Variedad</th><th>Cantidad</th><th>Direccion</th><th>Estado</th><th>Fecha</th></tr>
+          </thead>
+          <tbody id="misSemillasBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="chat-flotante">
+    <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-container oculto" id="chatContainer">
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Escribe...">
+        <button onclick="responder()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    const uid = localStorage.getItem('userId');
+    if (!uid) window.location.href = 'index.html';
+
+    document.getElementById('semillaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        usuario_id: parseInt(uid),
+        variedad: document.getElementById('semillaVariedad').value,
+        cantidad: parseInt(document.getElementById('semillaCantidad').value),
+        direccion: document.getElementById('semillaDireccion').value
+      };
+      try {
+        const res = await fetch('/api/semillas', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        const resp = document.getElementById('semillaRespuesta');
+        if (res.ok) {
+          resp.innerHTML = '<div class="alert-success"><i class="fas fa-check-circle"></i> Solicitud enviada exitosamente. Recibira notificaciones cuando sea aprobada.</div>';
+          document.getElementById('semillaForm').reset();
+          cargarMisSemillas();
+        } else {
+          resp.innerHTML = '<div class="alert-error"><i class="fas fa-exclamation-circle"></i> ' + result.error + '</div>';
+        }
+      } catch(err) {
+        document.getElementById('semillaRespuesta').innerHTML = '<div class="alert-error">Error de conexion</div>';
+      }
+    });
+
+    async function cargarMisSemillas() {
+      const tbody = document.getElementById('misSemillasBody');
+      try {
+        const res = await fetch('/api/semillas');
+        const todas = await res.json();
+        const misSemillas = todas.filter(s => s.usuario_id === parseInt(uid));
+        if (misSemillas.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--color-text-muted)">No has realizado solicitudes aun</td></tr>';
+          return;
+        }
+        tbody.innerHTML = misSemillas.map(s => {
+          const estados = { pendiente:'Pendiente', aprobado:'Aprobado', rechazado:'Rechazado', enviado:'Enviado' };
+          const colores = { pendiente:'#ff9800', aprobado:'#4caf50', rechazado:'#f44336', enviado:'#2196f3' };
+          return '<tr>'
+            + '<td>' + s.id + '</td>'
+            + '<td>' + s.variedad + '</td>'
+            + '<td>' + s.cantidad + '</td>'
+            + '<td>' + (s.direccion || '-') + '</td>'
+            + '<td><span class="estado-badge" style="background:' + (colores[s.estado] || '#999') + '">' + (estados[s.estado] || s.estado) + '</span></td>'
+            + '<td>' + new Date(s.created_at).toLocaleDateString() + '</td>'
+            + '</tr>';
+        }).join('');
+      } catch(err) {}
+    }
+
+    cargarMisSemillas();
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Pitahaya Biotec</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <section class="content-card" style="max-width:480px;margin:40px auto;text-align:center;">
+            <div style="width:56px;height:56px;border-radius:14px;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;color:var(--color-primary);">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2 style="margin:0 0 4px 0;font-size:1.4rem;">Registro de Usuario</h2>
+            <p style="color:var(--color-text-muted);margin:0 0 24px 0;">Crea tu cuenta para acceder al sistema</p>
+
+            <form id="registroForm" style="text-align:left;">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electr&oacute;nico</label>
+                    <input type="email" id="correo" placeholder="correo@ejemplo.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contrase&ntilde;a</label>
+                    <input type="password" id="passwordReg" placeholder="********" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-user-check"></i> Registrarse</button>
+            </form>
+
+            <p style="margin-top:20px;color:var(--color-text-muted);">
+                &iquest;Ya tienes cuenta? <a href="index.html" style="color:var(--color-primary);font-weight:600;">Inicia sesi&oacute;n</a>
+            </p>
+        </section>
+    </main>
+
+    <div class="chat-flotante">
+        <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+        <div class="chat-container oculto" id="chatContainer">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe...">
+                <button onclick="responder()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/nav.js"></script>
+</body>
+</html>

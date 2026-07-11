@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa - Pitahaya Biotec</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .mapa-iframe { border-radius:12px;width:100%;max-width:900px;height:450px;border:0;margin:0 auto;display:block; }
+        @media(max-width:600px){ .mapa-iframe { height:300px; } }
+    </style>
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div>
+                    <h1>Mapa de Cultivos</h1>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Ubicaci&oacute;n de parcelas experimentales ESPOCH / INIAP</p>
+                </div>
+            </div>
+        </div>
+
+        <section class="content-card" style="text-align:center;">
+            <iframe class="mapa-iframe" src="https://www.google.com/maps?q=-0.6357312,-77.0409702&output=embed" allowfullscreen loading="lazy"></iframe>
+        </section>
+    </main>
+
+    <div class="chat-flotante">
+        <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+        <div class="chat-container oculto" id="chatContainer">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe...">
+                <button onclick="responder()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/nav.js"></script>
+</body>
+</html>

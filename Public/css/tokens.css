@@ -1,0 +1,50 @@
+:root {
+  --color-primary: #167538;
+  --color-primary-hover: #125F2E;
+  --color-primary-dark: #0F4F27;
+  --color-primary-soft: #E3F6E9;
+
+  --color-accent: #F1D400;
+  --color-accent-hover: #D8BD00;
+  --color-accent-soft: #FFF8CE;
+
+  --color-background: #F3F7FB;
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F7F9FC;
+
+  --color-text-primary: #121B32;
+  --color-text-secondary: #5F6878;
+  --color-text-muted: #8A93A3;
+
+  --color-border: #DDE4EC;
+  --color-border-soft: #E9EEF3;
+
+  --color-info: #2367D1;
+  --color-info-soft: #E3EEFF;
+
+  --color-success: #178447;
+  --color-success-soft: #E1F7E9;
+
+  --color-warning: #B98700;
+  --color-warning-soft: #FFF3CE;
+
+  --color-danger: #D14343;
+  --color-danger-soft: #FDE7E7;
+
+  --color-dark-footer: #101A2C;
+
+  --font-family: 'Space Grotesk', 'Segoe UI', Tahoma, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+
+  --nav-height: 62px;
+  --max-width: 1260px;
+  --content-padding: 0 50px;
+  --card-padding: 28px 32px;
+}

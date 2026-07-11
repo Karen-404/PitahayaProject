@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Sistema Pitahaya</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/inicio.css">
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">PITAHAYA<span>BIOTEC</span></div>
+                <span id="roleBadge" class="role-badge">CARGANDO...</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="active">🏠 Inicio / Mapa</a></li>
+                    <li><a href="#">🌿 Bioproductos</a></li>
+                    <li><a href="#">📊 Análisis</a></li>
+                    <li><a href="#">📦 Pedidos</a></li>
+                    <li><a href="#">👤 Perfil</a></li>
+                </ul>
+            </nav>
+
+            <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2 id="welcomeMsg">Cargando panel...</h2>
+                <div class="stats-summary" id="adminOnly">
+                    <div class="stat-card">🟢 Sensores: Online</div>
+                    <div class="stat-card">🍎 Cosecha: Octubre</div>
+                </div>
+            </header>
+
+            <section class="map-section">
+                <div id="map"></div>
+            </section>
+
+            </main>
+    </div>
+
+    <div class="chat-flotante">
+        <div class="chat-boton" onclick="toggleChat()">🤖</div>
+        <div class="chat-container oculto" id="chatContainer">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Pregunta al bot...">
+                <button onclick="responder()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
