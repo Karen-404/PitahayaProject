@@ -348,6 +348,12 @@ app.get('/api/noticias/realtime', (req, res) => {
   req.on('close', () => clearInterval(interval));
 });
 
+app.get('/api/usuarios-email', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'BD no disponible' });
+  const { data } = await supabase.from('usuarios').select('id,email,nombre,role');
+  res.json(data || []);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
