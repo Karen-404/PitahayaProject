@@ -44,13 +44,11 @@
             <textarea id="noticiaContenido" rows="6" required></textarea>
           </div>
           <div class="form-group">
-            <label>Imagen (URL)</label>
-            <input type="url" id="noticiaImagen" placeholder="https://...">
-          </div>
-          <div class="form-group">
-            <label>O sube una imagen</label>
-            <input type="file" id="noticiaFile" accept="image/*" onchange="previewImagen(event)" style="height:auto;padding:8px 0;border:none;">
+            <label>Imagen</label>
+            <input type="file" id="noticiaFile" accept="image/*" style="height:auto;padding:8px 0;border:none;">
+            <div id="imagenSubiendo" style="display:none;color:var(--color-text-muted);font-size:0.85rem;margin-top:6px;"><i class="fas fa-spinner fa-spin"></i> Subiendo imagen...</div>
             <img id="previewImg" style="max-width:200px;margin-top:10px;display:none;border-radius:8px">
+            <input type="hidden" id="noticiaImagen">
           </div>
           <button type="submit" class="btn btn-primary" style="width:100%;" id="btnGuardarNoticia">Publicar</button>
         </form>
@@ -95,25 +93,44 @@
         document.getElementById('noticiaForm').reset();
         document.getElementById('noticiaId').value = '';
         document.getElementById('previewImg').style.display = 'none';
+        document.getElementById('previewImg').src = '';
+        document.getElementById('noticiaImagen').value = '';
       }
     }
 
     function cerrarModal() { document.getElementById('noticiaModal').style.display = 'none'; }
 
-    function previewImagen(e) {
+    var imagenSubiendo = false;
+
+    document.getElementById('noticiaFile').addEventListener('change', async function(e) {
       const file = e.target.files[0];
       if (!file) return;
+      if (imagenSubiendo) return;
+      imagenSubiendo = true;
+      document.getElementById('imagenSubiendo').style.display = 'block';
       const reader = new FileReader();
-      reader.onload = function(ev) {
-        document.getElementById('previewImg').src = ev.target.result;
-        document.getElementById('previewImg').style.display = 'block';
-        document.getElementById('noticiaImagen').value = ev.target.result;
+      reader.onload = async function(ev) {
+        try {
+          const res = await fetch('/api/subir-imagen', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ imagen: ev.target.result })
+          });
+          if (!res.ok) { const d = await res.json(); alert('Error: ' + (d.error || 'No se pudo subir')); imagenSubiendo = false; document.getElementById('imagenSubiendo').style.display = 'none'; return; }
+          const data = await res.json();
+          document.getElementById('noticiaImagen').value = data.url;
+          document.getElementById('previewImg').src = data.url;
+          document.getElementById('previewImg').style.display = 'block';
+        } catch(err) { alert('Error al subir imagen'); }
+        imagenSubiendo = false;
+        document.getElementById('imagenSubiendo').style.display = 'none';
       };
       reader.readAsDataURL(file);
-    }
+    });
 
     document.getElementById('noticiaForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (imagenSubiendo) { alert('Espera a que termine de subir la imagen'); return; }
       const data = {
         titulo: document.getElementById('noticiaTitulo').value,
         contenido: document.getElementById('noticiaContenido').value,

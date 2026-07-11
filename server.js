@@ -419,6 +419,30 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
 
+// ==================== SUBIR IMAGEN ====================
+app.post('/api/subir-imagen', async (req, res) => {
+  const { imagen } = req.body;
+  if (!imagen) return res.status(400).json({ error: 'Imagen requerida' });
+  try {
+    const base64Data = imagen.replace(/^data:image\/\w+;base64,/, '');
+    const mimeMatch = imagen.match(/^data:image\/(\w+);base64,/);
+    const ext = mimeMatch ? mimeMatch[1] : 'png';
+    const buffer = Buffer.from(base64Data, 'base64');
+    const fileName = `noticias/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+
+    const { data, error } = await supabase.storage.from('noticias').upload(fileName, buffer, {
+      contentType: `image/${ext}`,
+      upsert: false
+    });
+    if (error) return res.status(500).json({ error: error.message });
+
+    const { data: publicUrl } = supabase.storage.from('noticias').getPublicUrl(fileName);
+    res.json({ url: publicUrl.publicUrl });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = app;
 
 if (require.main === module) {
