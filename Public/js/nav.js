@@ -27,7 +27,12 @@
   html += '<i class="fas fa-leaf nav-leaf-icon"></i>';
   html += '<span class="nav-brand"><span class="nav-brand-white">PITAHAYA</span> <span class="nav-brand-yellow">BIOTEC</span></span>';
   html += '</div>';
-  html += '<button class="nav-toggle" onclick="document.getElementById(\'navList\').classList.toggle(\'open\')" aria-label="Men\u00fa"><i class="fas fa-bars"></i></button>';
+  html += '<button class="nav-toggle" id="navToggle" aria-label="Men\u00fa">';
+  html += '<span></span><span></span><span></span>';
+  html += '</button>';
+  html += '</div>';
+  html += '</nav>';
+  html += '<div class="nav-overlay" id="navOverlay"></div>';
   html += '<ul class="nav-list" id="navList">';
 
   for (var i = 0; i < navItems.length; i++) {
@@ -38,20 +43,41 @@
 
   html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button></li>';
   html += '</ul>';
-  html += '</div>';
-  html += '</nav>';
 
   var placeholder = document.getElementById('app-nav');
   if (placeholder) {
     placeholder.innerHTML = html;
   }
 
-  // Close nav on link click (mobile)
+  var toggle = document.getElementById('navToggle');
+  var navList = document.getElementById('navList');
+  var overlay = document.getElementById('navOverlay');
+
+  function toggleMenu() {
+    toggle.classList.toggle('open');
+    navList.classList.toggle('open');
+    overlay.classList.toggle('visible');
+    document.body.style.overflow = navList.classList.contains('open') ? 'hidden' : '';
+  }
+
+  function closeMenu() {
+    toggle.classList.remove('open');
+    navList.classList.remove('open');
+    overlay.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', toggleMenu);
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', closeMenu);
+  }
+
   var links = document.querySelectorAll('#navList a');
   for (var j = 0; j < links.length; j++) {
-    links[j].addEventListener('click', function() {
-      document.getElementById('navList').classList.remove('open');
-    });
+    links[j].addEventListener('click', closeMenu);
   }
 })();
 

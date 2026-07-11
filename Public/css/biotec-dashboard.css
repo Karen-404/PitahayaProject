@@ -33,75 +33,7 @@ body.biotec-body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ========== STICKY NAV ========== */
-.biotec-nav {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: var(--primary-green);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
 
-.biotec-nav-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.biotec-nav-logo-icon {
-  color: var(--yellow-accent);
-  font-size: 1.4rem;
-}
-
-.biotec-nav-logo {
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.biotec-nav-logo span { color: white; }
-.biotec-nav-logo .yellow { color: var(--yellow-accent); }
-
-.biotec-nav-right {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.biotec-nav-right a {
-  color: rgba(255,255,255,0.9);
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 500;
-  padding: 6px 0;
-  transition: 0.2s;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-}
-
-.biotec-nav-right a:hover,
-.biotec-nav-right a.active {
-  color: white;
-  border-bottom-color: var(--yellow-accent);
-}
-
-.biotec-nav-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 4px 8px;
-}
 
 /* ========== WRAPPER ========== */
 .biotec-wrapper {
@@ -544,33 +476,6 @@ body.biotec-body {
 }
 
 @media (max-width: 768px) {
-  .biotec-nav { padding: 0 20px; }
-
-  .biotec-nav-toggle { display: block; }
-
-  .biotec-nav-right {
-    display: none;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background: var(--primary-green);
-    flex-direction: column;
-    padding: 12px 20px;
-    gap: 4px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-
-  .biotec-nav-right.open { display: flex; }
-
-  .biotec-nav-right a {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    width: 100%;
-  }
-
-  .biotec-nav-right a:last-child { border-bottom: none; }
-
   .biotec-wrapper { padding: 0 18px; }
 
   .atlas-card { padding: 20px; margin-top: 24px; }
@@ -591,7 +496,5 @@ body.biotec-body {
 }
 
 @media (max-width: 480px) {
-  .biotec-nav { padding: 0 12px; }
-  .biotec-nav-logo { font-size: 1rem; }
   .atlas-title { font-size: 1.1rem; letter-spacing: 1px; }
 }

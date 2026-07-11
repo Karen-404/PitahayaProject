@@ -5,28 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Sistema Pitahaya</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="dashboard-style.css">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
+    <div id="app-nav"></div>
+
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h3>Pitahaya <span class="role-badge" id="roleBadge">Rol</span></h3>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="#" class="active">📍 Mapa de Cultivos</a></li>
-                    <li><a href="#">🌱 Bioproductos</a></li>
-                    <li><a href="#">📊 Reportes FAO</a></li>
-                    <li id="adminOnly"><a href="#">⚙️ Gestión de Usuarios</a></li>
-                </ul>
-            </nav>
-            <div class="sidebar-footer">
-                <button id="logoutBtn">Cerrar Sesión</button>
-            </div>
-        </aside>
 
         <main class="main-content">
             <header class="top-bar">
@@ -43,6 +29,7 @@
         </main>
     </div>
 
+    <script src="js/nav.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="dashboard-script.js"></script>
 </body>

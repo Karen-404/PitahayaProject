@@ -4,29 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Biotec - Pitahaya</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/biotec-dashboard.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="biotec-body">
 
-  <!-- ===== NAV ===== -->
-  <nav class="biotec-nav" role="navigation" aria-label="Navegacion principal">
-    <div class="biotec-nav-left">
-      <i class="fas fa-leaf biotec-nav-logo-icon"></i>
-      <div class="biotec-nav-logo">
-        <span>PITAHAYA</span> <span class="yellow">BIOTEC</span>
-      </div>
-    </div>
-    <button class="biotec-nav-toggle" onclick="toggleBiotecMenu()" aria-label="Menu">
-      <i class="fas fa-bars"></i>
-    </button>
-    <ul class="biotec-nav-right" id="biotecMenu">
-      <li><a href="biotec-dashboard.html" class="active">Dashboard</a></li>
-      <li><a href="inicio.html">Atlas Ecuador</a></li>
-      <li><a href="admin.html">Inventario FAO</a></li>
-      <li><a href="#laboratorio" onclick="document.getElementById('laboratorio').scrollIntoView({behavior:'smooth'}); return false;">Analizador</a></li>
-    </ul>
-  </nav>
+  <div id="app-nav"></div>
 
   <div class="biotec-wrapper">
 
@@ -203,19 +188,8 @@
     &copy; 2026 <span>Pitahaya Biotec</span> &mdash; ESPOCH / INIAP &mdash; Proyecto de Gesti&oacute;n Biotecnol&oacute;gica
   </footer>
 
+  <script src="js/nav.js"></script>
   <script>
-    // Menu toggle for mobile
-    function toggleBiotecMenu() {
-      document.getElementById('biotecMenu').classList.toggle('open');
-    }
-
-    // Close menu on link click (mobile)
-    document.querySelectorAll('.biotec-nav-right a').forEach(function(link) {
-      link.addEventListener('click', function() {
-        document.getElementById('biotecMenu').classList.remove('open');
-      });
-    });
-
     // ===== LABORATORIO VIRTUAL =====
     function clasificarMuestra() {
       const input = document.getElementById('pesoFruto');
