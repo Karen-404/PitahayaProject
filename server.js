@@ -38,11 +38,12 @@ async function requireRole(req, res, roles) {
   if (isNaN(uid)) return res.status(401).json({ error: 'No autorizado - id invalido' });
   // admin hardcodeado (userId=0) del login local en script.js
   if (uid === 0) {
-    if (roles.includes('admin')) return { role: 'admin' };
+    if (roles.includes('admin')) return { role: 'admin', id: 0 };
     return res.status(403).json({ error: 'Permiso denegado' });
   }
-  const { data: user } = await supabase.from('usuarios').select('role').eq('id', uid).single();
+  const { data: user } = await supabase.from('usuarios').select('*').eq('id', uid).single();
   if (!user || !roles.includes(user.role)) return res.status(403).json({ error: 'Permiso denegado' });
+  req.authedUser = user;
   return user;
 }
 
@@ -127,12 +128,16 @@ app.post('/api/noticias', async (req, res) => {
   if (!user) return;
   const { titulo, contenido, imagen_url } = req.body;
   if (!titulo || !contenido) return res.status(400).json({ error: 'Título y contenido son obligatorios' });
-  const { data, error } = await supabase.from('noticias').insert({
-    titulo, contenido, imagen_url: imagen_url || null,
-    autor_id: req.body.usuario_id, fecha: new Date().toISOString().split('T')[0]
-  }).select().single();
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  try {
+    const { data, error } = await supabase.from('noticias').insert({
+      titulo, contenido, imagen_url: imagen_url || null,
+      autor_id: user.id, fecha: new Date().toISOString().split('T')[0]
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.put('/api/noticias/:id', async (req, res) => {
