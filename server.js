@@ -36,6 +36,11 @@ async function requireRole(req, res, roles) {
   if (uid === undefined || uid === null || uid === '') return res.status(401).json({ error: 'No autorizado - usuario no identificado' });
   uid = Number(uid);
   if (isNaN(uid)) return res.status(401).json({ error: 'No autorizado - id invalido' });
+  // admin hardcodeado (userId=0) del login local en script.js
+  if (uid === 0) {
+    if (roles.includes('admin')) return { role: 'admin' };
+    return res.status(403).json({ error: 'Permiso denegado' });
+  }
   const { data: user } = await supabase.from('usuarios').select('role').eq('id', uid).single();
   if (!user || !roles.includes(user.role)) return res.status(403).json({ error: 'Permiso denegado' });
   return user;
