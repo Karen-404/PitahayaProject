@@ -350,66 +350,69 @@ app.get('/api/noticias/realtime', (req, res) => {
   req.on('close', () => clearInterval(interval));
 });
 
-// ==================== CHATBOT (IA) ====================
+// ==================== CHATBOT ====================
+const CONOCIMIENTO = [
+  { palabras: ['hola', 'buenas', 'buen día', 'buenas tardes'], respuesta: '¡Hola! 👋 Soy tu asistente virtual de Pitahaya Biotec. Pregúntame sobre la pitahaya, biotecnología, el proyecto, variedades, producción en Ecuador o cualquier tema relacionado.' },
+  { palabras: ['qué es la pitahaya', 'que es pitahaya', 'que es la pitahaya', 'fruta', 'dragon fruit'], respuesta: 'La pitahaya (Hylocereus spp), también llamada fruta del dragón, es una cactácea epífita originaria de América tropical. Se cultiva en Ecuador por su fruto comestible de alto valor nutricional y comercial. Existen variedades roja (Hylocereus undatus), amarilla (H. megalanthus) y blanca.' },
+  { palabras: ['variedad', 'tipo', 'clase', 'roja', 'amarilla', 'blanca'], respuesta: 'Tenemos 3 variedades principales:\n• Pitahaya Roja (Hylocereus undatus) - cáscara roja, pulpa blanca\n• Pitahaya Amarilla (Hylocereus megalanthus) - cáscara amarilla, pulpa blanca, más dulce\n• Pitahaya Blanca - variedad con pulpa blanca y alto contenido de azúcares\nLa amarilla suele alcanzar mejores precios por su mayor dulzor (18-22° Brix).' },
+  { palabras: ['precio', 'costo', 'valor', 'vender', 'exportación', 'exportar'], respuesta: 'La pitahaya ecuatoriana se exporta a más de 50 destinos. La pitahaya amarilla (Palora) alcanza precios premium por su alta calidad. Estados Unidos y Hong Kong representan el 80% de la demanda. Ecuador es el 3er producto no tradicional de exportación. Los precios varían según temporada y calibre.' },
+  { palabras: ['beneficio', 'salud', 'nutrición', 'vitamina', 'antioxidante', 'fibra', 'digestión'], respuesta: 'La pitahaya es rica en:\n• Fibra dietética - favorece la digestión\n• Vitamina C - refuerza el sistema inmune\n• Antioxidantes - combaten el envejecimiento celular\n• Magnesio y calcio - salud ósea\n• Bajo en calorías - ideal para dietas\nTambién se usa en cosmética natural por sus propiedades hidratantes.' },
+  { palabras: ['pedido', 'comprar', 'adquirir', 'orden', 'producto'], respuesta: 'Puedes realizar pedidos desde la sección "Pedidos" en el menú principal. Allí puedes solicitar pitahaya fresca, bioproductos o semillas. Los pedidos son gestionados por productores asociados.' },
+  { palabras: ['ecuador', 'país', 'producción', 'cultivo', 'agricultura', 'palora'], respuesta: 'Ecuador es líder mundial en producción de pitahaya amarilla. La región Amazónica (Palora, Morona Santiago) concentra la mayor producción con altos grados Brix (18-22°). La región Litoral (Santa Elena, Manabí) produce pitahaya roja con mayor infraestructura de empacadoras. Orellana alberga bancos de germoplasma para conservar variedades silvestres.' },
+  { palabras: ['dónde se cultiva', 'región', 'zonas', 'lugares', 'provincia'], respuesta: 'Las principales zonas productoras en Ecuador:\n• Palora (Morona Santiago) - líder en pitahaya amarilla\n• Santa Elena - pitahaya roja\n• Manabí - pitahaya roja\n• Orellana - conservación de germoplasma\n• Naranjal - producción mixta\nLa Ruta de la Pitahaya integra turismo científico y agroturismo en Palora y Orellana.' },
+  { palabras: ['biotecnología', 'biotec', 'laboratorio', 'investigación', 'genética', 'dna', 'adn'], respuesta: 'El proyecto Pitahaya Biotec aplica biotecnología agrícola con:\n• Descriptores FAO (WIEWS) para trazabilidad genética\n• Mejora de resistencia post-cosecha\n• Banco de germoplasma en Orellana\n• Análisis de grados Brix y calidad\n• Protocolo MCPD para inventario de accesiones\nCódigos de acceso: EI-PIT-26-001 (H. undatus), EI-PIT-26-002 (H. megalanthus).' },
+  { palabras: ['atlas', 'dashboard', 'panel', 'estadística', 'dato', 'información'], respuesta: 'El Atlas de la Pitahaya Ecuatoriana contiene información estratégica:\n• Consumo interno: +25% crecimiento anual\n• Mercado global: exportación a 50+ destinos\n• Potencial turístico: Ruta de la Pitahaya\n• Biotecnología: trazabilidad genética FAO\n• Accesiones registradas con código MCPD\n• Distribución: Amazónica, Litoral y Zonas de Conservación' },
+  { palabras: ['investigador', 'perfil', 'investigación', 'científico'], respuesta: 'Los investigadores pueden crear su perfil profesional con foto, biografía, títulos, logros, publicaciones y proyectos de investigación. El listado público está disponible en "Investigadores" del menú. Para acceder a tu perfil profesional, regístrate con rol "Investigador".' },
+  { palabras: ['noticia', 'novedad', 'evento', 'actualidad'], respuesta: 'Las noticias e investigaciones son publicadas por administradores e investigadores. Puedes verlas en la sección "Noticias". Si eres investigador o admin, puedes crear, editar y eliminar noticias.' },
+  { palabras: ['semilla', 'germoplasma', 'banco', 'conservación'], respuesta: 'El banco de germoplasma en Orellana preserva variedades silvestres de Hylocereus spp con potencial genético. Los productores pueden solicitar semillas desde la sección "Semillas" del menú.' },
+  { palabras: ['bioproducto', 'cosmético', 'natural', 'derivado'], respuesta: 'Los bioproductos derivados de la pitahaya incluyen cosméticos naturales, pulpa congelada, helados, yogurt y suplementos. Consulta la sección "Bioproductos" para más información.' },
+  { palabras: ['mapa', 'ubicación', 'dónde', 'georreferencia'], respuesta: 'El mapa interactivo muestra los puntos de monitoreo, zonas de producción y bancos de germoplasma a nivel nacional. Accede desde la sección "Mapa" del menú.' },
+  { palabras: ['usuario', 'registro', 'cuenta', 'login', 'iniciar', 'sesión'], respuesta: 'Para registrarte, ve a la página de inicio y crea una cuenta. Puedes elegir entre Productor, Investigador o Técnico. Los investigadores tienen acceso a su perfil profesional y pueden publicar noticias.' },
+  { palabras: ['admin', 'administrador', 'panel'], respuesta: 'El panel de administración permite gestionar usuarios, noticias, pedidos, semillas y más. Solo disponible para usuarios con rol Administrador.' },
+  { palabras: ['gracias', 'thank', 'thanks', 'vale', 'ok'], respuesta: '¡Con gusto! 😊 Si tienes más preguntas sobre pitahaya, biotecnología o el proyecto, aquí estoy para ayudarte.' },
+  { palabras: ['quien eres', 'quién eres', 'que eres', 'tu nombre', 'quien creo'], respuesta: 'Soy el asistente virtual de Pitahaya Biotec, un proyecto ecuatoriano de gestión biotecnológica sostenible de la pitahaya (Hylocereus spp). Puedo responder sobre variedades, cultivo, beneficios, exportación, biotecnología y más.' },
+  { palabras: ['proyecto', 'pitahaya biotec', 'módulo', 'sistema'], respuesta: 'Pitahaya Biotec es un sistema de gestión biotecnológica que integra:\n• Atlas informativo de la pitahaya ecuatoriana\n• Gestión de productores e investigadores\n• Inventario de accesiones con código MCPD\n• Laboratorio virtual de clasificación\n• Pedidos y bioproductos\n• Chat con asistente IA\nDesarrollado para ESPOCH / INIAP.' }
+];
+
 app.post('/api/chat', async (req, res) => {
   const { mensaje } = req.body;
   if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
 
-  const fetch = (url, opts) => new Promise((resolve, reject) => {
-    const { request } = require(url.startsWith('https') ? 'https' : 'http');
-    const u = new URL(url);
-    const req2 = request({ hostname: u.hostname, path: u.pathname + u.search, method: opts?.method || 'GET', headers: opts?.headers }, (res2) => {
-      let d = [];
-      res2.on('data', (c) => d.push(c));
-      res2.on('end', () => resolve({ json: () => { try { return Promise.resolve(JSON.parse(Buffer.concat(d).toString())); } catch(e) { return Promise.reject(e); } }, status: res2.statusCode }));
-    });
-    req2.on('error', reject);
-    if (opts?.body) req2.write(opts.body);
-    req2.end();
-  });
-
-  // Try Gemini first, fallback to Hugging Face
+  // Try Gemini if available
   const geminiKey = process.env.GEMINI_API_KEY;
   if (geminiKey) {
     try {
-      const body = JSON.stringify({
-        contents: [{ parts: [{ text: `Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa.\n\nUsuario: ${mensaje}\n\nAsistente:` }] }]
+      const https = require('https');
+      const body = JSON.stringify({ contents: [{ parts: [{ text: `Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa, máximo 3 párrafos.\n\nUsuario: ${mensaje}\n\nAsistente:` }] }] });
+      const data = await new Promise((resolve, reject) => {
+        const u = new URL(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${geminiKey}`);
+        const r = https.request({ hostname: u.hostname, path: u.pathname + u.search, method: 'POST', headers: { 'Content-Type': 'application/json' } }, (r2) => { let d = []; r2.on('data', c => d.push(c)); r2.on('end', () => { try { resolve(JSON.parse(Buffer.concat(d).toString())); } catch(e) { reject(e); } }); });
+        r.on('error', reject); r.write(body); r.end();
       });
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-      const d = await r.json();
-      const t = d?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const t = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (t) return res.json({ respuesta: t });
     } catch (e) { /* fallback */ }
   }
 
-  // Fallback: Hugging Face free inference
-  try {
-    const prompt = `<s>[INST] Eres un asistente experto en pitahaya, biotecnología agrícola y el proyecto Pitahaya Biotec de Ecuador. Responde en español. Si la pregunta no es del tema, responde cordialmente que solo puedes ayudar en temas agrícolas.
-
-  ${mensaje} [/INST]`;
-    const body = JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 200, temperature: 0.7 } });
-    const r = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-    const d = await r.json();
-    const t = Array.isArray(d) ? d[0]?.generated_text : d?.generated_text;
-    if (t) {
-      const respuesta = t.split('[/INST]').pop()?.trim() || t;
-      return res.json({ respuesta });
+  // Fallback: knowledge base
+  const txt = mensaje.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  for (const item of CONOCIMIENTO) {
+    for (const palabra of item.palabras) {
+      if (txt.includes(palabra)) return res.json({ respuesta: item.respuesta });
     }
-  } catch (e) { /* fallback */ }
+  }
 
-  // Ultra fallback: respuestas basicas
-  const resp = {
-    hola: 'Hola 👋 soy tu asistente de pitahaya. Pregúntame lo que quieras.',
-    precio: 'El precio varía según tipo y temporada. La pitahaya amarilla suele ser más cara que la roja.',
-    beneficio: 'Rica en fibra, vitamina C, antioxidantes y magnesio. Favorece la digestión 💪',
-    comprar: 'Puedes hacer pedidos desde la sección Pedidos del menú 🛒',
-    tipo: 'Variedades: roja (Hylocereus undatus), amarilla (H. megalanthus) y blanca.',
-    ecuador: 'Ecuador es el 3er exportador mundial. Palora es la zona productora líder 🌎',
-    gracias: '¡Con gusto! 😊'
-  };
-  const txt = mensaje.toLowerCase();
-  for (const [k, v] of Object.entries(resp)) { if (txt.includes(k)) return res.json({ respuesta: v }); }
-  res.json({ respuesta: 'Soy un asistente básico en modo offline. Para respuestas con IA, configura GEMINI_API_KEY o espera a que Hugging Face responda.' });
+  // Busqueda parcial: si alguna palabra clave aparece en el texto
+  for (const item of CONOCIMIENTO) {
+    for (const palabra of item.palabras) {
+      const palabrasTxt = txt.split(/\s+/);
+      for (const pt of palabrasTxt) {
+        if (pt.length > 3 && palabra.includes(pt)) return res.json({ respuesta: item.respuesta });
+      }
+    }
+  }
+
+  res.json({ respuesta: 'No encontré información específica sobre eso 🤔 Puedes preguntarme sobre:\n• Variedades de pitahaya (roja, amarilla, blanca)\n• Beneficios y nutrición\n• Producción en Ecuador\n• Precios y exportación\n• Biotecnología e investigación\n• Cómo hacer pedidos\n• El proyecto Pitahaya Biotec\n¿O prefieres que hable con un administrador?' });
 });
 
 app.get('/', (req, res) => {
