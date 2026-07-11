@@ -384,7 +384,7 @@ app.post('/api/chat', async (req, res) => {
     try {
       const https = require('https');
       const systemPrompt = 'Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa, máximo 3 párrafos. Si la pregunta no es sobre estos temas, responde cordialmente que solo puedes ayudar en temas relacionados con la pitahaya y la agricultura.';
-      const body = JSON.stringify({ model: 'llama3-70b-8192', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: mensaje }], temperature: 0.7, max_tokens: 500 });
+      const body = JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: mensaje }], temperature: 0.7, max_tokens: 500 });
       const data = await new Promise((resolve, reject) => {
         const r = https.request({ hostname: 'api.groq.com', path: '/openai/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` } }, (r2) => { let d = []; r2.on('data', c => d.push(c)); r2.on('end', () => { try { resolve(JSON.parse(Buffer.concat(d).toString())); } catch(e) { reject(e); } }); });
         r.on('error', reject); r.write(body); r.end();
