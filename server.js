@@ -350,7 +350,7 @@ app.get('/api/noticias/realtime', (req, res) => {
 
 app.get('/api/usuarios-email', async (req, res) => {
   if (!supabase) return res.status(503).json({ error: 'BD no disponible' });
-  const { data } = await supabase.from('usuarios').select('id,email,nombre,role');
+  const { data } = await supabase.from('usuarios').select('id,correo,nombre,role');
   res.json(data || []);
 });
 
