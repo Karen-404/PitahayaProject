@@ -350,65 +350,66 @@ app.get('/api/noticias/realtime', (req, res) => {
   req.on('close', () => clearInterval(interval));
 });
 
-// ==================== CHATBOT (Gemini) ====================
+// ==================== CHATBOT (IA) ====================
 app.post('/api/chat', async (req, res) => {
   const { mensaje } = req.body;
   if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    const respuestas = {
-      hola: 'Hola 👋 soy tu asistente de pitahaya. Pregúntame lo que quieras.',
-      precio: 'El precio de la pitahaya varía según tipo y temporada. La amarilla suele ser más cara que la roja.',
-      beneficio: 'La pitahaya es rica en fibra, vitamina C, antioxidantes y magnesio. Favorece la digestión y la salud cardiovascular 💪',
-      comprar: 'Puedes hacer pedidos desde la sección Pedidos del menú 🛒',
-      tipo: 'Las principales variedades: roja (Hylocereus undatus), amarilla (H. megalanthus) y blanca.',
-      ecuador: 'Ecuador es el 3er exportador mundial de pitahaya. Palora (Morona Santiago) es la zona productora líder 🌎',
-      gracias: '¡Con gusto! 😊 Vuelve cuando quieras.'
-    };
-    const txt = mensaje.toLowerCase();
-    for (const [key, val] of Object.entries(respuestas)) {
-      if (txt.includes(key)) return res.json({ respuesta: val });
-    }
-    return res.json({ respuesta: 'No entendí tu pregunta 🤔 Soy un asistente básico sin conexión a IA. Para respuestas más inteligentes, configura GEMINI_API_KEY.' });
-  }
-
-  try {
-    const https = require('https');
-    const body = JSON.stringify({
-      contents: [{
-        parts: [{ text: `Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa. Si la pregunta no es sobre estos temas, responde cordialmente que solo puedes ayudar con temas relacionados.\n\nUsuario: ${mensaje}\n\nAsistente:` }]
-      }]
+  const fetch = (url, opts) => new Promise((resolve, reject) => {
+    const { request } = require(url.startsWith('https') ? 'https' : 'http');
+    const u = new URL(url);
+    const req2 = request({ hostname: u.hostname, path: u.pathname + u.search, method: opts?.method || 'GET', headers: opts?.headers }, (res2) => {
+      let d = [];
+      res2.on('data', (c) => d.push(c));
+      res2.on('end', () => resolve({ json: () => { try { return Promise.resolve(JSON.parse(Buffer.concat(d).toString())); } catch(e) { return Promise.reject(e); } }, status: res2.statusCode }));
     });
+    req2.on('error', reject);
+    if (opts?.body) req2.write(opts.body);
+    req2.end();
+  });
 
-    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`);
-    const options = {
-      hostname: url.hostname,
-      path: url.pathname + url.search,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
-    };
-
-    const data = await new Promise((resolve, reject) => {
-      const req2 = https.request(options, (res2) => {
-        let chunks = [];
-        res2.on('data', (c) => chunks.push(c));
-        res2.on('end', () => {
-          try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-          catch (e) { reject(new Error('Error al parsear respuesta')); }
-        });
+  // Try Gemini first, fallback to Hugging Face
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey) {
+    try {
+      const body = JSON.stringify({
+        contents: [{ parts: [{ text: `Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa.\n\nUsuario: ${mensaje}\n\nAsistente:` }] }]
       });
-      req2.on('error', reject);
-      req2.write(body);
-      req2.end();
-    });
-
-    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (texto) return res.json({ respuesta: texto });
-    res.json({ respuesta: 'Lo siento, no pude procesar tu pregunta. Intenta de nuevo.' });
-  } catch (e) {
-    res.json({ respuesta: 'Error al conectar con la IA. Intenta más tarde.' });
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      const d = await r.json();
+      const t = d?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (t) return res.json({ respuesta: t });
+    } catch (e) { /* fallback */ }
   }
+
+  // Fallback: Hugging Face free inference
+  try {
+    const prompt = `<s>[INST] Eres un asistente experto en pitahaya, biotecnología agrícola y el proyecto Pitahaya Biotec de Ecuador. Responde en español. Si la pregunta no es del tema, responde cordialmente que solo puedes ayudar en temas agrícolas.
+
+  ${mensaje} [/INST]`;
+    const body = JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 200, temperature: 0.7 } });
+    const r = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+    const d = await r.json();
+    const t = Array.isArray(d) ? d[0]?.generated_text : d?.generated_text;
+    if (t) {
+      const respuesta = t.split('[/INST]').pop()?.trim() || t;
+      return res.json({ respuesta });
+    }
+  } catch (e) { /* fallback */ }
+
+  // Ultra fallback: respuestas basicas
+  const resp = {
+    hola: 'Hola 👋 soy tu asistente de pitahaya. Pregúntame lo que quieras.',
+    precio: 'El precio varía según tipo y temporada. La pitahaya amarilla suele ser más cara que la roja.',
+    beneficio: 'Rica en fibra, vitamina C, antioxidantes y magnesio. Favorece la digestión 💪',
+    comprar: 'Puedes hacer pedidos desde la sección Pedidos del menú 🛒',
+    tipo: 'Variedades: roja (Hylocereus undatus), amarilla (H. megalanthus) y blanca.',
+    ecuador: 'Ecuador es el 3er exportador mundial. Palora es la zona productora líder 🌎',
+    gracias: '¡Con gusto! 😊'
+  };
+  const txt = mensaje.toLowerCase();
+  for (const [k, v] of Object.entries(resp)) { if (txt.includes(k)) return res.json({ respuesta: v }); }
+  res.json({ respuesta: 'Soy un asistente básico en modo offline. Para respuestas con IA, configura GEMINI_API_KEY o espera a que Hugging Face responda.' });
 });
 
 app.get('/', (req, res) => {
