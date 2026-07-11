@@ -11,13 +11,25 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'Public')));
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+let supabase;
+try {
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_KEY
+  );
+} catch (e) {
+  console.warn('Supabase no configurado:', e.message);
+  supabase = null;
+}
+
+app.use('/api', (req, res, next) => {
+  if (!supabase) return res.status(503).json({ error: 'Base de datos no disponible - configure SUPABASE_URL y SUPABASE_SERVICE_KEY' });
+  next();
+});
 
 // Helper: verify role
 async function requireRole(req, res, roles) {
+  if (!supabase) return res.status(503).json({ error: 'Base de datos no disponible' });
   const { usuario_id } = req.body;
   if (!usuario_id && !req.query.usuario_id && !req.params.id) return res.status(401).json({ error: 'No autorizado' });
   const uid = req.body.usuario_id || req.query.usuario_id || req.params.id;
