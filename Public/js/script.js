@@ -62,12 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombre = document.getElementById('nombre').value.trim();
             const correo = document.getElementById('correo').value.trim();
             const password = document.getElementById('passwordReg').value.trim();
+            const role = document.getElementById('roleReg') ? document.getElementById('roleReg').value : 'productor';
 
             try {
                 const res = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre, correo, password })
+                    body: JSON.stringify({ nombre, correo, password, role })
                 });
                 const data = await res.json();
                 if (!res.ok) {

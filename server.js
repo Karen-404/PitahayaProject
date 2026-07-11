@@ -40,11 +40,13 @@ async function requireRole(req, res, roles) {
 
 // ==================== AUTH ====================
 app.post('/api/register', async (req, res) => {
-  const { nombre, correo, password } = req.body;
+  const { nombre, correo, password, role } = req.body;
   if (!nombre || !correo || !password) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  const rolesValidos = ['productor', 'investigador', 'tecnico', 'admin'];
+  const finalRole = rolesValidos.includes(role) ? role : 'productor';
   const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
   if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
-  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password, role: 'productor' }).select().single();
+  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password, role: finalRole }).select().single();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role });
 });
@@ -113,7 +115,7 @@ app.get('/api/noticias/:id', async (req, res) => {
 });
 
 app.post('/api/noticias', async (req, res) => {
-  const user = await requireRole(req, res, ['admin', 'tecnico', 'investigador']);
+  const user = await requireRole(req, res, ['admin', 'investigador']);
   if (!user) return;
   const { titulo, contenido, imagen_url } = req.body;
   if (!titulo || !contenido) return res.status(400).json({ error: 'Título y contenido son obligatorios' });
@@ -126,7 +128,7 @@ app.post('/api/noticias', async (req, res) => {
 });
 
 app.put('/api/noticias/:id', async (req, res) => {
-  const user = await requireRole(req, res, ['admin', 'tecnico', 'investigador']);
+  const user = await requireRole(req, res, ['admin', 'investigador']);
   if (!user) return;
   const { titulo, contenido, imagen_url } = req.body;
   const { data, error } = await supabase.from('noticias').update({ titulo, contenido, imagen_url }).eq('id', req.params.id).select().single();
@@ -135,7 +137,7 @@ app.put('/api/noticias/:id', async (req, res) => {
 });
 
 app.delete('/api/noticias/:id', async (req, res) => {
-  const user = await requireRole(req, res, ['admin', 'tecnico', 'investigador']);
+  const user = await requireRole(req, res, ['admin', 'investigador']);
   if (!user) return;
   const { error } = await supabase.from('noticias').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
@@ -346,12 +348,6 @@ app.get('/api/noticias/realtime', (req, res) => {
   }, 3000);
 
   req.on('close', () => clearInterval(interval));
-});
-
-app.get('/api/usuarios-email', async (req, res) => {
-  if (!supabase) return res.status(503).json({ error: 'BD no disponible' });
-  const { data } = await supabase.from('usuarios').select('id,correo,nombre,role');
-  res.json(data || []);
 });
 
 app.get('/', (req, res) => {
