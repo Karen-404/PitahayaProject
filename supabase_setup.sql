@@ -57,11 +57,15 @@ CREATE TABLE IF NOT EXISTS variedades (
   caracteristicas TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-CREATE TABLE IF NOT EXISTS logs_actividad (
+
+-- 5. SOPORTE TECNICO (chat de ayuda)
+CREATE TABLE IF NOT EXISTS soporte_mensajes (
   id SERIAL PRIMARY KEY,
-  usuario_id INTEGER,
-  accion TEXT,
-  tabla TEXT,
-  registro_id INTEGER,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  usuario_id INTEGER NOT NULL,
+  mensaje TEXT NOT NULL,
+  respuesta TEXT,
+  respondido_por INTEGER,
+  estado TEXT DEFAULT 'abierto',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  responded_at TIMESTAMPTZ
 );

@@ -16,6 +16,7 @@
     { label: 'Bioproductos', page: 'bioproductos.html', roles: null },
     { label: 'Pedidos', page: 'pedidos.html', roles: null },
     { label: 'Semillas', page: 'semillas.html', roles: null },
+    { label: 'Soporte', page: 'soporte.html', roles: null },
     { label: 'Perfil', page: 'perfil.html', roles: null },
     { label: 'Tipos', page: 'tipos.html', roles: null },
     { label: 'Mi Perfil Profesional', page: 'investigador-perfil.html', roles: ['investigador'] },

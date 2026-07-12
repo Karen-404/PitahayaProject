@@ -80,6 +80,25 @@
         </table>
       </div>
     </section>
+
+    <section class="content-card" style="margin-top:24px;">
+      <div class="section-title"><i class="fas fa-headset"></i> Solicitudes de Soporte</div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Mensaje</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Responder</th>
+            </tr>
+          </thead>
+          <tbody id="soporteAdminBody"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <div class="chat-flotante">
@@ -209,9 +228,40 @@
       } catch(err) {}
     }
 
+    async function cargarSoporte() {
+      const tbody = document.getElementById('soporteAdminBody');
+      try {
+        const res = await fetch('/api/soporte');
+        const data = await res.json();
+        tbody.innerHTML = data.map(function(s) {
+          var estado = s.estado === 'respondido' ? '<span style="color:var(--color-primary);font-weight:600;">Respondido</span>' : '<span style="color:var(--color-warning);">Pendiente</span>';
+          var fecha = new Date(s.created_at).toLocaleString('es-EC');
+          var respondido = s.estado === 'respondido' ? '<small style="color:var(--color-text-muted);">' + s.respuesta.substring(0,40) + '...</small>' : '<input type="text" id="resp-' + s.id + '" placeholder="Escribe respuesta..." style="width:100%;padding:6px 8px;border:1px solid var(--color-border);border-radius:6px;font-size:0.8rem;"><button class="btn btn-sm btn-primary" onclick="responderSoporte(' + s.id + ')" style="margin-top:4px;"><i class="fas fa-reply"></i></button>';
+          return '<tr><td>' + s.id + '</td><td>' + (s.usuarios ? s.usuarios.nombre : '#' + s.usuario_id) + '</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + s.mensaje + '">' + s.mensaje + '</td><td>' + estado + '</td><td>' + fecha + '</td><td style="min-width:160px;">' + respondido + '</td></tr>';
+        }).join('');
+        if (!data.length) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">Sin solicitudes</td></tr>';
+      } catch(e) { tbody.innerHTML = '<tr><td colspan="6">Error</td></tr>'; }
+    }
+
+    async function responderSoporte(id) {
+      var input = document.getElementById('resp-' + id);
+      var respuesta = input ? input.value.trim() : '';
+      if (!respuesta) return;
+      try {
+        var res = await fetch('/api/soporte/' + id, {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ respuesta })
+        });
+        if (!res.ok) { var r = await res.json(); alert('Error: ' + r.error); return; }
+        cargarSoporte();
+      } catch(e) { alert('Error'); }
+    }
+
     cargarUsuarios();
     cargarSemillas();
     cargarPedidosAdmin();
+    cargarSoporte();
   </script>
 </body>
 </html>

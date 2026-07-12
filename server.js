@@ -717,6 +717,39 @@ app.post('/api/subir-imagen', async (req, res) => {
   }
 });
 
+// ==================== SOPORTE TECNICO ====================
+app.post('/api/soporte', async (req, res) => {
+  try {
+    const { usuario_id, mensaje } = req.body;
+    if (!usuario_id || !mensaje) return res.status(400).json({ error: 'usuario_id y mensaje requeridos' });
+    const { data, error } = await supabase.from('soporte_mensajes').insert({ usuario_id, mensaje }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/soporte/:usuario_id', async (req, res) => {
+  const { data, error } = await supabase.from('soporte_mensajes').select('*').eq('usuario_id', req.params.usuario_id).order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.get('/api/soporte', async (req, res) => {
+  const { data, error } = await supabase.from('soporte_mensajes').select('*, usuarios!inner(nombre)').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.put('/api/soporte/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  try {
+    const { respuesta } = req.body;
+    if (!respuesta) return res.status(400).json({ error: 'respuesta requerida' });
+    const { data, error } = await supabase.from('soporte_mensajes').update({ respuesta, estado: 'respondido', responded_at: new Date().toISOString(), respondido_por: req.authedUser.id }).eq('id', req.params.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = app;
 
 if (require.main === module) {
