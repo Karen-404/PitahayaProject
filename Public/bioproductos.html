@@ -20,47 +20,47 @@
                     <h1>Bioproductos Disponibles</h1>
                 </div>
             </div>
+            <div class="page-header-right">
+                <button class="btn btn-primary" id="btnNuevoProducto" style="display:none" onclick="abrirModal()">
+                    <i class="fas fa-plus"></i> Nuevo Producto
+                </button>
+            </div>
         </div>
 
-        <div class="product-card content-card" style="max-width:500px;margin:0 auto;">
-            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-                <img src="https://via.placeholder.com/80" alt="" style="width:80px;height:80px;border-radius:12px;object-fit:cover;">
-                <div>
-                    <h3 style="margin:0 0 4px 0;">Pitahaya Roja</h3>
-                    <p style="margin:0;color:var(--color-text-muted);">Fruta tropical cultivada org&aacute;nicamente.</p>
-                </div>
+        <div id="productosContainer" class="bioproductos-grid"></div>
+
+        <div id="productoModal" class="modal" style="display:none">
+            <div class="modal-content">
+                <span class="modal-close" onclick="cerrarModal()">&times;</span>
+                <h2 id="modalTitle">Nuevo Bioproducto</h2>
+                <form id="productoForm">
+                    <input type="hidden" id="productoId">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="prodNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripci&oacute;n</label>
+                        <textarea id="prodDescripcion" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio ($)</label>
+                        <input type="number" id="prodPrecio" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagen</label>
+                        <input type="file" id="prodFile" accept="image/*" style="height:auto;padding:8px 0;border:none;">
+                        <div id="imagenSubiendo" style="display:none;color:var(--color-text-muted);font-size:0.85rem;margin-top:6px;"><i class="fas fa-spinner fa-spin"></i> Subiendo imagen...</div>
+                        <img id="previewImg" style="max-width:200px;margin-top:10px;display:none;border-radius:8px">
+                        <input type="hidden" id="prodImagen">
+                    </div>
+                    <div class="form-group">
+                        <label>Ficha T&eacute;cnica (JSON opcional)</label>
+                        <textarea id="prodFicha" rows="4" placeholder='{"codigo":"EI-PIT-26-001","especie":"Hylocereus undatus","ubicacion":"Orellana"}'></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Guardar</button>
+                </form>
             </div>
-
-            <button class="btn btn-secondary" onclick="toggleFicha(this)" style="width:100%;margin-bottom:12px;">
-                <i class="fas fa-file-alt"></i> Ver ficha t&eacute;cnica
-            </button>
-
-            <div class="ficha oculto" style="margin-bottom:12px;">
-                <table class="data-table">
-                    <tr><th>C&oacute;digo</th><td>EI</td></tr>
-                    <tr><th>N&uacute;mero de acceso</th><td>EI-PIT-26-001</td></tr>
-                    <tr><th>N&uacute;mero de colecta</th><td>RT-001</td></tr>
-                    <tr><th>G&eacute;nero</th><td>Hylocereus</td></tr>
-                    <tr><th>Especie</th><td>undatus</td></tr>
-                    <tr><th>Subtaxa</th><td>american beauty</td></tr>
-                    <tr><th>Nombre com&uacute;n</th><td>Pitahaya roja</td></tr>
-                    <tr><th>Nombre de la accesi&oacute;n</th><td>Pitahaya Roja Orellana</td></tr>
-                    <tr><th>Fecha adquisici&oacute;n</th><td>2024-01-15</td></tr>
-                    <tr><th>Pa&iacute;s</th><td>Ecuador</td></tr>
-                    <tr><th>Ubicaci&oacute;n</th><td>Orellana, 5 km sur El Coca</td></tr>
-                    <tr><th>Latitud</th><td>005025S</td></tr>
-                    <tr><th>Longitud</th><td>0763005W</td></tr>
-                    <tr><th>Altitud</th><td>250 m</td></tr>
-                    <tr><th>Estado biol&oacute;gico</th><td>Silvestre</td></tr>
-                    <tr><th>Fuente de colecta</th><td>Campo agr&iacute;cola</td></tr>
-                </table>
-            </div>
-
-            <p style="font-size:1.4rem;font-weight:700;color:var(--color-primary);margin:0 0 12px 0;">$10.00</p>
-
-            <button class="btn btn-primary" onclick="irPedido('Pitahaya Roja')" style="width:100%;">
-                <i class="fas fa-shopping-cart"></i> Solicitar
-            </button>
         </div>
     </main>
 
@@ -77,5 +77,142 @@
 
     <script src="js/script.js"></script>
     <script src="js/nav.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        const userRole = localStorage.getItem('userRole');
+        const puedeEditar = userRole === 'admin' || userRole === 'investigador';
+        if (puedeEditar) document.getElementById('btnNuevoProducto').style.display = 'inline-flex';
+
+        var imagenSubiendo = false;
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, function(m) {
+                if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+            });
+        }
+
+        function abrirModal(producto) {
+            const modal = document.getElementById('productoModal');
+            modal.style.display = 'flex';
+            document.getElementById('previewImg').style.display = 'none';
+            document.getElementById('productoFile').value = '';
+            document.getElementById('imagenSubiendo').style.display = 'none';
+            if (producto) {
+                document.getElementById('modalTitle').textContent = 'Editar Bioproducto';
+                document.getElementById('productoId').value = producto.id;
+                document.getElementById('prodNombre').value = producto.nombre || '';
+                document.getElementById('prodDescripcion').value = producto.descripcion || '';
+                document.getElementById('prodPrecio').value = producto.precio || '';
+                document.getElementById('prodImagen').value = producto.imagen_url || '';
+                document.getElementById('prodFicha').value = producto.ficha ? JSON.stringify(producto.ficha, null, 2) : '';
+                if (producto.imagen_url) {
+                    document.getElementById('previewImg').src = producto.imagen_url;
+                    document.getElementById('previewImg').style.display = 'block';
+                }
+            } else {
+                document.getElementById('modalTitle').textContent = 'Nuevo Bioproducto';
+                document.getElementById('productoForm').reset();
+                document.getElementById('productoId').value = '';
+                document.getElementById('previewImg').style.display = 'none';
+                document.getElementById('prodImagen').value = '';
+            }
+        }
+
+        function cerrarModal() { document.getElementById('productoModal').style.display = 'none'; }
+
+        document.getElementById('prodFile').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file || imagenSubiendo) return;
+            imagenSubiendo = true;
+            document.getElementById('imagenSubiendo').style.display = 'block';
+            const reader = new FileReader();
+            reader.onload = async function(ev) {
+                try {
+                    const res = await fetch('/api/subir-imagen', {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ imagen: ev.target.result })
+                    });
+                    if (!res.ok) { const d = await res.json(); alert('Error: ' + (d.error || 'No se pudo subir')); imagenSubiendo = false; document.getElementById('imagenSubiendo').style.display = 'none'; return; }
+                    const data = await res.json();
+                    document.getElementById('prodImagen').value = data.url;
+                    document.getElementById('previewImg').src = data.url;
+                    document.getElementById('previewImg').style.display = 'block';
+                } catch(err) { alert('Error al subir imagen'); }
+                imagenSubiendo = false;
+                document.getElementById('imagenSubiendo').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('productoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (imagenSubiendo) { alert('Espera a que termine de subir la imagen'); return; }
+            let ficha = null;
+            const fichaRaw = document.getElementById('prodFicha').value.trim();
+            if (fichaRaw) { try { ficha = JSON.parse(fichaRaw); } catch(e) { alert('Ficha técnica: JSON inválido'); return; } }
+            const data = {
+                nombre: document.getElementById('prodNombre').value,
+                descripcion: document.getElementById('prodDescripcion').value,
+                precio: parseFloat(document.getElementById('prodPrecio').value),
+                imagen_url: document.getElementById('prodImagen').value || null,
+                ficha
+            };
+            const id = document.getElementById('productoId').value;
+            const url = id ? '/api/bioproductos/' + id : '/api/bioproductos';
+            const method = id ? 'PUT' : 'POST';
+            try {
+                const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+                const result = await res.json();
+                if (!res.ok) { alert('Error: ' + result.error); return; }
+                cerrarModal();
+                cargarProductos();
+            } catch(err) { alert('Error de conexion'); }
+        });
+
+        async function eliminarProducto(id) {
+            if (!confirm('Eliminar este producto?')) return;
+            try {
+                const res = await fetch('/api/bioproductos/' + id, {
+                    method: 'DELETE',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ usuario_id: parseInt(userId) })
+                });
+                if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+                cargarProductos();
+            } catch(err) { alert('Error de conexion'); }
+        }
+
+        async function cargarProductos() {
+            const container = document.getElementById('productosContainer');
+            try {
+                const res = await fetch('/api/bioproductos');
+                const productos = await res.json();
+                if (!productos.length) {
+                    container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">No hay bioproductos disponibles</p>';
+                    return;
+                }
+                container.innerHTML = productos.map(p => {
+                    const imgHtml = p.imagen_url
+                        ? '<img src="' + escapeHTML(p.imagen_url) + '" alt="' + escapeHTML(p.nombre) + '">'
+                        : '<div style="height:160px;display:flex;align-items:center;justify-content:center;background:var(--color-border);border-radius:8px;margin-bottom:12px;"><i class="fas fa-leaf" style="font-size:3rem;color:var(--color-text-muted);"></i></div>';
+                    const fichaHtml = p.ficha ? '<button class="btn btn-secondary" onclick="toggleFicha(this)" style="width:100%;margin:8px 0;font-size:0.82rem;padding:8px;"><i class="fas fa-file-alt"></i> Ver ficha</button><div class="ficha oculto" style="margin-bottom:8px;">' + Object.entries(p.ficha).map(([k,v]) => '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--color-border-soft);font-size:0.82rem;"><strong>' + k + ':</strong><span>' + escapeHTML(String(v)) + '</span></div>').join('') + '</div>' : '';
+                    return '<div class="bioproducto-card">'
+                        + imgHtml
+                        + '<h3>' + escapeHTML(p.nombre) + '</h3>'
+                        + '<p>' + escapeHTML(p.descripcion || '') + '</p>'
+                        + '<div class="precio">$' + parseFloat(p.precio).toFixed(2) + '</div>'
+                        + fichaHtml
+                        + '<button class="btn btn-primary" onclick="irPedido(\'' + escapeHTML(p.nombre) + '\')" style="width:100%;margin-top:8px;font-size:0.85rem;"><i class="fas fa-shopping-cart"></i> Solicitar</button>'
+                        + (puedeEditar ? '<div style="margin-top:8px;display:flex;gap:8px;"><button class="btn-edit" onclick="abrirModal(' + escapeHTML(JSON.stringify(p)) + ')" style="flex:1;"><i class="fas fa-edit"></i></button><button class="btn-delete" onclick="eliminarProducto(' + p.id + ')" style="flex:1;"><i class="fas fa-trash"></i></button></div>' : '')
+                        + '</div>';
+                }).join('');
+            } catch(err) {
+                container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">Error al cargar productos</p>';
+            }
+        }
+
+        cargarProductos();
+    </script>
 </body>
 </html>

@@ -2,12 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa - Pitahaya Biotec</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Cultivos - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        .mapa-iframe { border-radius:12px;width:100%;max-width:900px;height:450px;border:0;margin:0 auto;display:block; }
-        @media(max-width:600px){ .mapa-iframe { height:300px; } }
+        .mapa-card #map { width: 100%; height: 480px; border-radius: var(--radius-md); border: none; }
+        @media(max-width:600px){ .mapa-card #map { height: 320px; } }
+        .mapa-busqueda { margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .mapa-busqueda input { flex: 1; min-width: 200px; }
+        .mapa-busqueda select { width: auto; min-width: 140px; }
+        .mapa-leyenda { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: 0.85rem; }
+        .mapa-leyenda span { display: flex; align-items: center; gap: 6px; }
+        .mapa-leyenda .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .dot-activo { background: #22c55e; }
+        .dot-inactivo { background: #ef4444; }
+        .dot-mantenimiento { background: #f59e0b; }
     </style>
 </head>
 <body>
@@ -21,14 +32,40 @@
                 </div>
                 <div>
                     <h1>Mapa de Cultivos</h1>
-                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Ubicaci&oacute;n de parcelas experimentales ESPOCH / INIAP</p>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Parcelas experimentales ESPOCH / INIAP</p>
                 </div>
             </div>
         </div>
 
-        <section class="content-card" style="text-align:center;">
-            <iframe class="mapa-iframe" src="https://www.google.com/maps?q=-0.6357312,-77.0409702&output=embed" allowfullscreen loading="lazy"></iframe>
+        <section class="mapa-card">
+            <div class="mapa-busqueda">
+                <input type="text" id="buscarMapa" placeholder="Buscar por nombre, variedad o responsable...">
+                <select id="filtroEstado">
+                    <option value="">Todos los estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                </select>
+                <select id="filtroVariedad">
+                    <option value="">Todas las variedades</option>
+                </select>
+            </div>
+            <div id="map"></div>
+            <div class="mapa-leyenda">
+                <span><span class="dot dot-activo"></span> Activo</span>
+                <span><span class="dot dot-inactivo"></span> Inactivo</span>
+                <span><span class="dot dot-mantenimiento"></span> Mantenimiento</span>
+                <span style="margin-left:auto;color:var(--color-text-muted);font-size:0.82rem;" id="contadorPuntos"></span>
+            </div>
         </section>
+
+        <div id="puntoModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:500px;">
+                <span class="modal-close" onclick="cerrarModalPunto()">&times;</span>
+                <h2 id="puntoModalTitle">Detalle del Punto</h2>
+                <div id="puntoDetalle"></div>
+            </div>
+        </div>
     </main>
 
     <div class="chat-flotante">
@@ -42,7 +79,132 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="js/script.js"></script>
     <script src="js/nav.js"></script>
+    <script>
+        var map, markers = [], allPuntos = [];
+
+        function getColor(estado) {
+            if (estado === 'activo') return '#22c55e';
+            if (estado === 'inactivo') return '#ef4444';
+            if (estado === 'mantenimiento') return '#f59e0b';
+            return '#6b7280';
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, function(m) {
+                if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+            });
+        }
+
+        function initMap() {
+            map = L.map('map').setView([-0.6357312, -77.0409702], 7);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>',
+                maxZoom: 18
+            }).addTo(map);
+            cargarPuntos();
+        }
+
+        function poblarFiltros(puntos) {
+            const variedades = [...new Set(puntos.map(p => p.variedad).filter(Boolean))];
+            const sel = document.getElementById('filtroVariedad');
+            sel.innerHTML = '<option value="">Todas las variedades</option>' + variedades.map(v => '<option value="' + escapeHTML(v) + '">' + escapeHTML(v) + '</option>').join('');
+        }
+
+        function cargarPuntos() {
+            fetch('/api/puntos')
+                .then(r => r.json())
+                .then(puntos => {
+                    allPuntos = puntos;
+                    poblarFiltros(puntos);
+                    aplicarFiltros();
+                })
+                .catch(() => {});
+        }
+
+        function aplicarFiltros() {
+            const texto = document.getElementById('buscarMapa').value.toLowerCase();
+            const estado = document.getElementById('filtroEstado').value;
+            const variedad = document.getElementById('filtroVariedad').value;
+
+            const filtrados = allPuntos.filter(p => {
+                if (estado && p.estado !== estado) return false;
+                if (variedad && p.variedad !== variedad) return false;
+                if (texto) {
+                    const searchable = [p.nombre, p.variedad, p.responsable, p.descripcion].filter(Boolean).join(' ').toLowerCase();
+                    if (!searchable.includes(texto)) return false;
+                }
+                return true;
+            });
+
+            renderizarPuntos(filtrados);
+        }
+
+        function renderizarPuntos(puntos) {
+            if (markers.length) { markers.forEach(m => map.removeLayer(m)); markers = []; }
+            document.getElementById('contadorPuntos').textContent = puntos.length + ' punto' + (puntos.length !== 1 ? 's' : '');
+
+            puntos.forEach(p => {
+                if (!p.lat || !p.lng) return;
+                const color = getColor(p.estado);
+                const marker = L.circleMarker([p.lat, p.lng], {
+                    radius: 10, fillColor: color, color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.8
+                }).addTo(map);
+
+                const fecha = p.fecha_siembra ? new Date(p.fecha_siembra).toLocaleDateString('es-EC', { year:'numeric', month:'long', day:'numeric' }) : 'No registrada';
+
+                marker.bindPopup(
+                    '<div style="min-width:200px;">'
+                    + '<h3 style="margin:0 0 8px 0;font-size:1rem;color:var(--color-primary-dark);">' + escapeHTML(p.nombre) + '</h3>'
+                    + (p.descripcion ? '<p style="margin:0 0 8px 0;font-size:0.85rem;">' + escapeHTML(p.descripcion) + '</p>' : '')
+                    + '<table style="width:100%;font-size:0.82rem;border-collapse:collapse;">'
+                    + (p.variedad ? '<tr><td style="padding:3px 6px;font-weight:600;">Variedad</td><td style="padding:3px 6px;">' + escapeHTML(p.variedad) + '</td></tr>' : '')
+                    + '<tr><td style="padding:3px 6px;font-weight:600;">Estado</td><td style="padding:3px 6px;"><span style="color:' + color + ';font-weight:600;">' + escapeHTML(p.estado || 'desconocido') + '</span></td></tr>'
+                    + '<tr><td style="padding:3px 6px;font-weight:600;">Siembra</td><td style="padding:3px 6px;">' + fecha + '</td></tr>'
+                    + (p.responsable ? '<tr><td style="padding:3px 6px;font-weight:600;">Responsable</td><td style="padding:3px 6px;">' + escapeHTML(p.responsable) + '</td></tr>' : '')
+                    + '<tr><td style="padding:3px 6px;font-weight:600;">Coordenadas</td><td style="padding:3px 6px;">' + p.lat.toFixed(4) + ', ' + p.lng.toFixed(4) + '</td></tr>'
+                    + '</table>'
+                    + '<button onclick="verDetalle(' + p.id + ')" style="width:100%;margin-top:8px;padding:6px;background:var(--color-primary);color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;">Ver detalle completo</button>'
+                    + '</div>'
+                );
+
+                markers.push(marker);
+            });
+
+            if (puntos.length > 0) {
+                const bounds = markers.map(m => m.getLatLng());
+                if (bounds.length > 0) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+            }
+        }
+
+        function verDetalle(id) {
+            const punto = allPuntos.find(p => p.id === id);
+            if (!punto) return;
+            const color = getColor(punto.estado);
+            const fecha = punto.fecha_siembra ? new Date(punto.fecha_siembra).toLocaleDateString('es-EC', { year:'numeric', month:'long', day:'numeric' }) : 'No registrada';
+            document.getElementById('puntoModalTitle').textContent = punto.nombre;
+            document.getElementById('puntoDetalle').innerHTML =
+                '<div style="text-align:center;margin-bottom:16px;"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:' + color + ';"></span> Estado: <strong>' + escapeHTML(punto.estado || 'desconocido') + '</strong></div>'
+                + '<table class="data-table">'
+                + (punto.variedad ? '<tr><th>Variedad</th><td>' + escapeHTML(punto.variedad) + '</td></tr>' : '')
+                + '<tr><th>Fecha de siembra</th><td>' + fecha + '</td></tr>'
+                + (punto.responsable ? '<tr><th>Responsable</th><td>' + escapeHTML(punto.responsable) + '</td></tr>' : '')
+                + '<tr><th>Latitud</th><td>' + punto.lat + '</td></tr>'
+                + '<tr><th>Longitud</th><td>' + punto.lng + '</td></tr>'
+                + (punto.descripcion ? '<tr><th>Descripción</th><td>' + escapeHTML(punto.descripcion) + '</td></tr>' : '')
+                + '</table>';
+            document.getElementById('puntoModal').style.display = 'flex';
+        }
+
+        function cerrarModalPunto() { document.getElementById('puntoModal').style.display = 'none'; }
+
+        document.getElementById('buscarMapa').addEventListener('input', aplicarFiltros);
+        document.getElementById('filtroEstado').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroVariedad').addEventListener('change', aplicarFiltros);
+
+        initMap();
+    </script>
 </body>
 </html>
