@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pasaporte FAO - Pitahaya Biotec</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+                    <i class="fas fa-passport"></i>
+                </div>
+                <div>
+                    <h1>Pasaporte FAO</h1>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Inventario de accesiones - Est&aacute;ndar MCPD</p>
+                </div>
+            </div>
+            <div class="page-header-right">
+                <button class="btn btn-primary" id="btnNuevoFao" style="display:none" onclick="abrirModal()">
+                    <i class="fas fa-plus"></i> Nueva Accesi&oacute;n
+                </button>
+            </div>
+        </div>
+
+        <div id="faoContainer" class="table-wrap" style="margin-top:20px;">
+            <table class="data-table" id="faoTable">
+                <thead>
+                    <tr>
+                        <th>C&oacute;digo</th>
+                        <th>Acceso</th>
+                        <th>Colecta</th>
+                        <th>G&eacute;nero</th>
+                        <th>Especie</th>
+                        <th>Nombre Com&uacute;n</th>
+                        <th>Pa&iacute;s</th>
+                        <th>Ubicaci&oacute;n</th>
+                        <th>Estado</th>
+                        <th style="width:80px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="faoBody"></tbody>
+            </table>
+            <p id="faoEmpty" style="text-align:center;color:var(--color-text-muted);padding:40px;display:none;">No hay registros FAO. Agrega el primero.</p>
+        </div>
+
+        <div id="faoModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:600px;">
+                <span class="modal-close" onclick="cerrarModal()">&times;</span>
+                <h2 id="modalTitle">Nueva Accesi&oacute;n FAO</h2>
+                <form id="faoForm">
+                    <input type="hidden" id="faoId">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group">
+                            <label>C&oacute;digo</label>
+                            <input type="text" id="fCodigo" placeholder="EI-PIT-26-001">
+                        </div>
+                        <div class="form-group">
+                            <label>N&uacute;mero de Acceso</label>
+                            <input type="text" id="fAcceso" placeholder="ACC-001">
+                        </div>
+                        <div class="form-group">
+                            <label>N&uacute;mero de Colecta</label>
+                            <input type="text" id="fColecta" placeholder="COL-001">
+                        </div>
+                        <div class="form-group">
+                            <label>G&eacute;nero</label>
+                            <input type="text" id="fGenero" placeholder="Hylocereus">
+                        </div>
+                        <div class="form-group">
+                            <label>Especie</label>
+                            <input type="text" id="fEspecie" placeholder="undatus">
+                        </div>
+                        <div class="form-group">
+                            <label>Subtaxa</label>
+                            <input type="text" id="fSubtaxa" placeholder="american beauty">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre Com&uacute;n</label>
+                            <input type="text" id="fNombreComun" placeholder="Pitahaya roja">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre de Accesi&oacute;n</label>
+                            <input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Adquisici&oacute;n</label>
+                            <input type="date" id="fFecha">
+                        </div>
+                        <div class="form-group">
+                            <label>Pa&iacute;s</label>
+                            <input type="text" id="fPais" placeholder="Ecuador">
+                        </div>
+                        <div class="form-group" style="grid-column:span 2;">
+                            <label>Ubicaci&oacute;n</label>
+                            <input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca">
+                        </div>
+                        <div class="form-group">
+                            <label>Latitud</label>
+                            <input type="number" id="fLat" step="any" placeholder="-0.6357312">
+                        </div>
+                        <div class="form-group">
+                            <label>Longitud</label>
+                            <input type="number" id="fLng" step="any" placeholder="-77.0409702">
+                        </div>
+                        <div class="form-group">
+                            <label>Altitud (m)</label>
+                            <input type="number" id="fAltitud" step="any" placeholder="250">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado Biol&oacute;gico</label>
+                            <select id="fEstadoBio" style="height:48px;">
+                                <option value="Silvestre">Silvestre</option>
+                                <option value="Cultivado">Cultivado</option>
+                                <option value="Mejorado">Mejorado</option>
+                                <option value="Hibrido">H&iacute;brido</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:span 2;">
+                            <label>Fuente de Colecta</label>
+                            <input type="text" id="fFuente" placeholder="Campo agricola, Mercado, Banco germoplasma...">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:12px;">Guardar</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="faoDetailModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:600px;">
+                <span class="modal-close" onclick="cerrarDetalle()">&times;</span>
+                <h2 id="detailTitle">Detalle de Accesi&oacute;n</h2>
+                <div id="faoDetail"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="chat-flotante">
+        <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+        <div class="chat-container oculto" id="chatContainer">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe...">
+                <button onclick="responder()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        const userRole = localStorage.getItem('userRole');
+        const puedeEditar = userRole === 'admin' || userRole === 'investigador';
+        if (puedeEditar) document.getElementById('btnNuevoFao').style.display = 'inline-flex';
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, function(m) {
+                if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+            });
+        }
+
+        function abrirModal(item) {
+            document.getElementById('faoModal').style.display = 'flex';
+            if (item) {
+                document.getElementById('modalTitle').textContent = 'Editar Accesi&oacute;n';
+                document.getElementById('faoId').value = item.id;
+                document.getElementById('fCodigo').value = item.codigo || '';
+                document.getElementById('fAcceso').value = item.numero_acceso || '';
+                document.getElementById('fColecta').value = item.numero_colecta || '';
+                document.getElementById('fGenero').value = item.genero || '';
+                document.getElementById('fEspecie').value = item.especie || '';
+                document.getElementById('fSubtaxa').value = item.subtaxa || '';
+                document.getElementById('fNombreComun').value = item.nombre_comun || '';
+                document.getElementById('fNombreAcc').value = item.nombre_accesion || '';
+                document.getElementById('fFecha').value = item.fecha_adquisicion || '';
+                document.getElementById('fPais').value = item.pais || '';
+                document.getElementById('fUbicacion').value = item.ubicacion || '';
+                document.getElementById('fLat').value = item.latitud || '';
+                document.getElementById('fLng').value = item.longitud || '';
+                document.getElementById('fAltitud').value = item.altitud || '';
+                document.getElementById('fEstadoBio').value = item.estado_biologico || 'Silvestre';
+                document.getElementById('fFuente').value = item.fuente_colecta || '';
+            } else {
+                document.getElementById('modalTitle').textContent = 'Nueva Accesi&oacute;n FAO';
+                document.getElementById('faoForm').reset();
+                document.getElementById('faoId').value = '';
+            }
+        }
+
+        function cerrarModal() { document.getElementById('faoModal').style.display = 'none'; }
+        function cerrarDetalle() { document.getElementById('faoDetailModal').style.display = 'none'; }
+
+        function verDetalle(id) {
+            const fao = window.faoData.find(f => f.id === id);
+            if (!fao) return;
+            document.getElementById('detailTitle').textContent = fao.nombre_comun || fao.codigo || 'Detalle';
+            const fields = [
+                ['Código', fao.codigo], ['N° Acceso', fao.numero_acceso], ['N° Colecta', fao.numero_colecta],
+                ['Género', fao.genero], ['Especie', fao.especie], ['Subtaxa', fao.subtaxa],
+                ['Nombre Común', fao.nombre_comun], ['Nombre Accesión', fao.nombre_accesion],
+                ['Fecha Adquisición', fao.fecha_adquisicion], ['País', fao.pais], ['Ubicación', fao.ubicacion],
+                ['Latitud', fao.latitud], ['Longitud', fao.longitud], ['Altitud', fao.altitud ? fao.altitud + ' m' : ''],
+                ['Estado Biológico', fao.estado_biologico], ['Fuente Colecta', fao.fuente_colecta]
+            ];
+            document.getElementById('faoDetail').innerHTML = '<table class="data-table">' + fields.filter(([,v]) => v).map(([k,v]) => '<tr><th>' + k + '</th><td>' + escapeHTML(String(v)) + '</td></tr>').join('') + '</table>';
+            document.getElementById('faoDetailModal').style.display = 'flex';
+        }
+
+        document.getElementById('faoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                codigo: document.getElementById('fCodigo').value || null,
+                numero_acceso: document.getElementById('fAcceso').value || null,
+                numero_colecta: document.getElementById('fColecta').value || null,
+                genero: document.getElementById('fGenero').value || null,
+                especie: document.getElementById('fEspecie').value || null,
+                subtaxa: document.getElementById('fSubtaxa').value || null,
+                nombre_comun: document.getElementById('fNombreComun').value || null,
+                nombre_accesion: document.getElementById('fNombreAcc').value || null,
+                fecha_adquisicion: document.getElementById('fFecha').value || null,
+                pais: document.getElementById('fPais').value || null,
+                ubicacion: document.getElementById('fUbicacion').value || null,
+                latitud: document.getElementById('fLat').value ? parseFloat(document.getElementById('fLat').value) : null,
+                longitud: document.getElementById('fLng').value ? parseFloat(document.getElementById('fLng').value) : null,
+                altitud: document.getElementById('fAltitud').value ? parseFloat(document.getElementById('fAltitud').value) : null,
+                estado_biologico: document.getElementById('fEstadoBio').value || null,
+                fuente_colecta: document.getElementById('fFuente').value || null
+            };
+            const id = document.getElementById('faoId').value;
+            const url = id ? '/api/fao-passport/' + id : '/api/fao-passport';
+            const method = id ? 'PUT' : 'POST';
+            try {
+                const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+                const result = await res.json();
+                if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
+                cerrarModal();
+                cargarFao();
+            } catch(e) { alert('Error de conexion'); }
+        });
+
+        async function eliminarFao(id) {
+            if (!confirm('Eliminar esta accesion?')) return;
+            try {
+                const res = await fetch('/api/fao-passport/' + id, { method:'DELETE', headers:{'Content-Type':'application/json'} });
+                if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+                cargarFao();
+            } catch(e) { alert('Error de conexion'); }
+        }
+
+        async function cargarFao() {
+            const tbody = document.getElementById('faoBody');
+            const empty = document.getElementById('faoEmpty');
+            try {
+                const res = await fetch('/api/fao-passport');
+                const data = await res.json();
+                window.faoData = data;
+                if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                tbody.innerHTML = data.map(f => {
+                    const json = escapeHTML(JSON.stringify(f));
+                    return '<tr>'
+                        + '<td>' + escapeHTML(f.codigo || '-') + '</td>'
+                        + '<td>' + escapeHTML(f.numero_acceso || '-') + '</td>'
+                        + '<td>' + escapeHTML(f.numero_colecta || '-') + '</td>'
+                        + '<td>' + escapeHTML(f.genero || '-') + '</td>'
+                        + '<td><em>' + escapeHTML(f.especie || '-') + '</em></td>'
+                        + '<td>' + escapeHTML(f.nombre_comun || '-') + '</td>'
+                        + '<td>' + escapeHTML(f.pais || '-') + '</td>'
+                        + '<td>' + escapeHTML(f.ubicacion || '-') + '</td>'
+                        + '<td>' + escapeHTML(f.estado_biologico || '-') + '</td>'
+                        + '<td style="white-space:nowrap;">'
+                        + '<button class="btn-edit" onclick="verDetalle(' + f.id + ')" title="Ver"><i class="fas fa-eye"></i></button>'
+                        + (puedeEditar ? '<button class="btn-edit" onclick="abrirModal(' + json + ')" title="Editar"><i class="fas fa-edit"></i></button>' : '')
+                        + (puedeEditar ? '<button class="btn-delete" onclick="eliminarFao(' + f.id + ')" title="Eliminar"><i class="fas fa-trash"></i></button>' : '')
+                        + '</td></tr>';
+                }).join('');
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--color-text-muted);padding:40px;">Error al cargar. Asegurate de haber creado la tabla <code>fao_passport</code> en Supabase.</td></tr>';
+            }
+        }
+
+        cargarFao();
+    </script>
+</body>
+</html>

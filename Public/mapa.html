@@ -49,6 +49,7 @@
                 <select id="filtroVariedad">
                     <option value="">Todas las variedades</option>
                 </select>
+                <button class="btn btn-primary" id="btnAgregarPunto" style="display:none;white-space:nowrap;" onclick="abrirModalPunto()"><i class="fas fa-plus"></i> Agregar</button>
             </div>
             <div id="map"></div>
             <div class="mapa-leyenda">
@@ -59,11 +60,52 @@
             </div>
         </section>
 
-        <div id="puntoModal" class="modal" style="display:none">
+        <div id="puntoDetalleModal" class="modal" style="display:none">
             <div class="modal-content" style="max-width:500px;">
-                <span class="modal-close" onclick="cerrarModalPunto()">&times;</span>
+                <span class="modal-close" onclick="cerrarDetallePunto()">&times;</span>
                 <h2 id="puntoModalTitle">Detalle del Punto</h2>
                 <div id="puntoDetalle"></div>
+            </div>
+        </div>
+
+        <div id="puntoFormModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:480px;">
+                <span class="modal-close" onclick="cerrarFormPunto()">&times;</span>
+                <h2>Nuevo Punto de Monitoreo</h2>
+                <form id="puntoForm">
+                    <div class="form-group">
+                        <label>Nombre de la Finca</label>
+                        <input type="text" id="pfNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Variedad</label>
+                        <select id="pfVariedad" style="height:48px;">
+                            <option value="Pitahaya Roja">Pitahaya Roja</option>
+                            <option value="Pitahaya Amarilla">Pitahaya Amarilla</option>
+                            <option value="Pitahaya Blanca">Pitahaya Blanca</option>
+                            <option value="Pitahaya Rosa">Pitahaya Rosa</option>
+                            <option value="Pitahaya Golden">Pitahaya Golden</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de Salud</label>
+                        <select id="pfEstado" style="height:48px;">
+                            <option value="Sano">Sano</option>
+                            <option value="Enfermo">Enfermo</option>
+                            <option value="En observacion">En observaci&oacute;n</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Latitud</label>
+                        <input type="number" id="pfLat" step="any" required placeholder="-0.6357">
+                    </div>
+                    <div class="form-group">
+                        <label>Longitud</label>
+                        <input type="number" id="pfLng" step="any" required placeholder="-77.0410">
+                    </div>
+                    <p style="font-size:0.82rem;color:var(--color-text-muted);">Tambi&eacute;n puedes hacer clic en el mapa para establecer las coordenadas.</p>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Guardar Punto</button>
+                </form>
             </div>
         </div>
     </main>
@@ -86,9 +128,9 @@
         var map, markers = [], allPuntos = [];
 
         function getColor(estado) {
-            if (estado === 'activo') return '#22c55e';
-            if (estado === 'inactivo') return '#ef4444';
-            if (estado === 'mantenimiento') return '#f59e0b';
+            if (estado === 'activo' || estado === 'Sano') return '#22c55e';
+            if (estado === 'inactivo' || estado === 'Enfermo') return '#ef4444';
+            if (estado === 'mantenimiento' || estado === 'En observacion') return '#f59e0b';
             return '#6b7280';
         }
 
@@ -98,12 +140,23 @@
             });
         }
 
+        // Show add button for admin/investigador
+        const userRole = localStorage.getItem('userRole');
+        if (userRole === 'admin' || userRole === 'investigador') {
+            document.getElementById('btnAgregarPunto').style.display = 'inline-flex';
+        }
+
         function initMap() {
             map = L.map('map').setView([-0.6357312, -77.0409702], 7);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://openstreetmap.org">OSM</a>',
                 maxZoom: 18
             }).addTo(map);
+            // Click on map to fill coordinates in form
+            map.on('click', function(e) {
+                document.getElementById('pfLat').value = e.latlng.lat.toFixed(6);
+                document.getElementById('pfLng').value = e.latlng.lng.toFixed(6);
+            });
             cargarPuntos();
         }
 
@@ -181,8 +234,7 @@
         function verDetalle(id) {
             const punto = allPuntos.find(p => p.id === id);
             if (!punto) return;
-            const estadoSalud = (punto.estado_salud || '').toLowerCase();
-            const color = getColor(estadoSalud === 'sano' ? 'activo' : estadoSalud === 'enfermo' ? 'inactivo' : 'mantenimiento');
+            const color = getColor(punto.estado_salud);
             document.getElementById('puntoModalTitle').textContent = punto.nombre_finca;
             document.getElementById('puntoDetalle').innerHTML =
                 '<div style="text-align:center;margin-bottom:16px;"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:' + color + ';"></span> Estado: <strong>' + escapeHTML(punto.estado_salud || 'desconocido') + '</strong></div>'
@@ -191,10 +243,41 @@
                 + '<tr><th>Latitud</th><td>' + punto.latitud + '</td></tr>'
                 + '<tr><th>Longitud</th><td>' + punto.longitud + '</td></tr>'
                 + '</table>';
-            document.getElementById('puntoModal').style.display = 'flex';
+            document.getElementById('puntoDetalleModal').style.display = 'flex';
         }
 
-        function cerrarModalPunto() { document.getElementById('puntoModal').style.display = 'none'; }
+        function cerrarDetallePunto() { document.getElementById('puntoDetalleModal').style.display = 'none'; }
+
+        function abrirModalPunto() {
+            document.getElementById('puntoFormModal').style.display = 'flex';
+            document.getElementById('pfLat').value = '';
+            document.getElementById('pfLng').value = '';
+        }
+        function cerrarFormPunto() { document.getElementById('puntoFormModal').style.display = 'none'; }
+
+        document.getElementById('puntoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre_finca: document.getElementById('pfNombre').value,
+                variedad: document.getElementById('pfVariedad').value,
+                estado_salud: document.getElementById('pfEstado').value,
+                latitud: parseFloat(document.getElementById('pfLat').value),
+                longitud: parseFloat(document.getElementById('pfLng').value)
+            };
+            const userId = localStorage.getItem('userId');
+            try {
+                const res = await fetch('/api/puntos', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
+                cerrarFormPunto();
+                cargarPuntos();
+                alert('Punto agregado correctamente');
+            } catch(e) { alert('Error de conexion'); }
+        });
 
         document.getElementById('buscarMapa').addEventListener('input', aplicarFiltros);
         document.getElementById('filtroEstado').addEventListener('change', aplicarFiltros);

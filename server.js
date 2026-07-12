@@ -199,6 +199,67 @@ app.delete('/api/noticias/:id', requireRole(['admin', 'investigador']), async (r
   res.json({ success: true });
 });
 
+// ==================== COMENTARIOS (RF-10) ====================
+app.get('/api/comentarios/:noticia_id', async (req, res) => {
+  const { data, error } = await supabase.from('comentarios').select('*, usuarios!inner(nombre)').eq('noticia_id', req.params.noticia_id).order('created_at', { ascending: true });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.post('/api/comentarios', async (req, res) => {
+  const { noticia_id, usuario_id, contenido } = req.body;
+  if (!noticia_id || !usuario_id || !contenido) return res.status(400).json({ error: 'Faltan datos' });
+  try {
+    const { data, error } = await supabase.from('comentarios').insert({ noticia_id, usuario_id, contenido }).select('*, usuarios!inner(nombre)').single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/comentarios/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+  const { error } = await supabase.from('comentarios').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
+});
+
+// ==================== FAO PASSPORT ====================
+app.get('/api/fao-passport', async (req, res) => {
+  const { data, error } = await supabase.from('fao_passport').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.get('/api/fao-passport/:id', async (req, res) => {
+  const { data, error } = await supabase.from('fao_passport').select('*').eq('id', req.params.id).single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+app.post('/api/fao-passport', requireRole(['admin', 'investigador']), async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('fao_passport').insert(req.body).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'CREAR', 'fao_passport', data.id);
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('fao_passport').update(req.body).eq('id', req.params.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'EDITAR', 'fao_passport', parseInt(req.params.id));
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/fao-passport/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+  const { error } = await supabase.from('fao_passport').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  logActividad(req.authedUser.id, 'ELIMINAR', 'fao_passport', parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // ==================== LIKES ====================
 app.post('/api/noticias/:id/like', async (req, res) => {
   const { usuario_id } = req.body;

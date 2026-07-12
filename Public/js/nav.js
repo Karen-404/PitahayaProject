@@ -12,6 +12,7 @@
     { label: 'Noticias', page: 'noticias.html', roles: null },
     { label: 'Investigadores', page: 'investigadores.html', roles: null },
     { label: 'Mapa', page: 'mapa.html', roles: null },
+    { label: 'FAO Passport', page: 'fao.html', roles: null },
     { label: 'Bioproductos', page: 'bioproductos.html', roles: null },
     { label: 'Pedidos', page: 'pedidos.html', roles: null },
     { label: 'Semillas', page: 'semillas.html', roles: null },
