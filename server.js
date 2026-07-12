@@ -740,7 +740,7 @@ app.get('/api/soporte', async (req, res) => {
   res.json(data || []);
 });
 
-app.put('/api/soporte/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+app.put('/api/soporte/:id', requireRole(['admin', 'tecnico']), async (req, res) => {
   try {
     const { respuesta } = req.body;
     if (!respuesta) return res.status(400).json({ error: 'respuesta requerida' });

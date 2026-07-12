@@ -152,7 +152,7 @@
         });
 
         // --- Bandeja del t&eacute;cnico ---
-        if (userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico') {
+        if (userRole === 'admin' || userRole === 'tecnico') {
             document.getElementById('bandejaSection').style.display = 'block';
         }
 
@@ -204,7 +204,7 @@
         }
 
         cargarMensajes();
-        if (userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico') cargarBandeja();
+        if (userRole === 'admin' || userRole === 'tecnico') cargarBandeja();
     </script>
 </body>
 </html>
