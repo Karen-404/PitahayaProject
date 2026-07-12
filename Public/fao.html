@@ -56,71 +56,71 @@
         </div>
 
         <div id="faoModal" class="modal" style="display:none">
-            <div class="modal-content" style="max-width:600px;">
+            <div class="modal-content" style="max-width:720px;padding:32px;">
                 <span class="modal-close" onclick="cerrarModal()">&times;</span>
-                <h2 id="modalTitle">Nueva Accesi&oacute;n FAO</h2>
+                <h2 id="modalTitle" style="margin:0 0 20px;font-size:1.15rem;">Nueva Accesi&oacute;n FAO</h2>
                 <form id="faoForm">
                     <input type="hidden" id="faoId">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                         <div class="form-group">
                             <label>C&oacute;digo</label>
-                            <input type="text" id="fCodigo" placeholder="EI-PIT-26-001">
+                            <input type="text" id="fCodigo" placeholder="EI-PIT-26-001" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>N&uacute;mero de Acceso</label>
-                            <input type="text" id="fAcceso" placeholder="ACC-001">
+                            <input type="text" id="fAcceso" placeholder="ACC-001" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>N&uacute;mero de Colecta</label>
-                            <input type="text" id="fColecta" placeholder="COL-001">
+                            <input type="text" id="fColecta" placeholder="COL-001" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>G&eacute;nero</label>
-                            <input type="text" id="fGenero" placeholder="Hylocereus">
+                            <input type="text" id="fGenero" placeholder="Hylocereus" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Especie</label>
-                            <input type="text" id="fEspecie" placeholder="undatus">
+                            <input type="text" id="fEspecie" placeholder="undatus" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Subtaxa</label>
-                            <input type="text" id="fSubtaxa" placeholder="american beauty">
+                            <input type="text" id="fSubtaxa" placeholder="american beauty" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Nombre Com&uacute;n</label>
-                            <input type="text" id="fNombreComun" placeholder="Pitahaya roja">
+                            <input type="text" id="fNombreComun" placeholder="Pitahaya roja" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Nombre de Accesi&oacute;n</label>
-                            <input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana">
+                            <input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Fecha Adquisici&oacute;n</label>
-                            <input type="date" id="fFecha">
+                            <input type="date" id="fFecha" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Pa&iacute;s</label>
-                            <input type="text" id="fPais" placeholder="Ecuador">
+                            <input type="text" id="fPais" placeholder="Ecuador" style="height:44px;">
                         </div>
                         <div class="form-group" style="grid-column:span 2;">
                             <label>Ubicaci&oacute;n</label>
-                            <input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca">
+                            <input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Latitud</label>
-                            <input type="number" id="fLat" step="any" placeholder="-0.6357312">
+                            <input type="number" id="fLat" step="any" placeholder="-0.6357312" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Longitud</label>
-                            <input type="number" id="fLng" step="any" placeholder="-77.0409702">
+                            <input type="number" id="fLng" step="any" placeholder="-77.0409702" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Altitud (m)</label>
-                            <input type="number" id="fAltitud" step="any" placeholder="250">
+                            <input type="number" id="fAltitud" step="any" placeholder="250" style="height:44px;">
                         </div>
                         <div class="form-group">
                             <label>Estado Biol&oacute;gico</label>
-                            <select id="fEstadoBio" style="height:48px;">
+                            <select id="fEstadoBio" style="height:44px;">
                                 <option value="Silvestre">Silvestre</option>
                                 <option value="Cultivado">Cultivado</option>
                                 <option value="Mejorado">Mejorado</option>
@@ -129,10 +129,10 @@
                         </div>
                         <div class="form-group" style="grid-column:span 2;">
                             <label>Fuente de Colecta</label>
-                            <input type="text" id="fFuente" placeholder="Campo agricola, Mercado, Banco germoplasma...">
+                            <input type="text" id="fFuente" placeholder="Campo agricola, Mercado, Banco germoplasma..." style="height:44px;">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:12px;">Guardar</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px;height:46px;font-size:0.95rem;">Guardar Accesi&oacute;n</button>
                 </form>
             </div>
         </div>
