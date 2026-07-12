@@ -692,9 +692,9 @@ input:focus, select:focus, textarea:focus {
 
 .login-container {
   max-width: 420px;
-  margin: -60px auto 40px;
+  margin: 0 auto;
   background: var(--color-surface);
-  padding: 32px;
+  padding: 30px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--color-border);

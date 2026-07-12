@@ -12,6 +12,9 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         body.registro-page-wrapper::before {
             content: '';
@@ -20,14 +23,10 @@
             z-index: 0;
         }
         body.registro-page-wrapper > * { position: relative; z-index: 1; }
-        .registro-page { display: flex; align-items: center; justify-content: center; flex: 1; padding: 20px; }
-        body.registro-page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
         .registro-page-wrapper .system-footer { margin-top: 0; }
+        body.registro-page-wrapper main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         @media (max-width: 767px) {
-            .registro-page-wrapper .login-container { max-width: 100% !important; margin: 0 16px !important; padding: 24px !important; }
-            .registro-page-wrapper .login-container input,
-            .registro-page-wrapper .login-container select { height: 48px !important; font-size: 0.95rem !important; }
-            .registro-page-wrapper .login-container button { height: 48px !important; font-size: 1rem !important; }
+            body.registro-page-wrapper .login-container { max-width: 95% !important; padding: 20px !important; }
         }
     </style>
 </head>
@@ -37,8 +36,8 @@
         <div class="brand">PITAHAYA <span>BIOTEC</span></div>
     </nav>
 
-    <main class="registro-page">
-        <section class="login-container" style="margin:0;max-width:960px;padding:40px;">
+    <main>
+        <section class="login-container">
             <h2>Crear Cuenta</h2>
             <form id="registroForm">
                 <div class="form-group">

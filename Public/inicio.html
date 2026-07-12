@@ -2,9 +2,42 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inicio - Pitahaya Biotec</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .inicio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .inicio-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+      text-align: center;
+      transition: 0.25s;
+    }
+    .inicio-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .inicio-card .icono {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: var(--color-primary-soft); color: var(--color-primary);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px; font-size: 1.5rem;
+    }
+    .inicio-card h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--color-primary-dark); }
+    .inicio-card p { font-size: 0.85rem; color: var(--color-text-secondary); margin: 0 0 14px; }
+    .inicio-card a { width: 100%; }
+    @media (max-width: 767px) {
+      .inicio-grid { grid-template-columns: 1fr; }
+      .content-card { padding: 24px 16px !important; }
+      .content-card h1 { font-size: 1.3rem !important; }
+    }
+  </style>
 </head>
 <body>
   <div id="app-nav"></div>
@@ -25,6 +58,27 @@
         <a href="noticias.html" class="btn btn-secondary"><i class="fas fa-newspaper"></i> Noticias</a>
       </div>
     </section>
+
+    <div class="inicio-grid">
+      <div class="inicio-card">
+        <div class="icono"><i class="fas fa-map-marker-alt"></i></div>
+        <h3>Mapa de Monitoreo</h3>
+        <p>Puntos de monitoreo con informaci&oacute;n de salud y variedad.</p>
+        <a href="mapa.html" class="btn btn-primary">Ir al Mapa</a>
+      </div>
+      <div class="inicio-card">
+        <div class="icono"><i class="fas fa-seedling"></i></div>
+        <h3>Variedades</h3>
+        <p>Cat&aacute;logo completo de variedades de pitahaya.</p>
+        <a href="tipos.html" class="btn btn-primary">Ver Variedades</a>
+      </div>
+      <div class="inicio-card">
+        <div class="icono"><i class="fas fa-flask"></i></div>
+        <h3>Bioproductos</h3>
+        <p>Productos biotecnol&oacute;gicos para el cultivo.</p>
+        <a href="bioproductos.html" class="btn btn-primary">Ver Productos</a>
+      </div>
+    </div>
   </main>
 
   <div class="chat-flotante">
