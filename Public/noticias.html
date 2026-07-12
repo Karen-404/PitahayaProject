@@ -209,6 +209,8 @@
             + '</button>'
             + (puedeEditar ? '<button class="btn-edit" onclick="abrirModal(' + noticiaJson + ')"><i class="fas fa-edit"></i></button>' : '')
             + (puedeEditar ? '<button class="btn-delete" onclick="eliminarNoticia(' + n.id + ')"><i class="fas fa-trash"></i></button>' : '')
+            + '<button class="btn-share" onclick="window.open(\'https://wa.me/?text=' + encodeURIComponent(n.titulo + ' - ' + window.location.origin + '/noticias.html?id=' + n.id) + '\',\'_blank\')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>'
+            + '<button class="btn-share" onclick="window.open(\'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.origin + '/noticias.html?id=' + n.id) + '\',\'_blank\')" title="Facebook"><i class="fab fa-facebook"></i></button>'
             + '</div></div></div>';
         }).join('');
       } catch(err) {

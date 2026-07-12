@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('userName', data.nombre);
                 localStorage.setItem('userId', data.id);
                 localStorage.setItem('userEmail', data.correo);
+                if (data.token) localStorage.setItem('userToken', data.token);
                 window.location.href = 'inicio.html';
             } catch (err) {
                 alert('❌ Error de conexión');
@@ -75,8 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('⚠️ ' + data.error);
                     return;
                 }
+                if (data.token) {
+                    localStorage.setItem('userToken', data.token);
+                    localStorage.setItem('userRole', data.role);
+                    localStorage.setItem('userName', data.nombre);
+                    localStorage.setItem('userId', data.id);
+                }
                 alert('✅ Registro exitoso');
-                window.location.href = 'index.html';
+                window.location.href = 'inicio.html';
             } catch (err) {
                 alert('❌ Error de conexión');
             }
@@ -160,6 +167,7 @@ if (logoutBtn) {
         localStorage.removeItem('userName');
         localStorage.removeItem('userId');
         localStorage.removeItem('userEmail');
+        localStorage.removeItem('userToken');
         window.location.href = 'index.html';
     });
 }

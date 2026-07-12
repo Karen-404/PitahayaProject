@@ -2,7 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'pitahaya_secret_dev_key_2026';
+const TOKEN_EXPIRY = '7d';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,10 +32,23 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// Helper: verify role
+// Helper: verify role (supports JWT via Authorization header + legacy usuario_id)
 async function requireRole(req, res, roles) {
   if (!supabase) return res.status(503).json({ error: 'Base de datos no disponible' });
-  var uid = req.body.usuario_id;
+  var uid = null;
+  // Try JWT from Authorization header first
+  const auth = req.headers['authorization'];
+  if (auth && auth.startsWith('Bearer ')) {
+    try {
+      const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
+      uid = decoded.id;
+      req.authedUser = decoded;
+      if (uid === 0 || !roles.includes(decoded.role)) return res.status(403).json({ error: 'Permiso denegado' });
+      return decoded;
+    } catch (e) { return res.status(401).json({ error: 'Token invalido o expirado' }); }
+  }
+  // Legacy fallback: usuario_id from body/query/headers
+  uid = req.body.usuario_id;
   if (uid === undefined || uid === null || uid === '') uid = req.query.usuario_id;
   if (uid === undefined || uid === null || uid === '') uid = req.headers['x-usuario-id'];
   if (uid === undefined || uid === null || uid === '') return res.status(401).json({ error: 'No autorizado - usuario no identificado' });
@@ -47,6 +65,13 @@ async function requireRole(req, res, roles) {
   return user;
 }
 
+// Helper: log activity (silently fails if table doesn't exist)
+async function logActividad(usuario_id, accion, tabla, registro_id, detalles) {
+  try {
+    await supabase.from('logs_actividad').insert({ usuario_id, accion, tabla, registro_id, detalles });
+  } catch (e) { /* table not yet created */ }
+}
+
 // ==================== AUTH ====================
 app.post('/api/register', async (req, res) => {
   const { nombre, correo, password, role } = req.body;
@@ -55,17 +80,30 @@ app.post('/api/register', async (req, res) => {
   const finalRole = rolesValidos.includes(role) ? role : 'productor';
   const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
   if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
-  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password, role: finalRole }).select().single();
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: finalRole }).select().single();
   if (error) return res.status(500).json({ error: error.message });
-  res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role });
+  const token = jwt.sign({ id: data.id, role: data.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role, token });
 });
 
 app.post('/api/login', async (req, res) => {
   const { correo, password } = req.body;
-  const { data: user, error } = await supabase.from('usuarios').select('*').eq('correo', correo).eq('password', password).maybeSingle();
+  const { data: user, error } = await supabase.from('usuarios').select('*').eq('correo', correo).maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
   if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
-  res.json({ id: user.id, nombre: user.nombre, correo: user.correo, role: user.role });
+  let match = false;
+  // Try bcrypt first, then fallback to plain-text for migration
+  try { match = await bcrypt.compare(password, user.password); } catch (e) { /* ignore */ }
+  if (!match && user.password === password) {
+    match = true;
+    // Migrate plain-text password to bcrypt hash
+    const hashed = await bcrypt.hash(password, 10);
+    await supabase.from('usuarios').update({ password: hashed }).eq('id', user.id);
+  }
+  if (!match) return res.status(401).json({ error: 'Credenciales incorrectas' });
+  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  res.json({ id: user.id, nombre: user.nombre, correo: user.correo, role: user.role, token });
 });
 
 // ==================== USUARIOS (Admin) ====================
@@ -134,6 +172,7 @@ app.post('/api/noticias', async (req, res) => {
       autor_id: user.id, fecha: new Date().toISOString().split('T')[0]
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
+    logActividad(user.id, 'CREAR', 'noticias', data.id, `Título: ${titulo}`);
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -146,6 +185,7 @@ app.put('/api/noticias/:id', async (req, res) => {
   const { titulo, contenido, imagen_url } = req.body;
   const { data, error } = await supabase.from('noticias').update({ titulo, contenido, imagen_url }).eq('id', req.params.id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  logActividad(user.id, 'EDITAR', 'noticias', parseInt(req.params.id), `Título: ${titulo}`);
   res.json(data);
 });
 
@@ -154,6 +194,7 @@ app.delete('/api/noticias/:id', async (req, res) => {
   if (!user) return;
   const { error } = await supabase.from('noticias').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
+  logActividad(user.id, 'ELIMINAR', 'noticias', parseInt(req.params.id));
   res.json({ success: true });
 });
 
@@ -430,6 +471,34 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Public', 'index.html'));
+});
+
+// ==================== EXPORTACION DATOS (RF-11) ====================
+app.get('/api/exportar/:tabla', async (req, res) => {
+  const { tabla } = req.params;
+  const { formato, usuario_id } = req.query;
+  const tablasPermitidas = ['noticias', 'usuarios', 'pedidos', 'semillas', 'bioproductos'];
+  if (!tablasPermitidas.includes(tabla)) return res.status(400).json({ error: 'Tabla no disponible para exportacion' });
+  const { data, error } = await supabase.from(tabla).select('*');
+  if (error) return res.status(500).json({ error: error.message });
+  if (usuario_id) logActividad(parseInt(usuario_id), 'EXPORTAR', tabla, null, `Formato: ${formato || 'json'}`);
+  if (formato === 'csv') {
+    const keys = Object.keys(data[0] || {});
+    const csv = [keys.join(','), ...data.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${tabla}.csv"`);
+    return res.send('\uFEFF' + csv);
+  }
+  if (formato === 'txt') {
+    let txt = `=== Exportacion: ${tabla} ===\n\n`;
+    data.forEach((r, i) => { txt += `Registro ${i+1}:\n${JSON.stringify(r, null, 2)}\n\n`; });
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${tabla}.txt"`);
+    return res.send(txt);
+  }
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${tabla}.json"`);
+  res.json(data);
 });
 
 // ==================== SUBIR IMAGEN ====================

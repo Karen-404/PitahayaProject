@@ -487,6 +487,9 @@ input:focus, select:focus, textarea:focus {
 }
 .btn-delete-sm:hover { background: var(--color-danger-soft); }
 
+.btn-share { background:none; border:none; color:var(--color-text-muted); cursor:pointer; font-size:1rem; padding:5px 8px; border-radius:6px; transition:0.2s; }
+.btn-share:hover { background:var(--color-border); color:var(--color-primary); }
+
 /* ====================================
    MODAL
    ==================================== */
