@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fertirriego - Pitahaya Biotec</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <div>
+                    <h1>Fertirriego de Pitahaya</h1>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Requerimientos h&iacute;dricos y nutricionales por etapa fenol&oacute;gica</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="content-card" style="padding:24px;">
+                <h2 style="font-size:1.1rem;margin:0 0 16px;"><i class="fas fa-calculator" style="color:var(--color-primary);"></i> Calculadora de Riego</h2>
+                <div class="form-group">
+                    <label>Edad del cultivo</label>
+                    <select id="edadPlanta" style="height:48px;">
+                        <option value="0-6">0 - 6 meses (Establecimiento)</option>
+                        <option value="6-12">6 - 12 meses (Crecimiento)</option>
+                        <option value="12-24">12 - 24 meses (Desarrollo)</option>
+                        <option value="24+" selected>24+ meses (Producci&oacute;n)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de suelo</label>
+                    <select id="tipoSuelo" style="height:48px;">
+                        <option value="arenoso">Arenoso</option>
+                        <option value="franco" selected>Franco</option>
+                        <option value="arcilloso">Arcilloso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Temperatura media (&deg;C)</label>
+                    <input type="number" id="tempMedia" value="25" min="10" max="40" style="height:48px;">
+                </div>
+                <button class="btn btn-primary" onclick="calcularRiego()" style="width:100%;"><i class="fas fa-sync"></i> Calcular</button>
+
+                <div id="resultadoRiego" style="margin-top:16px;padding:16px;background:var(--color-primary-soft);border-radius:12px;display:none;"></div>
+            </div>
+
+            <div class="content-card" style="padding:24px;">
+                <h2 style="font-size:1.1rem;margin:0 0 16px;"><i class="fas fa-flask" style="color:var(--color-primary);"></i> Requerimientos Nutricionales</h2>
+                <div class="form-group">
+                    <label>Etapa fenol&oacute;gica</label>
+                    <select id="etapaNutricion" style="height:48px;" onchange="mostrarNutricion()">
+                        <option value="vegetativo">Vegetativo</option>
+                        <option value="floracion">Floraci&oacute;n / Cuajado</option>
+                        <option value="llenado">Llenado de fruto</option>
+                        <option value="cosecha">Post-cosecha / Mantenimiento</option>
+                    </select>
+                </div>
+                <div id="tablaNutricion" style="margin-top:12px;"></div>
+            </div>
+        </div>
+
+        <div class="content-card" style="margin-top:20px;padding:24px;">
+            <h2 style="font-size:1.1rem;margin:0 0 12px;"><i class="fas fa-info-circle" style="color:var(--color-primary);"></i> Recomendaciones Generales</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                <div style="padding:14px;background:var(--color-surface-secondary);border-radius:10px;">
+                    <strong style="color:var(--color-primary-dark);"><i class="fas fa-droplet"></i> Riego por goteo</strong>
+                    <p style="font-size:0.82rem;margin:6px 0 0;color:var(--color-text-secondary);">Sistema recomendado: 2-4 goteros por planta, caudal 2-4 L/h. Eficiencia &gt;90%.</p>
+                </div>
+                <div style="padding:14px;background:var(--color-surface-secondary);border-radius:10px;">
+                    <strong style="color:var(--color-primary-dark);"><i class="fas fa-leaf"></i> Frecuencia</strong>
+                    <p style="font-size:0.82rem;margin:6px 0 0;color:var(--color-text-secondary);">Riego cada 2-3 d&iacute;as en verano, cada 5-7 d&iacute;as en invierno. Evitar encharcamiento.</p>
+                </div>
+                <div style="padding:14px;background:var(--color-surface-secondary);border-radius:10px;">
+                    <strong style="color:var(--color-primary-dark);"><i class="fas fa-seedling"></i> Mulching</strong>
+                    <p style="font-size:0.82rem;margin:6px 0 0;color:var(--color-text-secondary);">Cobertura org&aacute;nica reduce evaporaci&oacute;n en un 30% y regula temperatura del suelo.</p>
+                </div>
+                <div style="padding:14px;background:var(--color-surface-secondary);border-radius:10px;">
+                    <strong style="color:var(--color-primary-dark);"><i class="fas fa-vial"></i> An&aacute;lisis de suelo</strong>
+                    <p style="font-size:0.82rem;margin:6px 0 0;color:var(--color-text-secondary);">Realizar an&aacute;lisis cada 6 meses. pH &oacute;ptimo: 5.5 - 6.5. M.O. &gt;3%.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/nav.js"></script>
+    <script>
+        function calcularRiego() {
+            const edad = document.getElementById('edadPlanta').value;
+            const suelo = document.getElementById('tipoSuelo').value;
+            const temp = parseFloat(document.getElementById('tempMedia').value) || 25;
+            const div = document.getElementById('resultadoRiego');
+            var lamina = 0, frec = '', obs = '';
+            if (edad === '0-6') { lamina = 2; frec = 'Cada 3-4 d&iacute;as'; obs = 'Riego ligero y frecuente para establecer sistema radicular.'; }
+            else if (edad === '6-12') { lamina = 4; frec = 'Cada 2-3 d&iacute;as'; obs = 'Aumentar volumen para soportar crecimiento vegetativo.'; }
+            else if (edad === '12-24') { lamina = 6; frec = 'Cada 2 d&iacute;as'; obs = 'Mantener humedad constante durante formaci&oacute;n de estructuras reproductivas.'; }
+            else { lamina = 8; frec = 'Cada 1-2 d&iacute;as'; obs = 'M&aacute;ximo requerimiento. Cr&iacute;tico en floraci&oacute;n y llenado de fruto.'; }
+            if (suelo === 'arenoso') { lamina *= 1.3; obs += ' Suelo arenoso: aumentar frecuencia, menor retenci&oacute;n.'; }
+            else if (suelo === 'arcilloso') { lamina *= 0.8; obs += ' Suelo arcilloso: reducir l&aacute;mina, mayor retenci&oacute;n.'; }
+            if (temp > 30) { lamina *= 1.2; obs += ' Temperatura alta: incrementar riego.'; }
+            else if (temp < 20) { lamina *= 0.8; obs += ' Temperatura baja: reducir riego.'; }
+            div.style.display = 'block';
+            div.innerHTML = '<p style="margin:0 0 8px;font-weight:700;color:var(--color-primary-dark);"><i class="fas fa-check-circle"></i> Resultado</p>'
+                + '<table style="width:100%;font-size:0.85rem;"><tr><td style="padding:4px 0;color:var(--color-text-secondary);">L&aacute;mina de riego:</td><td style="padding:4px 0;font-weight:600;">' + lamina.toFixed(1) + ' L/planta/d&iacute;a</td></tr>'
+                + '<tr><td style="padding:4px 0;color:var(--color-text-secondary);">Frecuencia:</td><td style="padding:4px 0;font-weight:600;">' + frec + '</td></tr>'
+                + '<tr><td style="padding:4px 0;color:var(--color-text-secondary);">Observaci&oacute;n:</td><td style="padding:4px 0;font-size:0.8rem;">' + obs + '</td></tr></table>';
+        }
+
+        function mostrarNutricion() {
+            const etapa = document.getElementById('etapaNutricion').value;
+            const div = document.getElementById('tablaNutricion');
+            var data = [];
+            if (etapa === 'vegetativo') {
+                data = [['Nitr&oacute;geno (N)', '150-200', 'Alta'], ['F&oacute;sforo (P)', '60-80', 'Media'], ['Potasio (K)', '120-160', 'Media'], ['Calcio (Ca)', '80-100', 'Media'], ['Magnesio (Mg)', '30-40', 'Baja'], ['Fertilizante sugerido', '20-10-10', '1-2 kg/planta/a&ntilde;o']];
+            } else if (etapa === 'floracion') {
+                data = [['Nitr&oacute;geno (N)', '80-100', 'Baja'], ['F&oacute;sforo (P)', '100-140', 'Alta'], ['Potasio (K)', '180-220', 'Alta'], ['Calcio (Ca)', '100-120', 'Alta'], ['Boro (B)', '1-2', 'Alta'], ['Fertilizante sugerido', '10-20-20', '0.5-1 kg/planta']];
+            } else if (etapa === 'llenado') {
+                data = [['Nitr&oacute;geno (N)', '100-120', 'Media'], ['F&oacute;sforo (P)', '80-100', 'Media'], ['Potasio (K)', '200-250', 'Alta'], ['Calcio (Ca)', '80-100', 'Media'], ['Magnesio (Mg)', '40-50', 'Media'], ['Fertilizante sugerido', '15-15-20', '1-1.5 kg/planta']];
+            } else {
+                data = [['Nitr&oacute;geno (N)', '100-130', 'Media'], ['F&oacute;sforo (P)', '60-80', 'Baja'], ['Potasio (K)', '120-150', 'Media'], ['Calcio (Ca)', '60-80', 'Media'], ['Potasio (K)', '120-150', 'Media'], ['Fertilizante sugerido', '18-10-15', '0.5 kg/planta']];
+            }
+            div.innerHTML = '<table class="data-table" style="font-size:0.82rem;"><thead><tr><th>Elemento</th><th>Dosis (kg/ha)</th><th>Prioridad</th></tr></thead><tbody>'
+                + data.map(function(r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('')
+                + '</tbody></table>';
+        }
+
+        calcularRiego();
+        mostrarNutricion();
+    </script>
+</body>
+</html>

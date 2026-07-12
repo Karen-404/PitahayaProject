@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicaciones - Pitahaya Biotec</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-nav"></div>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-header-icon" style="background:var(--color-primary-soft);color:var(--color-primary);">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <div>
+                    <h1>Publicaciones Cient&iacute;ficas</h1>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Tesis, art&iacute;culos e investigaciones del proyecto</p>
+                </div>
+            </div>
+            <div class="page-header-right">
+                <button class="btn btn-primary" id="btnNuevaPub" style="display:none" onclick="abrirModal()">
+                    <i class="fas fa-plus"></i> Nueva Publicaci&oacute;n
+                </button>
+            </div>
+        </div>
+
+        <div class="buscador" style="margin-bottom:24px;">
+            <input type="text" id="buscarPub" placeholder="Buscar por t&iacute;tulo, autor o revista..." style="width:100%;max-width:400px;">
+            <select id="filtroTipo" style="height:40px;padding:0 12px;border:1px solid var(--color-border);border-radius:8px;">
+                <option value="">Todos</option>
+                <option value="articulo">Art&iacute;culos</option>
+                <option value="tesis">Tesis</option>
+            </select>
+        </div>
+
+        <div id="pubGrid" class="variedades-grid"></div>
+
+        <div id="pubModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:560px;">
+                <span class="modal-close" onclick="cerrarModal()">&times;</span>
+                <h2 id="pubModalTitle">Nueva Publicaci&oacute;n</h2>
+                <form id="pubForm">
+                    <input type="hidden" id="pubId">
+                    <div class="form-group">
+                        <label>T&iacute;tulo *</label>
+                        <input type="text" id="pTitulo" required placeholder="T&iacute;tulo completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Autores</label>
+                        <input type="text" id="pAutores" placeholder="Apellido1, N; Apellido2, N">
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="pTipo" style="height:48px;">
+                                <option value="articulo">Art&iacute;culo</option>
+                                <option value="tesis">Tesis</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>A&ntilde;o</label>
+                            <input type="number" id="pAno" placeholder="2026" min="2000" max="2030">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Revista / Instituci&oacute;n</label>
+                        <input type="text" id="pRevista" placeholder="Nombre de la revista o instituci&oacute;n">
+                    </div>
+                    <div class="form-group">
+                        <label>DOI</label>
+                        <input type="text" id="pDoi" placeholder="10.xxxx/xxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Resumen</label>
+                        <textarea id="pResumen" rows="4" placeholder="Resumen o abstract..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL del documento</label>
+                        <input type="text" id="pArchivo" placeholder="https://...">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/nav.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        const userRole = localStorage.getItem('userRole');
+        const puedeEditar = userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico';
+        if (puedeEditar) document.getElementById('btnNuevaPub').style.display = 'inline-flex';
+
+        let pubs = [];
+
+        function escapeHTML(s) { return String(s).replace(/[&<>"']/g, function(m) { if (m==='&') return '&amp;'; if (m==='<') return '&lt;'; if (m==='>') return '&gt;'; if (m==='"') return '&quot;'; return '&#39;'; }); }
+
+        function abrirModal(item) {
+            document.getElementById('pubModal').style.display = 'flex';
+            if (item) {
+                document.getElementById('pubModalTitle').textContent = 'Editar Publicaci&oacute;n';
+                document.getElementById('pubId').value = item.id;
+                document.getElementById('pTitulo').value = item.titulo || '';
+                document.getElementById('pAutores').value = item.autores || '';
+                document.getElementById('pTipo').value = item.tipo || 'articulo';
+                document.getElementById('pAno').value = item.año || '';
+                document.getElementById('pRevista').value = item.revista || '';
+                document.getElementById('pDoi').value = item.doi || '';
+                document.getElementById('pResumen').value = item.resumen || '';
+                document.getElementById('pArchivo').value = item.archivo_url || '';
+            } else {
+                document.getElementById('pubModalTitle').textContent = 'Nueva Publicaci&oacute;n';
+                document.getElementById('pubForm').reset();
+                document.getElementById('pubId').value = '';
+            }
+        }
+        function cerrarModal() { document.getElementById('pubModal').style.display = 'none'; }
+
+        document.getElementById('pubForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                titulo: document.getElementById('pTitulo').value,
+                autores: document.getElementById('pAutores').value || null,
+                tipo: document.getElementById('pTipo').value,
+                año: document.getElementById('pAno').value ? parseInt(document.getElementById('pAno').value) : null,
+                revista: document.getElementById('pRevista').value || null,
+                doi: document.getElementById('pDoi').value || null,
+                resumen: document.getElementById('pResumen').value || null,
+                archivo_url: document.getElementById('pArchivo').value || null
+            };
+            const id = document.getElementById('pubId').value;
+            const url = id ? '/api/publicaciones/' + id : '/api/publicaciones';
+            const method = id ? 'PUT' : 'POST';
+            try {
+                const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+                const r = await res.json();
+                if (!res.ok) { alert('Error: ' + (r.error || '')); return; }
+                cerrarModal();
+                cargarPubs();
+            } catch(e) { alert('Error de conexion'); }
+        });
+
+        async function eliminarPub(id) {
+            if (!confirm('Eliminar esta publicacion?')) return;
+            try {
+                const res = await fetch('/api/publicaciones/' + id, { method:'DELETE', headers:{'Content-Type':'application/json'} });
+                if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+                cargarPubs();
+            } catch(e) { alert('Error'); }
+        }
+
+        document.getElementById('buscarPub').addEventListener('input', filtrar);
+        document.getElementById('filtroTipo').addEventListener('change', filtrar);
+
+        function filtrar() {
+            const q = document.getElementById('buscarPub').value.toLowerCase();
+            const t = document.getElementById('filtroTipo').value;
+            document.querySelectorAll('.pub-card').forEach(c => {
+                const texto = c.dataset.search || '';
+                const tipo = c.dataset.tipo || '';
+                c.style.display = (texto.includes(q) && (!t || tipo === t)) ? 'block' : 'none';
+            });
+        }
+
+        async function cargarPubs() {
+            const grid = document.getElementById('pubGrid');
+            try {
+                const res = await fetch('/api/publicaciones');
+                pubs = await res.json();
+                if (!pubs.length) {
+                    grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">No hay publicaciones registradas.</p>';
+                    return;
+                }
+                grid.innerHTML = pubs.map(p => {
+                    const json = escapeHTML(JSON.stringify(p));
+                    const s = (p.titulo + ' ' + (p.autores||'') + ' ' + (p.revista||'')).toLowerCase();
+                    const tipoLabel = p.tipo === 'tesis' ? '<span style="background:var(--color-info-soft);color:var(--color-info);padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">TESIS</span>' : '<span style="background:var(--color-primary-soft);color:var(--color-primary);padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">ARTÍCULO</span>';
+                    return '<div class="variedad-card pub-card" data-search="' + escapeHTML(s) + '" data-tipo="' + (p.tipo||'articulo') + '" style="text-align:left;cursor:default;">'
+                        + '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">'
+                        + '<div style="font-size:1.8rem;color:var(--color-primary);opacity:0.4;"><i class="fas fa-' + (p.tipo==='tesis'?'graduation-cap':'file-alt') + '"></i></div>'
+                        + tipoLabel
+                        + '</div>'
+                        + '<h3 style="font-size:0.92rem;margin:0 0 6px;line-height:1.4;">' + escapeHTML(p.titulo) + '</h3>'
+                        + (p.autores ? '<p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 6px;"><i class="fas fa-user"></i> ' + escapeHTML(p.autores) + '</p>' : '')
+                        + (p.revista ? '<p style="font-size:0.8rem;color:var(--color-text-secondary);margin:0 0 6px;"><i class="fas fa-book"></i> ' + escapeHTML(p.revista) + (p.año ? ' (' + p.año + ')' : '') + '</p>' : (p.año ? '<p style="font-size:0.8rem;color:var(--color-text-secondary);margin:0 0 6px;">' + p.año + '</p>' : ''))
+                        + (p.resumen ? '<p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 8px;line-height:1.4;">' + escapeHTML(p.resumen.length > 120 ? p.resumen.slice(0,120) + '...' : p.resumen) + '</p>' : '')
+                        + '<div style="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--color-border-soft);">'
+                        + (p.doi ? '<a href="https://doi.org/' + escapeHTML(p.doi) + '" target="_blank" class="btn btn-sm btn-secondary" style="font-size:0.75rem;"><i class="fas fa-external-link-alt"></i> DOI</a>' : '')
+                        + (p.archivo_url ? '<a href="' + escapeHTML(p.archivo_url) + '" target="_blank" class="btn btn-sm btn-secondary" style="font-size:0.75rem;"><i class="fas fa-file-pdf"></i> PDF</a>' : '')
+                        + (puedeEditar ? '<button class="btn-edit" onclick="abrirModal(' + json + ')" title="Editar" style="margin-left:auto;"><i class="fas fa-edit"></i></button><button class="btn-delete" onclick="eliminarPub(' + p.id + ')" title="Eliminar"><i class="fas fa-trash"></i></button>' : '')
+                        + '</div></div>';
+                }).join('');
+            } catch(e) {
+                grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Error al cargar. Crea la tabla <code>publicaciones</code> en Supabase.</p>';
+            }
+        }
+
+        cargarPubs();
+    </script>
+</body>
+</html>

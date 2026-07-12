@@ -16,6 +16,8 @@
     { label: 'Bioproductos', page: 'bioproductos.html', roles: null },
     { label: 'Pedidos', page: 'pedidos.html', roles: null },
     { label: 'Semillas', page: 'semillas.html', roles: null },
+    { label: 'Publicaciones', page: 'publicaciones.html', roles: null },
+    { label: 'Fertirriego', page: 'fertirriego.html', roles: null },
     { label: 'Soporte', page: 'soporte.html', roles: null },
     { label: 'Perfil', page: 'perfil.html', roles: null },
     { label: 'Tipos', page: 'tipos.html', roles: null },

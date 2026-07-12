@@ -58,7 +58,21 @@ CREATE TABLE IF NOT EXISTS variedades (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. SOPORTE TECNICO (chat de ayuda)
+-- 5. PUBLICACIONES CIENTIFICAS (tesis y articulos)
+CREATE TABLE IF NOT EXISTS publicaciones (
+  id SERIAL PRIMARY KEY,
+  titulo TEXT NOT NULL,
+  autores TEXT,
+  revista TEXT,
+  tipo TEXT DEFAULT 'articulo',
+  año INTEGER,
+  doi TEXT,
+  resumen TEXT,
+  archivo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. SOPORTE TECNICO (chat de ayuda)
 CREATE TABLE IF NOT EXISTS soporte_mensajes (
   id SERIAL PRIMARY KEY,
   usuario_id INTEGER NOT NULL,

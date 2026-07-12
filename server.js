@@ -750,6 +750,50 @@ app.put('/api/soporte/:id', requireRole(['admin', 'investigador', 'tecnico']), a
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ==================== PUBLICACIONES CIENTIFICAS ====================
+app.get('/api/publicaciones', async (req, res) => {
+  const { data, error } = await supabase.from('publicaciones').select('*').order('año', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.post('/api/publicaciones', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  try {
+    const { titulo, autores, revista, tipo, año, doi, resumen, archivo_url } = req.body;
+    if (!titulo) return res.status(400).json({ error: 'Titulo requerido' });
+    const { data, error } = await supabase.from('publicaciones').insert({ titulo, autores, revista, tipo, año, doi, resumen, archivo_url }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'CREAR', 'publicaciones', data.id);
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/publicaciones/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  try {
+    const { titulo, autores, revista, tipo, año, doi, resumen, archivo_url } = req.body;
+    const upd = {};
+    if (titulo !== undefined) upd.titulo = titulo;
+    if (autores !== undefined) upd.autores = autores;
+    if (revista !== undefined) upd.revista = revista;
+    if (tipo !== undefined) upd.tipo = tipo;
+    if (año !== undefined) upd.año = año;
+    if (doi !== undefined) upd.doi = doi;
+    if (resumen !== undefined) upd.resumen = resumen;
+    if (archivo_url !== undefined) upd.archivo_url = archivo_url;
+    const { data, error } = await supabase.from('publicaciones').update(upd).eq('id', req.params.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'EDITAR', 'publicaciones', parseInt(req.params.id));
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/publicaciones/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  const { error } = await supabase.from('publicaciones').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  logActividad(req.authedUser.id, 'ELIMINAR', 'publicaciones', parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 module.exports = app;
 
 if (require.main === module) {
