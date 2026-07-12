@@ -144,7 +144,7 @@ app.get('/api/noticias', async (req, res) => {
   const usuario_id = req.query.usuario_id;
   const { data, error } = await supabase
     .from('noticias')
-    .select('*, usuarios!inner(nombre), likes(count)')
+    .select('*, likes(count)')
     .order('fecha', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   // Add liked status for the requesting user
@@ -160,7 +160,7 @@ app.get('/api/noticias', async (req, res) => {
 app.get('/api/noticias/:id', async (req, res) => {
   const { data, error } = await supabase
     .from('noticias')
-    .select('*, usuarios!inner(nombre), likes(count)')
+    .select('*, likes(count)')
     .eq('id', req.params.id)
     .single();
   if (error) return res.status(500).json({ error: error.message });
@@ -587,7 +587,7 @@ app.get('/api/noticias/realtime', (req, res) => {
   });
 
   const interval = setInterval(async () => {
-    const { data } = await supabase.from('noticias').select('*, usuarios(nombre), likes(count)').order('fecha', { ascending: false });
+    const { data } = await supabase.from('noticias').select('*, likes(count)').order('fecha', { ascending: false });
     // Add liked=false for SSE (client handles individual like states)
     if (data) data.forEach(n => n.liked = false);
     res.write(`data: ${JSON.stringify(data)}\n\n`);
