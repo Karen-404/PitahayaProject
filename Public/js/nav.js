@@ -31,23 +31,46 @@
     return currentPage === page ? ' class="active"' : '';
   };
 
-  var navItems = [
-    { label: 'Dashboard Biotec', page: 'biotec-dashboard.html', roles: null },
-    { label: 'Inicio', page: 'inicio.html', roles: null },
-    { label: 'Noticias', page: 'noticias.html', roles: null },
-    { label: 'Investigadores', page: 'investigadores.html', roles: null },
-    { label: 'Mapa', page: 'mapa.html', roles: null },
-    { label: 'FAO Passport', page: 'fao.html', roles: null },
-    { label: 'Bioproductos', page: 'bioproductos.html', roles: null },
-    { label: 'Pedidos', page: 'pedidos.html', roles: null },
-    { label: 'Semillas', page: 'semillas.html', roles: null },
-    { label: 'Publicaciones', page: 'publicaciones.html', roles: null },
-    { label: 'Fertirriego', page: 'fertirriego.html', roles: null },
-    { label: 'Soporte', page: 'soporte.html', roles: null },
-    { label: 'Perfil', page: 'perfil.html', roles: null },
-    { label: 'Tipos', page: 'tipos.html', roles: null },
-    { label: 'Mi Perfil Profesional', page: 'investigador-perfil.html', roles: ['investigador'] },
-    { label: 'Admin', page: 'admin.html', roles: ['admin'] }
+  var sections = [
+    {
+      name: 'Panel Principal',
+      icon: 'fa-home',
+      items: [
+        { label: 'Inicio', page: 'biotec-dashboard.html', roles: null },
+        { label: 'Noticias', page: 'noticias.html', roles: null }
+      ]
+    },
+    {
+      name: 'Investigaci&oacute;n y Datos Cient&iacute;ficos',
+      icon: 'fa-flask',
+      items: [
+        { label: 'Investigadores', page: 'investigadores.html', roles: null },
+        { label: 'Publicaciones', page: 'publicaciones.html', roles: null },
+        { label: 'FAO Passport', page: 'fao.html', roles: null },
+        { label: 'Semillas', page: 'semillas.html', roles: null },
+        { label: 'Mapa', page: 'mapa.html', roles: null }
+      ]
+    },
+    {
+      name: 'Operaciones y Gesti&oacute;n de Campo',
+      icon: 'fa-tractor',
+      items: [
+        { label: 'Fertirriego', page: 'fertirriego.html', roles: null },
+        { label: 'Bioproductos', page: 'bioproductos.html', roles: null },
+        { label: 'Pedidos', page: 'pedidos.html', roles: null }
+      ]
+    },
+    {
+      name: 'Configuraci&oacute;n y Usuario',
+      icon: 'fa-cog',
+      items: [
+        { label: 'Perfil', page: 'perfil.html', roles: null },
+        { label: 'Soporte', page: 'soporte.html', roles: null },
+        { label: 'Tipos', page: 'tipos.html', roles: null },
+        { label: 'Mi Perfil Profesional', page: 'investigador-perfil.html', roles: ['investigador'] },
+        { label: 'Admin', page: 'admin.html', roles: ['admin'] }
+      ]
+    }
   ];
 
   var html = '<nav class="system-nav">';
@@ -64,12 +87,27 @@
   html += '<div class="nav-overlay" id="navOverlay"></div>';
   html += '<ul class="nav-list" id="navList">';
 
-  for (var i = 0; i < navItems.length; i++) {
-    var item = navItems[i];
-    if (item.roles && (!role || item.roles.indexOf(role) === -1)) continue;
-    html += '<li><a href="' + item.page + '"' + isActive(item.page) + '>' + item.label + '</a></li>';
+  for (var s = 0; s < sections.length; s++) {
+    var sec = sections[s];
+    var hasVisible = false;
+    for (var i = 0; i < sec.items.length; i++) {
+      var item = sec.items[i];
+      if (item.roles && (!role || item.roles.indexOf(role) === -1)) continue;
+      hasVisible = true;
+      break;
+    }
+    if (!hasVisible) continue;
+
+    html += '<li class="nav-section-header"><i class="fas ' + sec.icon + '"></i> ' + sec.name + '</li>';
+
+    for (var i = 0; i < sec.items.length; i++) {
+      var item = sec.items[i];
+      if (item.roles && (!role || item.roles.indexOf(role) === -1)) continue;
+      html += '<li><a href="' + item.page + '"' + isActive(item.page) + '>' + item.label + '</a></li>';
+    }
   }
 
+  html += '<li class="nav-section-header" style="border-top:1px solid rgba(255,255,255,0.15);margin-top:6px;padding-top:12px;">&nbsp;</li>';
   html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button></li>';
   html += '</ul>';
 
