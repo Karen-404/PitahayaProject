@@ -305,6 +305,10 @@ button:not(.nav-logout-btn):not(.chat-boton):not(.menu-toggle):not(.nav-toggle) 
    FORMS
    ==================================== */
 .form-group { margin-bottom: 16px; }
+.password-wrapper { position: relative; display: flex; align-items: center; }
+.password-wrapper input { flex: 1; padding-right: 2.5rem; }
+.password-wrapper .toggle-password { position: absolute; right: 1rem; cursor: pointer; color: #888; font-size: 1.1rem; user-select: none; }
+.password-wrapper .toggle-password:hover { color: #1a8a3f; }
 
 .form-label, label:not(.lab-label) {
   display: block;

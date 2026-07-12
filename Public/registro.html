@@ -2,22 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body.registro-page-wrapper {
+            background-image: url('img/fondoPitahaya.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        body.registro-page-wrapper::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 0;
+        }
+        body.registro-page-wrapper > * { position: relative; z-index: 1; }
+        .registro-container { box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+    </style>
 </head>
-<body>
-    <div id="app-nav"></div>
+<body class="registro-page-wrapper">
+    <nav class="login-nav-bar">
+        <i class="fas fa-leaf"></i>
+        <div class="brand">PITAHAYA <span>BIOTEC</span></div>
+    </nav>
 
-    <main class="page-container">
-        <section class="content-card" style="max-width:480px;margin:40px auto;text-align:center;">
-            <div style="width:56px;height:56px;border-radius:14px;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;color:var(--color-primary);">
-                <i class="fas fa-user-plus"></i>
-            </div>
-            <h2 style="margin:0 0 4px 0;font-size:1.4rem;">Registro de Usuario</h2>
-            <p style="color:var(--color-text-muted);margin:0 0 24px 0;">Crea tu cuenta para acceder al sistema</p>
-
-            <form id="registroForm" style="text-align:left;">
+    <main>
+        <section class="login-container registro-container" style="max-width:480px;">
+            <h2>Crear Cuenta</h2>
+            <form id="registroForm">
                 <div class="form-group">
                     <label>Nombre Completo</label>
                     <input type="text" id="nombre" placeholder="Tu nombre" required>
@@ -28,7 +43,7 @@
                 </div>
                 <div class="form-group">
                     <label>Tipo de Usuario</label>
-                    <select id="roleReg" style="height:48px;">
+                    <select id="roleReg" style="height:48px;" required>
                         <option value="productor">Productor</option>
                         <option value="investigador">Investigador</option>
                         <option value="tecnico">T&eacute;cnico</option>
@@ -36,29 +51,37 @@
                 </div>
                 <div class="form-group">
                     <label>Contrase&ntilde;a</label>
-                    <input type="password" id="passwordReg" placeholder="********" required>
+                    <div class="password-wrapper">
+                        <input type="password" id="passwordReg" placeholder="********" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword('passwordReg')"></i>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-user-check"></i> Registrarse</button>
             </form>
-
-            <p style="margin-top:20px;color:var(--color-text-muted);">
+            <p style="margin-top:20px;color:var(--color-text-muted);text-align:center;">
                 &iquest;Ya tienes cuenta? <a href="index.html" style="color:var(--color-primary);font-weight:600;">Inicia sesi&oacute;n</a>
             </p>
         </section>
     </main>
 
-    <div class="chat-flotante">
-        <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
-        <div class="chat-container oculto" id="chatContainer">
-            <div id="chatBox" class="chat-box"></div>
-            <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Escribe...">
-                <button onclick="responder()">Enviar</button>
-            </div>
-        </div>
-    </div>
+    <footer class="system-footer">
+        &copy; 2026 <span>Pitahaya Biotec</span> &mdash; ESPOCH / INIAP &mdash; Proyecto de Gesti&oacute;n Biotecnol&oacute;gica
+    </footer>
 
     <script src="js/script.js"></script>
-    <script src="js/nav.js"></script>
+    <script>
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            const icon = input.parentNode.querySelector('.toggle-password');
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>
