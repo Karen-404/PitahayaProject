@@ -145,7 +145,7 @@
           <button class="lab-btn" id="btnClasificar" onclick="clasificarMuestra()">
             <i class="fas fa-play-circle"></i> Clasificar Muestra
           </button>
-          <div id="resultadoLab" style="font-size:0.88rem;color:var(--text-secondary);min-height:24px;"></div>
+          <div id="resultadoLab" style="font-size:0.88rem;color:var(--text-secondary);min-height:80px;"></div>
         </div>
       </section>
     </div>
@@ -193,7 +193,28 @@
       }
 
       const peso = parseFloat(valor);
-      resultado.innerHTML = '<span style="color:var(--primary-green);font-weight:600;"><i class="fas fa-check-circle"></i> Muestra clasificada: ' + peso.toFixed(1) + ' g</span>';
+      var info = '';
+      var cls = '';
+      if (peso < 200) {
+        info = 'Fruto peque\u00f1o. Bajo rendimiento comercial. Recomendado para consumo local o subproductos.';
+        cls = '#ef4444';
+      } else if (peso < 300) {
+        info = 'Fruto mediano. Calidad est\u00e1ndar. Aceptable para mercado nacional. Grado Brix estimado: 14-16\u00b0.';
+        cls = '#f59e0b';
+      } else if (peso < 400) {
+        info = 'Fruto grande. Buena calidad. Potencial exportaci\u00f3n. Grado Brix estimado: 16-18\u00b0. Resistencia post-cosecha: 12-15 d\u00edas.';
+        cls = '#167538';
+      } else if (peso < 500) {
+        info = 'Fruto premium. Excelente calidad de exportaci\u00f3n. Grado Brix estimado: 18-20\u00b0. Resistencia post-cosecha: 15-18 d\u00edas.';
+        cls = '#167538';
+      } else {
+        info = 'Fruto super-premium. Calidad excepcional. Ideal para mercados internacionales de alto valor. Grado Brix estimado: 20-22\u00b0. Resistencia post-cosecha: 18-21 d\u00edas.';
+        cls = '#0F4F27';
+      }
+      resultado.innerHTML = '<div style="text-align:left;">'
+        + '<p style="margin:0 0 6px;color:' + cls + ';font-weight:700;font-size:1.05rem;"><i class="fas fa-check-circle"></i> Muestra: ' + peso.toFixed(1) + ' g</p>'
+        + '<p style="margin:0;font-size:0.85rem;color:var(--color-text-secondary);">' + info + '</p>'
+        + '</div>';
     }
 
     // Allow Enter key to trigger classification
