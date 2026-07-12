@@ -53,83 +53,114 @@
         </div>
 
         <div id="faoModal" class="modal" style="display:none">
-            <div class="modal-content" style="max-width:720px;padding:32px;">
+            <div class="modal-content" style="max-width:760px;padding:32px;">
                 <span class="modal-close" onclick="cerrarModal()">&times;</span>
                 <h2 id="modalTitle" style="margin:0 0 20px;font-size:1.15rem;">Nuevo Registro FAO</h2>
                 <form id="faoForm">
                     <input type="hidden" id="faoId">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                        <div class="form-group">
-                            <label>C&oacute;digo</label>
-                            <input type="text" id="fCodigo" placeholder="EI-PIT-26-001" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>N&uacute;mero de Acceso</label>
-                            <input type="text" id="fAcceso" placeholder="ACC-001" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>N&uacute;mero de Colecta</label>
-                            <input type="text" id="fColecta" placeholder="COL-001" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>G&eacute;nero</label>
-                            <input type="text" id="fGenero" placeholder="Hylocereus" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Especie</label>
-                            <input type="text" id="fEspecie" placeholder="undatus" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Subtaxa</label>
-                            <input type="text" id="fSubtaxa" placeholder="american beauty" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Nombre Com&uacute;n</label>
-                            <input type="text" id="fNombreComun" placeholder="Pitahaya roja" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Nombre de Accesi&oacute;n</label>
-                            <input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha Adquisici&oacute;n</label>
-                            <input type="date" id="fFecha" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Pa&iacute;s</label>
-                            <input type="text" id="fPais" placeholder="Ecuador" style="height:44px;">
-                        </div>
-                        <div class="form-group" style="grid-column:span 2;">
-                            <label>Ubicaci&oacute;n</label>
-                            <input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Latitud</label>
-                            <input type="number" id="fLat" step="any" placeholder="-0.6357312" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Longitud</label>
-                            <input type="number" id="fLng" step="any" placeholder="-77.0409702" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Altitud (m)</label>
-                            <input type="number" id="fAltitud" step="any" placeholder="250" style="height:44px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Estado Biol&oacute;gico</label>
-                            <select id="fEstadoBio" style="height:44px;">
-                                <option value="Silvestre">Silvestre</option>
-                                <option value="Cultivado">Cultivado</option>
-                                <option value="Mejorado">Mejorado</option>
-                                <option value="Hibrido">H&iacute;brido</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="grid-column:span 2;">
-                            <label>Fuente de Colecta</label>
-                            <input type="text" id="fFuente" placeholder="Campo agricola, Mercado, Banco germoplasma..." style="height:44px;">
+
+                    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-sm tab-fao active" data-tab="ident" onclick="switchTab('ident')" style="flex:1;background:var(--color-primary);color:white;border:none;padding:10px;border-radius:8px;font-weight:600;"><i class="fas fa-tag"></i> Identificaci&oacute;n</button>
+                        <button type="button" class="btn btn-sm tab-fao" data-tab="taxo" onclick="switchTab('taxo')" style="flex:1;background:var(--color-surface);color:var(--color-text-secondary);border:1px solid var(--color-border);padding:10px;border-radius:8px;"><i class="fas fa-dna"></i> Taxonom&iacute;a</button>
+                        <button type="button" class="btn btn-sm tab-fao" data-tab="origen" onclick="switchTab('origen')" style="flex:1;background:var(--color-surface);color:var(--color-text-secondary);border:1px solid var(--color-border);padding:10px;border-radius:8px;"><i class="fas fa-map-marker-alt"></i> Origen</button>
+                        <button type="button" class="btn btn-sm tab-fao" data-tab="colec" onclick="switchTab('colec')" style="flex:1;background:var(--color-surface);color:var(--color-text-secondary);border:1px solid var(--color-border);padding:10px;border-radius:8px;"><i class="fas fa-leaf"></i> Colecta</button>
+                    </div>
+
+                    <!-- TAB 1: IDENTIFICACION -->
+                    <div id="tab-ident" class="fao-tab">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                            <div class="form-group">
+                                <label>C&oacute;digo</label>
+                                <input type="text" id="fCodigo" placeholder="EI-PIT-26-001" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>N&uacute;mero de Acceso</label>
+                                <input type="text" id="fAcceso" placeholder="ACC-001" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>N&uacute;mero de Colecta</label>
+                                <input type="text" id="fColecta" placeholder="COL-001" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre de Accesi&oacute;n</label>
+                                <input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana" style="height:44px;">
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px;height:46px;font-size:0.95rem;">Guardar Accesi&oacute;n</button>
+
+                    <!-- TAB 2: TAXONOMIA -->
+                    <div id="tab-taxo" class="fao-tab" style="display:none;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                            <div class="form-group">
+                                <label>G&eacute;nero</label>
+                                <input type="text" id="fGenero" placeholder="Hylocereus" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Especie</label>
+                                <input type="text" id="fEspecie" placeholder="undatus" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Subtaxa</label>
+                                <input type="text" id="fSubtaxa" placeholder="american beauty" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre Com&uacute;n</label>
+                                <input type="text" id="fNombreComun" placeholder="Pitahaya roja" style="height:44px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: ORIGEN -->
+                    <div id="tab-origen" class="fao-tab" style="display:none;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                            <div class="form-group">
+                                <label>Pa&iacute;s</label>
+                                <input type="text" id="fPais" placeholder="Ecuador" style="height:44px;">
+                            </div>
+                            <div class="form-group" style="grid-column:span 2;">
+                                <label>Ubicaci&oacute;n / Zona</label>
+                                <input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca" style="height:44px;">
+                                <small style="color:var(--color-text-muted);">Nombre de la zona, parroquia, cant&oacute;n o referencia geogr&aacute;fica</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Latitud</label>
+                                <input type="number" id="fLat" step="any" placeholder="-0.6357312" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Longitud</label>
+                                <input type="number" id="fLng" step="any" placeholder="-77.0409702" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Altitud (m)</label>
+                                <input type="number" id="fAltitud" step="any" placeholder="250" style="height:44px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Adquisici&oacute;n</label>
+                                <input type="date" id="fFecha" style="height:44px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: COLECTA -->
+                    <div id="tab-colec" class="fao-tab" style="display:none;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                            <div class="form-group">
+                                <label>Estado Biol&oacute;gico</label>
+                                <select id="fEstadoBio" style="height:44px;">
+                                    <option value="Silvestre">Silvestre</option>
+                                    <option value="Cultivado">Cultivado</option>
+                                    <option value="Mejorado">Mejorado</option>
+                                    <option value="Hibrido">H&iacute;brido</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="grid-column:span 2;">
+                                <label>Fuente de Colecta</label>
+                                <input type="text" id="fFuente" placeholder="Campo agricola, Mercado, Banco germoplasma..." style="height:44px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px;height:46px;font-size:0.95rem;">Guardar Registro</button>
                 </form>
             </div>
         </div>
@@ -171,8 +202,21 @@
             });
         }
 
+        function switchTab(tab) {
+            document.querySelectorAll('.fao-tab').forEach(t => t.style.display = 'none');
+            document.getElementById('tab-' + tab).style.display = '';
+            document.querySelectorAll('.tab-fao').forEach(b => {
+                b.style.background = 'var(--color-surface)';
+                b.style.color = 'var(--color-text-secondary)';
+                b.style.border = '1px solid var(--color-border)';
+            });
+            const btn = document.querySelector('.tab-fao[data-tab="' + tab + '"]');
+            if (btn) { btn.style.background = 'var(--color-primary)'; btn.style.color = 'white'; btn.style.border = 'none'; }
+        }
+
         function abrirModal(item) {
             document.getElementById('faoModal').style.display = 'flex';
+            switchTab('ident');
             if (item) {
                 document.getElementById('modalTitle').textContent = 'Editar Accesi&oacute;n';
                 document.getElementById('faoId').value = item.id;
