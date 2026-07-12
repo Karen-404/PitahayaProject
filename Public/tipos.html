@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tipos de Pitahaya - Pitahaya Biotec</title>
+    <title>Variedades de Pitahaya - Pitahaya Biotec</title>
 </head>
 <body>
     <div id="app-nav"></div>
@@ -21,33 +21,257 @@
                     <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Descubre las principales variedades cultivadas en Ecuador</p>
                 </div>
             </div>
+            <div class="page-header-right">
+                <button class="btn btn-primary" id="btnNuevaVariedad" style="display:none" onclick="abrirModal()">
+                    <i class="fas fa-plus"></i> Nueva Variedad
+                </button>
+            </div>
         </div>
 
         <div class="buscador" style="margin-bottom:24px;">
-            <input type="text" id="buscar" placeholder="Buscar variedad..." style="width:100%;max-width:400px;">
+            <input type="text" id="buscarVariedad" placeholder="Buscar variedad..." style="width:100%;max-width:400px;">
         </div>
 
-        <div class="contenedor" id="contenedor" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
-            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('tipos/roja.html')">
-                <img src="img/pitahaya-rosa.png" alt="Pitahaya Roja" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
-                <h3 style="margin:0;">Pitahaya Roja</h3>
+        <div id="variedadesGrid" class="variedades-grid"></div>
+
+        <div id="varFormModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:580px;">
+                <span class="modal-close" onclick="cerrarForm()">&times;</span>
+                <h2 id="formTitle">Nueva Variedad</h2>
+                <form id="varForm">
+                    <input type="hidden" id="varId">
+                    <div class="form-group">
+                        <label>Nombre de la variedad *</label>
+                        <input type="text" id="vNombre" required placeholder="Ej: Pitahaya Roja">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre Cient&iacute;fico</label>
+                        <input type="text" id="vCientifico" placeholder="Ej: Hylocereus undatus">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripci&oacute;n</label>
+                        <textarea id="vDescripcion" rows="3" placeholder="Descripci&oacute;n general de la variedad..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagen (URL o subir archivo)</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="vImagen" placeholder="URL de la imagen..." style="flex:1;">
+                            <input type="file" id="vImagenFile" accept="image/*" style="display:none;">
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('vImagenFile').click()"><i class="fas fa-upload"></i></button>
+                        </div>
+                        <img id="vPreview" style="display:none;width:100%;max-height:120px;object-fit:contain;margin-top:8px;border-radius:6px;" />
+                    </div>
+                    <div class="form-group">
+                        <label>Beneficios</label>
+                        <textarea id="vBeneficios" rows="3" placeholder="Beneficios nutricionales, medicinales, comerciales..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Localidad / Zonas de cultivo</label>
+                        <input type="text" id="vLocalidad" placeholder="Ej: Palora, Santa Elena, Orellana">
+                    </div>
+                    <div class="form-group">
+                        <label>Producci&oacute;n / Datos de cosecha</label>
+                        <textarea id="vProduccion" rows="2" placeholder="Rendimiento, temporada, grados Brix..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Caracter&iacute;sticas</label>
+                        <textarea id="vCaracteristicas" rows="2" placeholder="Color de pulpa, tama&ntilde;o, aroma..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Guardar</button>
+                </form>
             </div>
-            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('rosa.html')">
-                <img src="img/pitahaya-roja.png" alt="Pitahaya Rosa" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
-                <h3 style="margin:0;">Pitahaya Rosa</h3>
-            </div>
-            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('amarilla.html')">
-                <img src="img/pitahaya-amarilla.png" alt="Pitahaya Amarilla" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
-                <h3 style="margin:0;">Pitahaya Amarilla Palora</h3>
-            </div>
-            <div class="content-card" style="cursor:pointer;text-align:center;padding:24px;" onclick="ir('golden.html')">
-                <img src="img/pitahaya-golden.png" alt="Pitahaya Golden" style="width:120px;height:120px;object-fit:contain;margin-bottom:12px;">
-                <h3 style="margin:0;">Pitahaya Golden</h3>
+        </div>
+
+        <div id="varDetailModal" class="modal" style="display:none">
+            <div class="modal-content" style="max-width:640px;">
+                <span class="modal-close" onclick="cerrarDetalle()">&times;</span>
+                <div id="varDetailContent"></div>
             </div>
         </div>
     </main>
 
+    <div class="chat-flotante">
+        <div class="chat-boton" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+        <div class="chat-container oculto" id="chatContainer">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe...">
+                <button onclick="responder()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
     <script src="js/nav.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        const userRole = localStorage.getItem('userRole');
+        const puedeEditar = userRole === 'admin' || userRole === 'investigador';
+        if (puedeEditar) document.getElementById('btnNuevaVariedad').style.display = 'inline-flex';
+
+        let variedades = [];
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, function(m) {
+                if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
+            });
+        }
+
+        // Image upload
+        document.getElementById('vImagenFile').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(ev) {
+                try {
+                    const res = await fetch('/api/subir-imagen', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ imagen: ev.target.result })
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                        document.getElementById('vImagen').value = data.url;
+                        document.getElementById('vPreview').src = data.url;
+                        document.getElementById('vPreview').style.display = 'block';
+                    }
+                } catch(e) { alert('Error al subir imagen'); }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('vImagen').addEventListener('input', function() {
+            const preview = document.getElementById('vPreview');
+            if (this.value) {
+                preview.src = this.value;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        function abrirModal(item) {
+            document.getElementById('varFormModal').style.display = 'flex';
+            if (item) {
+                document.getElementById('formTitle').textContent = 'Editar Variedad';
+                document.getElementById('varId').value = item.id;
+                document.getElementById('vNombre').value = item.nombre || '';
+                document.getElementById('vCientifico').value = item.nombre_cientifico || '';
+                document.getElementById('vDescripcion').value = item.descripcion || '';
+                document.getElementById('vImagen').value = item.imagen_url || '';
+                document.getElementById('vBeneficios').value = item.beneficios || '';
+                document.getElementById('vLocalidad').value = item.localidad || '';
+                document.getElementById('vProduccion').value = item.produccion || '';
+                document.getElementById('vCaracteristicas').value = item.caracteristicas || '';
+                const preview = document.getElementById('vPreview');
+                if (item.imagen_url) { preview.src = item.imagen_url; preview.style.display = 'block'; }
+                else { preview.style.display = 'none'; }
+            } else {
+                document.getElementById('formTitle').textContent = 'Nueva Variedad';
+                document.getElementById('varForm').reset();
+                document.getElementById('varId').value = '';
+                document.getElementById('vPreview').style.display = 'none';
+            }
+        }
+
+        function cerrarForm() { document.getElementById('varFormModal').style.display = 'none'; }
+        function cerrarDetalle() { document.getElementById('varDetailModal').style.display = 'none'; }
+
+        function verDetalle(id) {
+            const v = variedades.find(x => x.id === id);
+            if (!v) return;
+            const img = v.imagen_url ? '<img src="' + escapeHTML(v.imagen_url) + '" alt="' + escapeHTML(v.nombre) + '" style="width:100%;max-height:280px;object-fit:contain;border-radius:8px;margin-bottom:16px;">' : '';
+            const json = escapeHTML(JSON.stringify(v));
+            document.getElementById('varDetailContent').innerHTML =
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+                + '<h2 style="margin:0;">' + escapeHTML(v.nombre) + '</h2>'
+                + (puedeEditar
+                    ? '<div>' +
+                        '<button class="btn-edit" onclick="cerrarDetalle();abrirModal(' + json + ')" title="Editar"><i class="fas fa-edit"></i> Editar</button> ' +
+                        '<button class="btn-delete" onclick="cerrarDetalle();eliminarVar(' + v.id + ')" title="Eliminar"><i class="fas fa-trash"></i></button>'
+                      + '</div>'
+                    : '')
+                + '</div>'
+                + img
+                + (v.nombre_cientifico ? '<p style="font-style:italic;color:var(--color-text-muted);margin:0 0 16px 0;"><em>' + escapeHTML(v.nombre_cientifico) + '</em></p>' : '')
+                + (v.descripcion ? '<div style="margin-bottom:16px;"><h4 style="margin:0 0 6px 0;">Descripci&oacute;n</h4><p style="margin:0;color:var(--color-text-secondary);line-height:1.6;">' + escapeHTML(v.descripcion) + '</p></div>' : '')
+                + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
+                + (v.beneficios ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-heart"></i> Beneficios</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.beneficios) + '</p></div>' : '')
+                + (v.localidad ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-map-marker-alt"></i> Localidad</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.localidad) + '</p></div>' : '')
+                + (v.produccion ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-chart-line"></i> Producci&oacute;n</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.produccion) + '</p></div>' : '')
+                + (v.caracteristicas ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-clipboard-list"></i> Caracter&iacute;sticas</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.caracteristicas) + '</p></div>' : '')
+                + '</div>';
+            document.getElementById('varDetailModal').style.display = 'flex';
+        }
+
+        document.getElementById('varForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('vNombre').value,
+                nombre_cientifico: document.getElementById('vCientifico').value || null,
+                descripcion: document.getElementById('vDescripcion').value || null,
+                imagen_url: document.getElementById('vImagen').value || null,
+                beneficios: document.getElementById('vBeneficios').value || null,
+                localidad: document.getElementById('vLocalidad').value || null,
+                produccion: document.getElementById('vProduccion').value || null,
+                caracteristicas: document.getElementById('vCaracteristicas').value || null
+            };
+            const id = document.getElementById('varId').value;
+            const url = id ? '/api/variedades/' + id : '/api/variedades';
+            const method = id ? 'PUT' : 'POST';
+            try {
+                const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+                const result = await res.json();
+                if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
+                cerrarForm();
+                cargarVariedades();
+            } catch(e) { alert('Error de conexion'); }
+        });
+
+        async function eliminarVar(id) {
+            if (!confirm('Eliminar esta variedad?')) return;
+            try {
+                const res = await fetch('/api/variedades/' + id, { method:'DELETE', headers:{'Content-Type':'application/json'} });
+                if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+                cargarVariedades();
+            } catch(e) { alert('Error de conexion'); }
+        }
+
+        async function cargarVariedades() {
+            const grid = document.getElementById('variedadesGrid');
+            try {
+                const res = await fetch('/api/variedades');
+                variedades = await res.json();
+                if (!variedades.length) {
+                    grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">No hay variedades registradas. Agrega la primera.</p>';
+                    return;
+                }
+                grid.innerHTML = variedades.map(v => {
+                    const img = v.imagen_url
+                        ? '<img src="' + escapeHTML(v.imagen_url) + '" alt="' + escapeHTML(v.nombre) + '">'
+                        : '<div style="width:100%;height:180px;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;border-radius:8px;margin-bottom:10px;"><i class="fas fa-seedling" style="font-size:3rem;color:var(--color-primary);opacity:0.5;"></i></div>';
+                    return '<div class="variedad-card" onclick="verDetalle(' + v.id + ')">'
+                        + img
+                        + '<h3>' + escapeHTML(v.nombre) + '</h3>'
+                        + (v.nombre_cientifico ? '<p style="font-style:italic;font-size:0.82rem;color:var(--color-text-muted);margin:2px 0 8px;"><em>' + escapeHTML(v.nombre_cientifico) + '</em></p>' : '')
+                        + (v.descripcion ? '<p style="font-size:0.82rem;color:var(--color-text-secondary);margin:0;">' + escapeHTML(v.descripcion.length > 80 ? v.descripcion.slice(0,80) + '...' : v.descripcion) + '</p>' : '')
+                        + (v.localidad ? '<p style="font-size:0.78rem;color:var(--color-text-muted);margin:8px 0 0;"><i class="fas fa-map-marker-alt"></i> ' + escapeHTML(v.localidad) + '</p>' : '')
+                        + '</div>';
+                }).join('');
+            } catch(e) {
+                grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">Error al cargar. Aseg&uacute;rate de haber creado la tabla <code>variedades</code> en Supabase.</p>';
+            }
+        }
+
+        // Search
+        document.getElementById('buscarVariedad').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.variedad-card').forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+            });
+        });
+
+        cargarVariedades();
+    </script>
 </body>
 </html>

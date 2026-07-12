@@ -260,6 +260,58 @@ app.delete('/api/fao-passport/:id', requireRole(['admin', 'investigador']), asyn
   res.json({ success: true });
 });
 
+// ==================== VARIEDADES ====================
+app.get('/api/variedades', async (req, res) => {
+  const { data, error } = await supabase.from('variedades').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.get('/api/variedades/:id', async (req, res) => {
+  const { data, error } = await supabase.from('variedades').select('*').eq('id', req.params.id).single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+app.post('/api/variedades', requireRole(['admin', 'investigador']), async (req, res) => {
+  try {
+    const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas } = req.body;
+    if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
+    const { data, error } = await supabase.from('variedades').insert({
+      nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'CREAR', 'variedades', data.id);
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/variedades/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+  try {
+    const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas } = req.body;
+    const updateData = {};
+    if (nombre !== undefined) updateData.nombre = nombre;
+    if (nombre_cientifico !== undefined) updateData.nombre_cientifico = nombre_cientifico;
+    if (descripcion !== undefined) updateData.descripcion = descripcion;
+    if (imagen_url !== undefined) updateData.imagen_url = imagen_url;
+    if (beneficios !== undefined) updateData.beneficios = beneficios;
+    if (localidad !== undefined) updateData.localidad = localidad;
+    if (produccion !== undefined) updateData.produccion = produccion;
+    if (caracteristicas !== undefined) updateData.caracteristicas = caracteristicas;
+    const { data, error } = await supabase.from('variedades').update(updateData).eq('id', req.params.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'EDITAR', 'variedades', parseInt(req.params.id));
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/variedades/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+  const { error } = await supabase.from('variedades').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  logActividad(req.authedUser.id, 'ELIMINAR', 'variedades', parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // ==================== LIKES ====================
 app.post('/api/noticias/:id/like', async (req, res) => {
   const { usuario_id } = req.body;

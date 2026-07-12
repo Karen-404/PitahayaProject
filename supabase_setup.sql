@@ -43,3 +43,25 @@ CREATE TABLE IF NOT EXISTS logs_actividad (
   registro_id INTEGER,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 4. VARIEDADES DE PITABAYA (CRUD con info completa)
+CREATE TABLE IF NOT EXISTS variedades (
+  id SERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  nombre_cientifico TEXT,
+  descripcion TEXT,
+  imagen_url TEXT,
+  beneficios TEXT,
+  localidad TEXT,
+  produccion TEXT,
+  caracteristicas TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS logs_actividad (
+  id SERIAL PRIMARY KEY,
+  usuario_id INTEGER,
+  accion TEXT,
+  tabla TEXT,
+  registro_id INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
