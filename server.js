@@ -34,7 +34,7 @@ app.use('/api', (req, res, next) => {
 
 // Helper: verify role (supports JWT via Authorization header + legacy usuario_id)
 async function requireRole(req, res, roles) {
-  if (!supabase) return res.status(503).json({ error: 'Base de datos no disponible' });
+  if (!supabase) { res.status(503).json({ error: 'Base de datos no disponible' }); return null; }
   var uid = null;
   // Try JWT from Authorization header first
   const auth = req.headers['authorization'];
@@ -43,24 +43,24 @@ async function requireRole(req, res, roles) {
       const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
       uid = decoded.id;
       req.authedUser = decoded;
-      if (uid === 0 || !roles.includes(decoded.role)) return res.status(403).json({ error: 'Permiso denegado' });
+      if (uid === 0 || !roles.includes(decoded.role)) { res.status(403).json({ error: 'Permiso denegado' }); return null; }
       return decoded;
-    } catch (e) { return res.status(401).json({ error: 'Token invalido o expirado' }); }
+    } catch (e) { res.status(401).json({ error: 'Token invalido o expirado' }); return null; }
   }
   // Legacy fallback: usuario_id from body/query/headers
   uid = req.body.usuario_id;
   if (uid === undefined || uid === null || uid === '') uid = req.query.usuario_id;
   if (uid === undefined || uid === null || uid === '') uid = req.headers['x-usuario-id'];
-  if (uid === undefined || uid === null || uid === '') return res.status(401).json({ error: 'No autorizado - usuario no identificado' });
+  if (uid === undefined || uid === null || uid === '') { res.status(401).json({ error: 'No autorizado - usuario no identificado' }); return null; }
   uid = Number(uid);
-  if (isNaN(uid)) return res.status(401).json({ error: 'No autorizado - id invalido' });
+  if (isNaN(uid)) { res.status(401).json({ error: 'No autorizado - id invalido' }); return null; }
   // admin hardcodeado (userId=0) del login local en script.js
   if (uid === 0) {
     if (roles.includes('admin')) return { role: 'admin', id: 1 };
-    return res.status(403).json({ error: 'Permiso denegado' });
+    res.status(403).json({ error: 'Permiso denegado' }); return null;
   }
   const { data: user } = await supabase.from('usuarios').select('*').eq('id', uid).single();
-  if (!user || !roles.includes(user.role)) return res.status(403).json({ error: 'Permiso denegado' });
+  if (!user || !roles.includes(user.role)) { res.status(403).json({ error: 'Permiso denegado' }); return null; }
   req.authedUser = user;
   return user;
 }
@@ -88,22 +88,26 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
-  const { correo, password } = req.body;
-  const { data: user, error } = await supabase.from('usuarios').select('*').eq('correo', correo).maybeSingle();
-  if (error) return res.status(500).json({ error: error.message });
-  if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
-  let match = false;
-  // Try bcrypt first, then fallback to plain-text for migration
-  try { match = await bcrypt.compare(password, user.password); } catch (e) { /* ignore */ }
-  if (!match && user.password === password) {
-    match = true;
-    // Migrate plain-text password to bcrypt hash
-    const hashed = await bcrypt.hash(password, 10);
-    await supabase.from('usuarios').update({ password: hashed }).eq('id', user.id);
+  try {
+    const { correo, password } = req.body;
+    const { data: user, error } = await supabase.from('usuarios').select('*').eq('correo', correo).maybeSingle();
+    if (error) return res.status(500).json({ error: error.message });
+    if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
+    let match = false;
+    // Try bcrypt first
+    try { if (user.password && user.password.startsWith('$2')) match = await bcrypt.compare(password, user.password); } catch (e) {}
+    // Fallback to plain-text for migration
+    if (!match && user.password === password) {
+      match = true;
+      const hashed = await bcrypt.hash(password, 10);
+      await supabase.from('usuarios').update({ password: hashed }).eq('id', user.id);
+    }
+    if (!match) return res.status(401).json({ error: 'Credenciales incorrectas' });
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+    res.json({ id: user.id, nombre: user.nombre, correo: user.correo, role: user.role, token });
+  } catch (e) {
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
-  if (!match) return res.status(401).json({ error: 'Credenciales incorrectas' });
-  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
-  res.json({ id: user.id, nombre: user.nombre, correo: user.correo, role: user.role, token });
 });
 
 // ==================== USUARIOS (Admin) ====================
