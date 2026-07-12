@@ -23,7 +23,7 @@
             </div>
             <div class="page-header-right">
                 <button class="btn btn-primary" id="btnNuevoFao" style="display:none" onclick="abrirModal()">
-                    <i class="fas fa-plus"></i> Nueva Accesi&oacute;n
+                    <i class="fas fa-plus"></i> Nuevo Registro
                 </button>
                 <button class="btn btn-secondary" id="btnEjemploFao" style="display:none" onclick="cargarEjemplo()">
                     <i class="fas fa-flask"></i> Datos Ejemplo
@@ -58,7 +58,7 @@
         <div id="faoModal" class="modal" style="display:none">
             <div class="modal-content" style="max-width:720px;padding:32px;">
                 <span class="modal-close" onclick="cerrarModal()">&times;</span>
-                <h2 id="modalTitle" style="margin:0 0 20px;font-size:1.15rem;">Nueva Accesi&oacute;n FAO</h2>
+                <h2 id="modalTitle" style="margin:0 0 20px;font-size:1.15rem;">Nuevo Registro FAO</h2>
                 <form id="faoForm">
                     <input type="hidden" id="faoId">
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
@@ -196,7 +196,7 @@
                 document.getElementById('fEstadoBio').value = item.estado_biologico || 'Silvestre';
                 document.getElementById('fFuente').value = item.fuente_colecta || '';
             } else {
-                document.getElementById('modalTitle').textContent = 'Nueva Accesi&oacute;n FAO';
+                document.getElementById('modalTitle').textContent = 'Nuevo Registro FAO';
                 document.getElementById('faoForm').reset();
                 document.getElementById('faoId').value = '';
             }
