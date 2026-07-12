@@ -5,12 +5,19 @@
     opts = opts || {};
     if (typeof url === 'string' && url.startsWith('/api/')) {
       var token = localStorage.getItem('userToken');
+      var uid = localStorage.getItem('userId');
+      opts.headers = opts.headers || {};
       if (token) {
-        opts.headers = opts.headers || {};
         if (Array.isArray(opts.headers)) {
           opts.headers.push(['Authorization', 'Bearer ' + token]);
         } else {
           opts.headers['Authorization'] = 'Bearer ' + token;
+        }
+      } else if (uid) {
+        if (Array.isArray(opts.headers)) {
+          opts.headers.push(['x-usuario-id', uid]);
+        } else {
+          opts.headers['x-usuario-id'] = uid;
         }
       }
     }
