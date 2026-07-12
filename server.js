@@ -244,6 +244,17 @@ app.post('/api/fao-passport', requireRole(['admin', 'investigador']), async (req
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.post('/api/fao-passport/bulk', requireRole(['admin', 'investigador']), async (req, res) => {
+  try {
+    const records = req.body;
+    if (!Array.isArray(records) || !records.length) return res.status(400).json({ error: 'Arreglo vacio' });
+    const { data, error } = await supabase.from('fao_passport').insert(records).select();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'IMPORTAR', 'fao_passport', records.length);
+    res.json({ count: data.length, data });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador']), async (req, res) => {
   try {
     const { data, error } = await supabase.from('fao_passport').update(req.body).eq('id', req.params.id).select().single();

@@ -25,6 +25,10 @@
                 <button class="btn btn-primary" id="btnNuevoFao" style="display:none" onclick="abrirModal()">
                     <i class="fas fa-plus"></i> Nueva Accesi&oacute;n
                 </button>
+                <button class="btn btn-secondary" id="btnImportarFao" style="display:none" onclick="document.getElementById('csvFileInput').click()">
+                    <i class="fas fa-file-import"></i> Importar CSV
+                </button>
+                <input type="file" id="csvFileInput" accept=".csv" style="display:none">
             </div>
         </div>
 
@@ -157,7 +161,10 @@
         const userId = localStorage.getItem('userId');
         const userRole = localStorage.getItem('userRole');
         const puedeEditar = userRole === 'admin' || userRole === 'investigador';
-        if (puedeEditar) document.getElementById('btnNuevoFao').style.display = 'inline-flex';
+        if (puedeEditar) {
+            document.getElementById('btnNuevoFao').style.display = 'inline-flex';
+            document.getElementById('btnImportarFao').style.display = 'inline-flex';
+        }
 
         function escapeHTML(str) {
             return String(str).replace(/[&<>"']/g, function(m) {
@@ -284,6 +291,55 @@
                 tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--color-text-muted);padding:40px;">Error al cargar. Asegurate de haber creado la tabla <code>fao_passport</code> en Supabase.</td></tr>';
             }
         }
+
+        // CSV Import
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(ev) {
+                const text = ev.target.result;
+                const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+                if (lines.length < 2) { alert('CSV debe tener encabezados y al menos 1 fila'); return; }
+                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+                const records = [];
+                const colMap = {
+                    'codigo':'codigo','numero_acceso':'numero_acceso','numero_colecta':'numero_colecta',
+                    'genero':'genero','especie':'especie','subtaxa':'subtaxa',
+                    'nombre_comun':'nombre_comun','nombre_accesion':'nombre_accesion',
+                    'fecha_adquisicion':'fecha_adquisicion','pais':'pais','ubicacion':'ubicacion',
+                    'latitud':'latitud','longitud':'longitud','altitud':'altitud',
+                    'estado_biologico':'estado_biologico','fuente_colecta':'fuente_colecta'
+                };
+                for (let i = 1; i < lines.length; i++) {
+                    const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                    const rec = {};
+                    headers.forEach((h, idx) => {
+                        const key = colMap[h.toLowerCase().replace(/[\s-]/g,'_')] || h;
+                        if (vals[idx] && vals[idx] !== '') {
+                            if (['latitud','longitud','altitud'].includes(key)) rec[key] = parseFloat(vals[idx]);
+                            else rec[key] = vals[idx];
+                        }
+                    });
+                    if (Object.keys(rec).length) records.push(rec);
+                }
+                if (!records.length) { alert('No se encontraron registros validos en el CSV'); return; }
+                if (!confirm(`Importar ${records.length} registros?`)) return;
+                try {
+                    const res = await fetch('/api/fao-passport/bulk', {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify(records)
+                    });
+                    const result = await res.json();
+                    if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
+                    alert(`${result.count} registros importados`);
+                    cargarFao();
+                } catch(e) { alert('Error de conexion'); }
+            };
+            reader.readAsText(file);
+            this.value = '';
+        });
 
         cargarFao();
     </script>
