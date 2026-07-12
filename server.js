@@ -302,32 +302,27 @@ app.get('/api/bioproductos', async (req, res) => {
 });
 
 app.post('/api/bioproductos', requireRole(['admin', 'investigador']), async (req, res) => {
-  const { nombre, descripcion, precio, imagen_url, ficha } = req.body;
+  const { nombre, descripcion, precio, imagen_url } = req.body;
   if (!nombre || !precio) return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
   try {
-    const insertData = { nombre, descripcion, precio: parseFloat(precio), imagen_url };
-    if (ficha) insertData.ficha_tecnica = JSON.stringify(ficha);
-    const { data, error } = await supabase.from('bioproductos').insert(insertData).select().single();
+    const { data, error } = await supabase.from('bioproductos').insert({ nombre, descripcion, precio: parseFloat(precio), imagen_url }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'CREAR', 'bioproductos', data.id, `Nombre: ${nombre}`);
-    if (data.ficha_tecnica) { try { data.ficha = JSON.parse(data.ficha_tecnica); } catch(e) {} }
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.put('/api/bioproductos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
-  const { nombre, descripcion, precio, imagen_url, ficha } = req.body;
+  const { nombre, descripcion, precio, imagen_url } = req.body;
   try {
     const updateData = {};
     if (nombre !== undefined) updateData.nombre = nombre;
     if (descripcion !== undefined) updateData.descripcion = descripcion;
     if (precio !== undefined) updateData.precio = parseFloat(precio);
     if (imagen_url !== undefined) updateData.imagen_url = imagen_url;
-    if (ficha !== undefined) updateData.ficha_tecnica = JSON.stringify(ficha);
     const { data, error } = await supabase.from('bioproductos').update(updateData).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'EDITAR', 'bioproductos', parseInt(req.params.id), `Nombre: ${nombre}`);
-    if (data.ficha_tecnica) { try { data.ficha = JSON.parse(data.ficha_tecnica); } catch(e) {} }
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

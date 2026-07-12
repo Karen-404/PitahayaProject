@@ -54,10 +54,6 @@
                         <img id="previewImg" style="max-width:200px;margin-top:10px;display:none;border-radius:8px">
                         <input type="hidden" id="prodImagen">
                     </div>
-                    <div class="form-group">
-                        <label>Ficha T&eacute;cnica (opcional)</label>
-                        <textarea id="prodFicha" rows="4" placeholder='Codigo, especie, ubicacion, etc. Un dato por linea: codigo=EI-PIT-26-001, especie=Hylocereus undatus'></textarea>
-                    </div>
                     <button type="submit" class="btn btn-primary" style="width:100%;">Guardar</button>
                 </form>
             </div>
@@ -104,7 +100,6 @@
                 document.getElementById('prodDescripcion').value = producto.descripcion || '';
                 document.getElementById('prodPrecio').value = producto.precio || '';
                 document.getElementById('prodImagen').value = producto.imagen_url || '';
-                document.getElementById('prodFicha').value = producto.ficha ? JSON.stringify(producto.ficha, null, 2) : '';
                 if (producto.imagen_url) {
                     document.getElementById('previewImg').src = producto.imagen_url;
                     document.getElementById('previewImg').style.display = 'block';
@@ -148,21 +143,11 @@
         document.getElementById('productoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (imagenSubiendo) { alert('Espera a que termine de subir la imagen'); return; }
-            let ficha = null;
-            const fichaRaw = document.getElementById('prodFicha').value.trim();
-            if (fichaRaw) {
-                ficha = {};
-                fichaRaw.split('\n').filter(Boolean).forEach(line => {
-                    const parts = line.split('=');
-                    if (parts.length === 2) ficha[parts[0].trim()] = parts[1].trim();
-                });
-            }
             const data = {
                 nombre: document.getElementById('prodNombre').value,
                 descripcion: document.getElementById('prodDescripcion').value,
                 precio: parseFloat(document.getElementById('prodPrecio').value),
-                imagen_url: document.getElementById('prodImagen').value || null,
-                ficha
+                imagen_url: document.getElementById('prodImagen').value || null
             };
             const id = document.getElementById('productoId').value;
             const url = id ? '/api/bioproductos/' + id : '/api/bioproductos';
@@ -202,13 +187,11 @@
                     const imgHtml = p.imagen_url
                         ? '<img src="' + escapeHTML(p.imagen_url) + '" alt="' + escapeHTML(p.nombre) + '">'
                         : '<div style="height:160px;display:flex;align-items:center;justify-content:center;background:var(--color-border);border-radius:8px;margin-bottom:12px;"><i class="fas fa-leaf" style="font-size:3rem;color:var(--color-text-muted);"></i></div>';
-                    const fichaHtml = p.ficha ? '<button class="btn btn-secondary" onclick="toggleFicha(this)" style="width:100%;margin:8px 0;font-size:0.82rem;padding:8px;"><i class="fas fa-file-alt"></i> Ver ficha</button><div class="ficha oculto" style="margin-bottom:8px;">' + Object.entries(p.ficha).map(([k,v]) => '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--color-border-soft);font-size:0.82rem;"><strong>' + k + ':</strong><span>' + escapeHTML(String(v)) + '</span></div>').join('') + '</div>' : '';
                     return '<div class="bioproducto-card">'
                         + imgHtml
                         + '<h3>' + escapeHTML(p.nombre) + '</h3>'
                         + '<p>' + escapeHTML(p.descripcion || '') + '</p>'
                         + '<div class="precio">$' + parseFloat(p.precio).toFixed(2) + '</div>'
-                        + fichaHtml
                         + '<button class="btn btn-primary" onclick="irPedido(\'' + escapeHTML(p.nombre) + '\')" style="width:100%;margin-top:8px;font-size:0.85rem;"><i class="fas fa-shopping-cart"></i> Solicitar</button>'
                         + (puedeEditar ? '<div style="margin-top:8px;display:flex;gap:8px;"><button class="btn-edit" onclick="abrirModal(' + escapeHTML(JSON.stringify(p)) + ')" style="flex:1;"><i class="fas fa-edit"></i></button><button class="btn-delete" onclick="eliminarProducto(' + p.id + ')" style="flex:1;"><i class="fas fa-trash"></i></button></div>' : '')
                         + '</div>';
