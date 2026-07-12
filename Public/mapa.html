@@ -142,7 +142,7 @@
 
         // Show add button for admin/investigador
         const userRole = localStorage.getItem('userRole');
-        if (userRole === 'admin' || userRole === 'investigador') {
+        if (userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico') {
             document.getElementById('btnAgregarPunto').style.display = 'inline-flex';
         }
 
@@ -262,9 +262,9 @@
                 variedad: document.getElementById('pfVariedad').value,
                 estado_salud: document.getElementById('pfEstado').value,
                 latitud: parseFloat(document.getElementById('pfLat').value),
-                longitud: parseFloat(document.getElementById('pfLng').value)
+                longitud: parseFloat(document.getElementById('pfLng').value),
+                usuario_id: parseInt(localStorage.getItem('userId'))
             };
-            const userId = localStorage.getItem('userId');
             try {
                 const res = await fetch('/api/puntos', {
                     method: 'POST',

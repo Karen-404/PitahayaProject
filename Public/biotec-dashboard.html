@@ -106,29 +106,18 @@
           <h2><i class="fas fa-database"></i> Inventario de Accesiones</h2>
           <span class="inventario-badge">PROTOCOLO MCPD</span>
         </div>
-        <div class="table-wrap">
+        <div class="table-wrap" id="faoInventoryWrap">
           <table class="inventario-table">
             <thead>
               <tr>
                 <th>C&Oacute;DIGO</th>
                 <th>ESPECIE / VARIEDAD</th>
                 <th>UBICACI&Oacute;N DE COLECTA</th>
-                <th>CALIDAD TE&Oacute;RICA</th>
+                <th>ESTADO BIOL&Oacute;GICO</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td class="codigo">EI-PIT-26-001</td>
-                <td><span class="cursiva">H. undatus</span> (Roja)</td>
-                <td class="ubicacion">Orellana, 5 km sur El Coca</td>
-                <td><span class="tag tag-export">EXPORTACI&Oacute;N</span></td>
-              </tr>
-              <tr>
-                <td class="codigo">EI-PIT-26-002</td>
-                <td><span class="cursiva">H. megalanthus</span> (Amarilla)</td>
-                <td class="ubicacion">Palora, Morona Santiago</td>
-                <td><span class="tag tag-premium">PREMIUM</span></td>
-              </tr>
+            <tbody id="faoInventoryBody">
+              <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Cargando...</td></tr>
             </tbody>
           </table>
         </div>
@@ -241,6 +230,33 @@
           document.getElementById('pedidosStatusBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Error al cargar pedidos</td></tr>';
         });
     }
+
+    // ===== INVENTARIO DE ACCESIONES =====
+    fetch('/api/fao-passport')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var tbody = document.getElementById('faoInventoryBody');
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Sin accesiones registradas</td></tr>';
+          return;
+        }
+        var estados = { 'Silvestre': 'tag-export', 'Cultivado': 'tag-premium', 'Mejorado': 'tag-export', 'Hibrido': 'tag-premium' };
+        tbody.innerHTML = data.map(function(f) {
+          var label = f.estado_biologico || 'Silvestre';
+          var cls = estados[label] || 'tag-premium';
+          var especie = f.especie ? '<span class="cursiva">' + f.especie + '</span>' : '-';
+          if (f.nombre_comun) especie += ' (' + f.nombre_comun + ')';
+          return '<tr>'
+            + '<td class="codigo">' + (f.codigo || '-') + '</td>'
+            + '<td>' + especie + '</td>'
+            + '<td class="ubicacion">' + (f.ubicacion || '-') + '</td>'
+            + '<td><span class="tag ' + cls + '">' + label.toUpperCase() + '</span></td>'
+            + '</tr>';
+        }).join('');
+      })
+      .catch(function() {
+        document.getElementById('faoInventoryBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Error al cargar inventario</td></tr>';
+      });
   </script>
 </body>
 </html>

@@ -173,7 +173,7 @@
     <script>
         const userId = localStorage.getItem('userId');
         const userRole = localStorage.getItem('userRole');
-        const puedeEditar = userRole === 'admin' || userRole === 'investigador';
+        const puedeEditar = userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico';
         if (puedeEditar) {
             document.getElementById('btnNuevoFao').style.display = 'inline-flex';
             document.getElementById('btnImportarFao').style.display = 'inline-flex';

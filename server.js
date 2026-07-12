@@ -167,7 +167,7 @@ app.get('/api/noticias/:id', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/noticias', requireRole(['admin', 'investigador']), async (req, res) => {
+app.post('/api/noticias', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { authedUser } = req;
   const { titulo, contenido, imagen_url } = req.body;
   if (!titulo || !contenido) return res.status(400).json({ error: 'Título y contenido son obligatorios' });
@@ -184,7 +184,7 @@ app.post('/api/noticias', requireRole(['admin', 'investigador']), async (req, re
   }
 });
 
-app.put('/api/noticias/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.put('/api/noticias/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { titulo, contenido, imagen_url } = req.body;
   const { data, error } = await supabase.from('noticias').update({ titulo, contenido, imagen_url }).eq('id', req.params.id).select().single();
   if (error) return res.status(500).json({ error: error.message });
@@ -192,7 +192,7 @@ app.put('/api/noticias/:id', requireRole(['admin', 'investigador']), async (req,
   res.json(data);
 });
 
-app.delete('/api/noticias/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.delete('/api/noticias/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('noticias').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   logActividad(req.authedUser.id, 'ELIMINAR', 'noticias', parseInt(req.params.id));
@@ -216,7 +216,7 @@ app.post('/api/comentarios', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/comentarios/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.delete('/api/comentarios/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('comentarios').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -235,7 +235,7 @@ app.get('/api/fao-passport/:id', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/fao-passport', requireRole(['admin', 'investigador']), async (req, res) => {
+app.post('/api/fao-passport', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
     const { data, error } = await supabase.from('fao_passport').insert(req.body).select().single();
     if (error) return res.status(500).json({ error: error.message });
@@ -244,7 +244,7 @@ app.post('/api/fao-passport', requireRole(['admin', 'investigador']), async (req
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/fao-passport/bulk', requireRole(['admin', 'investigador']), async (req, res) => {
+app.post('/api/fao-passport/bulk', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
     const records = req.body;
     if (!Array.isArray(records) || !records.length) return res.status(400).json({ error: 'Arreglo vacio' });
@@ -255,7 +255,7 @@ app.post('/api/fao-passport/bulk', requireRole(['admin', 'investigador']), async
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
     const { data, error } = await supabase.from('fao_passport').update(req.body).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
@@ -264,7 +264,7 @@ app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador']), async (
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/fao-passport/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.delete('/api/fao-passport/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('fao_passport').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   logActividad(req.authedUser.id, 'ELIMINAR', 'fao_passport', parseInt(req.params.id));
@@ -284,7 +284,7 @@ app.get('/api/variedades/:id', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/variedades', requireRole(['admin', 'investigador']), async (req, res) => {
+app.post('/api/variedades', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
     const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas } = req.body;
     if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
@@ -297,7 +297,7 @@ app.post('/api/variedades', requireRole(['admin', 'investigador']), async (req, 
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/variedades/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.put('/api/variedades/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
     const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas } = req.body;
     const updateData = {};
@@ -316,7 +316,7 @@ app.put('/api/variedades/:id', requireRole(['admin', 'investigador']), async (re
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/variedades/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.delete('/api/variedades/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('variedades').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   logActividad(req.authedUser.id, 'ELIMINAR', 'variedades', parseInt(req.params.id));
@@ -384,7 +384,7 @@ app.get('/api/puntos', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/puntos', requireRole(['admin', 'investigador']), async (req, res) => {
+app.post('/api/puntos', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { nombre_finca, latitud, longitud, variedad, estado_salud } = req.body;
   if (!nombre_finca || latitud === undefined || longitud === undefined) return res.status(400).json({ error: 'nombre_finca, latitud y longitud son obligatorios' });
   try {
@@ -395,7 +395,7 @@ app.post('/api/puntos', requireRole(['admin', 'investigador']), async (req, res)
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/puntos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.put('/api/puntos/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { nombre_finca, latitud, longitud, variedad, estado_salud } = req.body;
   try {
     const updateData = {};
@@ -411,7 +411,7 @@ app.put('/api/puntos/:id', requireRole(['admin', 'investigador']), async (req, r
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/puntos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.delete('/api/puntos/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('puntos_monitoreo').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   logActividad(req.authedUser.id, 'ELIMINAR', 'puntos_monitoreo', parseInt(req.params.id));
@@ -425,7 +425,7 @@ app.get('/api/bioproductos', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/bioproductos', requireRole(['admin', 'investigador']), async (req, res) => {
+app.post('/api/bioproductos', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { nombre, descripcion, precio, imagen_url } = req.body;
   if (!nombre || !precio) return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
   try {
@@ -436,7 +436,7 @@ app.post('/api/bioproductos', requireRole(['admin', 'investigador']), async (req
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/bioproductos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.put('/api/bioproductos/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { nombre, descripcion, precio, imagen_url } = req.body;
   try {
     const updateData = {};
@@ -451,7 +451,7 @@ app.put('/api/bioproductos/:id', requireRole(['admin', 'investigador']), async (
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/bioproductos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
+app.delete('/api/bioproductos/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('bioproductos').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   logActividad(req.authedUser.id, 'ELIMINAR', 'bioproductos', parseInt(req.params.id));
