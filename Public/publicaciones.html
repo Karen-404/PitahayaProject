@@ -23,7 +23,7 @@
             </div>
             <div class="page-header-right">
                 <button class="btn btn-primary" id="btnNuevaPub" style="display:none" onclick="abrirModal()">
-                    <i class="fas fa-plus"></i> Nueva Publicaci&oacute;n
+                    <i class="fas fa-plus"></i> Nueva Publicacion
                 </button>
             </div>
         </div>
@@ -42,7 +42,7 @@
         <div id="pubModal" class="modal" style="display:none">
             <div class="modal-content" style="max-width:560px;">
                 <span class="modal-close" onclick="cerrarModal()">&times;</span>
-                <h2 id="pubModalTitle">Nueva Publicaci&oacute;n</h2>
+                <h2 id="pubModalTitle">Nueva Publicacion</h2>
                 <form id="pubForm">
                     <input type="hidden" id="pubId">
                     <div class="form-group">
@@ -113,7 +113,7 @@
                 document.getElementById('pResumen').value = item.resumen || '';
                 document.getElementById('pArchivo').value = item.archivo_url || '';
             } else {
-                document.getElementById('pubModalTitle').textContent = 'Nueva Publicaci&oacute;n';
+                document.getElementById('pubModalTitle').textContent = 'Nueva Publicacion';
                 document.getElementById('pubForm').reset();
                 document.getElementById('pubId').value = '';
             }
