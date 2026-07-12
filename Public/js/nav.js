@@ -1,4 +1,22 @@
 (function() {
+  // Patch global fetch to include JWT Bearer token on API calls
+  var origFetch = window.fetch;
+  window.fetch = function(url, opts) {
+    opts = opts || {};
+    if (typeof url === 'string' && url.startsWith('/api/')) {
+      var token = localStorage.getItem('userToken');
+      if (token) {
+        opts.headers = opts.headers || {};
+        if (Array.isArray(opts.headers)) {
+          opts.headers.push(['Authorization', 'Bearer ' + token]);
+        } else {
+          opts.headers['Authorization'] = 'Bearer ' + token;
+        }
+      }
+    }
+    return origFetch.call(window, url, opts);
+  };
+
   var role = localStorage.getItem('userRole');
   var currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
