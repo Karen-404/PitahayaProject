@@ -20,7 +20,9 @@
             z-index: 0;
         }
         body.registro-page-wrapper > * { position: relative; z-index: 1; }
-        .registro-container { box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+        .registro-page { display: flex; align-items: center; justify-content: center; flex: 1; padding: 20px; }
+        body.registro-page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        .registro-page-wrapper .system-footer { margin-top: 0; }
     </style>
 </head>
 <body class="registro-page-wrapper">
@@ -29,8 +31,8 @@
         <div class="brand">PITAHAYA <span>BIOTEC</span></div>
     </nav>
 
-    <main>
-        <section class="login-container registro-container" style="max-width:480px;">
+    <main class="registro-page">
+        <section class="login-container" style="max-width:480px;margin:0;">
             <h2>Crear Cuenta</h2>
             <form id="registroForm">
                 <div class="form-group">
