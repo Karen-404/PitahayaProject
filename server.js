@@ -735,7 +735,7 @@ app.get('/api/soporte/:usuario_id', async (req, res) => {
 });
 
 app.get('/api/soporte', async (req, res) => {
-  const { data, error } = await supabase.from('soporte_mensajes').select('*, usuarios!left(nombre, email)').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from('soporte_mensajes').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data || []);
 });
