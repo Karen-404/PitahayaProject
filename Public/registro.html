@@ -23,6 +23,12 @@
         .registro-page { display: flex; align-items: center; justify-content: center; flex: 1; padding: 20px; }
         body.registro-page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
         .registro-page-wrapper .system-footer { margin-top: 0; }
+        @media (max-width: 767px) {
+            .registro-page-wrapper .login-container { max-width: 100% !important; margin: 0 16px !important; padding: 24px !important; }
+            .registro-page-wrapper .login-container input,
+            .registro-page-wrapper .login-container select { height: 48px !important; font-size: 0.95rem !important; }
+            .registro-page-wrapper .login-container button { height: 48px !important; font-size: 1rem !important; }
+        }
     </style>
 </head>
 <body class="registro-page-wrapper">
