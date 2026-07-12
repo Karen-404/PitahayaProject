@@ -201,7 +201,7 @@ app.delete('/api/noticias/:id', requireRole(['admin', 'investigador', 'tecnico']
 
 // ==================== COMENTARIOS (RF-10) ====================
 app.get('/api/comentarios/:noticia_id', async (req, res) => {
-  const { data, error } = await supabase.from('comentarios').select('*, usuarios!inner(nombre)').eq('noticia_id', req.params.noticia_id).order('created_at', { ascending: true });
+  const { data, error } = await supabase.from('comentarios').select('*').eq('noticia_id', req.params.noticia_id).order('created_at', { ascending: true });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data || []);
 });
@@ -210,7 +210,7 @@ app.post('/api/comentarios', async (req, res) => {
   const { noticia_id, usuario_id, contenido } = req.body;
   if (!noticia_id || !usuario_id || !contenido) return res.status(400).json({ error: 'Faltan datos' });
   try {
-    const { data, error } = await supabase.from('comentarios').insert({ noticia_id, usuario_id, contenido }).select('*, usuarios!inner(nombre)').single();
+    const { data, error } = await supabase.from('comentarios').insert({ noticia_id, usuario_id, contenido }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
