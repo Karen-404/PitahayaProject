@@ -63,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombre = document.getElementById('nombre').value.trim();
             const correo = document.getElementById('correo').value.trim();
             const password = document.getElementById('passwordReg').value.trim();
+            const confirm = document.getElementById('passwordConfirm');
+            if (confirm && confirm.value.trim() !== password) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
             const role = document.getElementById('roleReg') ? document.getElementById('roleReg').value : 'productor';
 
             try {
