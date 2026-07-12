@@ -261,22 +261,28 @@ app.get('/api/puntos', async (req, res) => {
 });
 
 app.post('/api/puntos', requireRole(['admin', 'investigador']), async (req, res) => {
-  const { nombre, descripcion, lat, lng, variedad, fecha_siembra, estado, responsable } = req.body;
-  if (!nombre || lat === undefined || lng === undefined) return res.status(400).json({ error: 'Nombre, lat y lng son obligatorios' });
+  const { nombre_finca, latitud, longitud, variedad, estado_salud } = req.body;
+  if (!nombre_finca || latitud === undefined || longitud === undefined) return res.status(400).json({ error: 'nombre_finca, latitud y longitud son obligatorios' });
   try {
-    const { data, error } = await supabase.from('puntos_monitoreo').insert({ nombre, descripcion, lat: parseFloat(lat), lng: parseFloat(lng), variedad, fecha_siembra, estado: estado || 'activo', responsable }).select().single();
+    const { data, error } = await supabase.from('puntos_monitoreo').insert({ nombre_finca, latitud: parseFloat(latitud), longitud: parseFloat(longitud), variedad, estado_salud: estado_salud || 'Sano' }).select().single();
     if (error) return res.status(500).json({ error: error.message });
-    logActividad(req.authedUser.id, 'CREAR', 'puntos_monitoreo', data.id, `Nombre: ${nombre}`);
+    logActividad(req.authedUser.id, 'CREAR', 'puntos_monitoreo', data.id, `Nombre: ${nombre_finca}`);
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.put('/api/puntos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
-  const { nombre, descripcion, lat, lng, variedad, fecha_siembra, estado, responsable } = req.body;
+  const { nombre_finca, latitud, longitud, variedad, estado_salud } = req.body;
   try {
-    const { data, error } = await supabase.from('puntos_monitoreo').update({ nombre, descripcion, lat: lat !== undefined ? parseFloat(lat) : undefined, lng: lng !== undefined ? parseFloat(lng) : undefined, variedad, fecha_siembra, estado, responsable }).eq('id', req.params.id).select().single();
+    const updateData = {};
+    if (nombre_finca !== undefined) updateData.nombre_finca = nombre_finca;
+    if (latitud !== undefined) updateData.latitud = parseFloat(latitud);
+    if (longitud !== undefined) updateData.longitud = parseFloat(longitud);
+    if (variedad !== undefined) updateData.variedad = variedad;
+    if (estado_salud !== undefined) updateData.estado_salud = estado_salud;
+    const { data, error } = await supabase.from('puntos_monitoreo').update(updateData).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
-    logActividad(req.authedUser.id, 'EDITAR', 'puntos_monitoreo', parseInt(req.params.id), `Nombre: ${nombre}`);
+    logActividad(req.authedUser.id, 'EDITAR', 'puntos_monitoreo', parseInt(req.params.id), `Nombre: ${nombre_finca}`);
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -299,9 +305,12 @@ app.post('/api/bioproductos', requireRole(['admin', 'investigador']), async (req
   const { nombre, descripcion, precio, imagen_url, ficha } = req.body;
   if (!nombre || !precio) return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
   try {
-    const { data, error } = await supabase.from('bioproductos').insert({ nombre, descripcion, precio: parseFloat(precio), imagen_url, ficha: ficha || null }).select().single();
+    const insertData = { nombre, descripcion, precio: parseFloat(precio), imagen_url };
+    if (ficha) insertData.ficha_tecnica = JSON.stringify(ficha);
+    const { data, error } = await supabase.from('bioproductos').insert(insertData).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'CREAR', 'bioproductos', data.id, `Nombre: ${nombre}`);
+    if (data.ficha_tecnica) { try { data.ficha = JSON.parse(data.ficha_tecnica); } catch(e) {} }
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -309,9 +318,16 @@ app.post('/api/bioproductos', requireRole(['admin', 'investigador']), async (req
 app.put('/api/bioproductos/:id', requireRole(['admin', 'investigador']), async (req, res) => {
   const { nombre, descripcion, precio, imagen_url, ficha } = req.body;
   try {
-    const { data, error } = await supabase.from('bioproductos').update({ nombre, descripcion, precio: precio ? parseFloat(precio) : undefined, imagen_url, ficha }).eq('id', req.params.id).select().single();
+    const updateData = {};
+    if (nombre !== undefined) updateData.nombre = nombre;
+    if (descripcion !== undefined) updateData.descripcion = descripcion;
+    if (precio !== undefined) updateData.precio = parseFloat(precio);
+    if (imagen_url !== undefined) updateData.imagen_url = imagen_url;
+    if (ficha !== undefined) updateData.ficha_tecnica = JSON.stringify(ficha);
+    const { data, error } = await supabase.from('bioproductos').update(updateData).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'EDITAR', 'bioproductos', parseInt(req.params.id), `Nombre: ${nombre}`);
+    if (data.ficha_tecnica) { try { data.ficha = JSON.parse(data.ficha_tecnica); } catch(e) {} }
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

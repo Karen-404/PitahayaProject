@@ -55,8 +55,8 @@
                         <input type="hidden" id="prodImagen">
                     </div>
                     <div class="form-group">
-                        <label>Ficha T&eacute;cnica (JSON opcional)</label>
-                        <textarea id="prodFicha" rows="4" placeholder='{"codigo":"EI-PIT-26-001","especie":"Hylocereus undatus","ubicacion":"Orellana"}'></textarea>
+                        <label>Ficha T&eacute;cnica (opcional)</label>
+                        <textarea id="prodFicha" rows="4" placeholder='Codigo, especie, ubicacion, etc. Un dato por linea: codigo=EI-PIT-26-001, especie=Hylocereus undatus'></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width:100%;">Guardar</button>
                 </form>
@@ -150,7 +150,13 @@
             if (imagenSubiendo) { alert('Espera a que termine de subir la imagen'); return; }
             let ficha = null;
             const fichaRaw = document.getElementById('prodFicha').value.trim();
-            if (fichaRaw) { try { ficha = JSON.parse(fichaRaw); } catch(e) { alert('Ficha técnica: JSON inválido'); return; } }
+            if (fichaRaw) {
+                ficha = {};
+                fichaRaw.split('\n').filter(Boolean).forEach(line => {
+                    const parts = line.split('=');
+                    if (parts.length === 2) ficha[parts[0].trim()] = parts[1].trim();
+                });
+            }
             const data = {
                 nombre: document.getElementById('prodNombre').value,
                 descripcion: document.getElementById('prodDescripcion').value,
