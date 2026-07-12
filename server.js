@@ -32,37 +32,39 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// Helper: verify role (supports JWT via Authorization header + legacy usuario_id)
-async function requireRole(req, res, roles) {
-  if (!supabase) { res.status(503).json({ error: 'Base de datos no disponible' }); return null; }
-  var uid = null;
-  // Try JWT from Authorization header first
-  const auth = req.headers['authorization'];
-  if (auth && auth.startsWith('Bearer ')) {
-    try {
-      const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
-      uid = decoded.id;
-      req.authedUser = decoded;
-      if (uid === 0 || !roles.includes(decoded.role)) { res.status(403).json({ error: 'Permiso denegado' }); return null; }
-      return decoded;
-    } catch (e) { res.status(401).json({ error: 'Token invalido o expirado' }); return null; }
-  }
-  // Legacy fallback: usuario_id from body/query/headers
-  uid = req.body.usuario_id;
-  if (uid === undefined || uid === null || uid === '') uid = req.query.usuario_id;
-  if (uid === undefined || uid === null || uid === '') uid = req.headers['x-usuario-id'];
-  if (uid === undefined || uid === null || uid === '') { res.status(401).json({ error: 'No autorizado - usuario no identificado' }); return null; }
-  uid = Number(uid);
-  if (isNaN(uid)) { res.status(401).json({ error: 'No autorizado - id invalido' }); return null; }
-  // admin hardcodeado (userId=0) del login local en script.js
-  if (uid === 0) {
-    if (roles.includes('admin')) return { role: 'admin', id: 1 };
-    res.status(403).json({ error: 'Permiso denegado' }); return null;
-  }
-  const { data: user } = await supabase.from('usuarios').select('*').eq('id', uid).single();
-  if (!user || !roles.includes(user.role)) { res.status(403).json({ error: 'Permiso denegado' }); return null; }
-  req.authedUser = user;
-  return user;
+// Middleware: verify role (supports JWT via Authorization header + legacy usuario_id)
+// Sets req.authedUser on success. Sends error response and calls next(false) on failure.
+function requireRole(roles) {
+  return async (req, res, next) => {
+    if (!supabase) return res.status(503).json({ error: 'Base de datos no disponible' });
+    var uid = null;
+    // Try JWT from Authorization header first
+    const auth = req.headers['authorization'];
+    if (auth && auth.startsWith('Bearer ')) {
+      try {
+        const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
+        req.authedUser = decoded;
+        if (uid === 0 || !roles.includes(decoded.role)) return res.status(403).json({ error: 'Permiso denegado' });
+        return next();
+      } catch (e) { return res.status(401).json({ error: 'Token invalido o expirado' }); }
+    }
+    // Legacy fallback: usuario_id from body/query/headers
+    uid = req.body.usuario_id;
+    if (uid === undefined || uid === null || uid === '') uid = req.query.usuario_id;
+    if (uid === undefined || uid === null || uid === '') uid = req.headers['x-usuario-id'];
+    if (uid === undefined || uid === null || uid === '') return res.status(401).json({ error: 'No autorizado - usuario no identificado' });
+    uid = Number(uid);
+    if (isNaN(uid)) return res.status(401).json({ error: 'No autorizado - id invalido' });
+    // admin hardcodeado (userId=0) del login local en script.js
+    if (uid === 0) {
+      if (roles.includes('admin')) { req.authedUser = { role: 'admin', id: 1 }; return next(); }
+      return res.status(403).json({ error: 'Permiso denegado' });
+    }
+    const { data: user } = await supabase.from('usuarios').select('*').eq('id', uid).single();
+    if (!user || !roles.includes(user.role)) return res.status(403).json({ error: 'Permiso denegado' });
+    req.authedUser = user;
+    next();
+  };
 }
 
 // Helper: log activity (silently fails if table doesn't exist)
@@ -165,40 +167,35 @@ app.get('/api/noticias/:id', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/noticias', async (req, res) => {
-  const user = await requireRole(req, res, ['admin', 'investigador']);
-  if (!user) return;
+app.post('/api/noticias', requireRole(['admin', 'investigador']), async (req, res) => {
+  const { authedUser } = req;
   const { titulo, contenido, imagen_url } = req.body;
   if (!titulo || !contenido) return res.status(400).json({ error: 'Título y contenido son obligatorios' });
   try {
     const { data, error } = await supabase.from('noticias').insert({
       titulo, contenido, imagen_url: imagen_url || null,
-      autor_id: user.id, fecha: new Date().toISOString().split('T')[0]
+      autor_id: authedUser.id, fecha: new Date().toISOString().split('T')[0]
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
-    logActividad(user.id, 'CREAR', 'noticias', data.id, `Título: ${titulo}`);
+    logActividad(authedUser.id, 'CREAR', 'noticias', data.id, `Título: ${titulo}`);
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-app.put('/api/noticias/:id', async (req, res) => {
-  const user = await requireRole(req, res, ['admin', 'investigador']);
-  if (!user) return;
+app.put('/api/noticias/:id', requireRole(['admin', 'investigador']), async (req, res) => {
   const { titulo, contenido, imagen_url } = req.body;
   const { data, error } = await supabase.from('noticias').update({ titulo, contenido, imagen_url }).eq('id', req.params.id).select().single();
   if (error) return res.status(500).json({ error: error.message });
-  logActividad(user.id, 'EDITAR', 'noticias', parseInt(req.params.id), `Título: ${titulo}`);
+  logActividad(req.authedUser.id, 'EDITAR', 'noticias', parseInt(req.params.id), `Título: ${titulo}`);
   res.json(data);
 });
 
-app.delete('/api/noticias/:id', async (req, res) => {
-  const user = await requireRole(req, res, ['admin', 'investigador']);
-  if (!user) return;
+app.delete('/api/noticias/:id', requireRole(['admin', 'investigador']), async (req, res) => {
   const { error } = await supabase.from('noticias').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
-  logActividad(user.id, 'ELIMINAR', 'noticias', parseInt(req.params.id));
+  logActividad(req.authedUser.id, 'ELIMINAR', 'noticias', parseInt(req.params.id));
   res.json({ success: true });
 });
 
