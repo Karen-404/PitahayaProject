@@ -209,7 +209,7 @@
         const noticias = await res.json();
         container.innerHTML = noticias.map(n => {
           const fecha = new Date(n.fecha).toLocaleDateString('es-EC', { year:'numeric', month:'long', day:'numeric' });
-          const likesCount = n.likes ? n.likes.length : 0;
+          const likesCount = n.likes && n.likes[0] ? n.likes[0].count : 0;
           const puedeEditar = (userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico');
           let imagenes = [];
           try { imagenes = JSON.parse(n.imagen_url || '[]'); } catch(e) { if (n.imagen_url) imagenes = [n.imagen_url]; }
