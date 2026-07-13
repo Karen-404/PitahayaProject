@@ -25,9 +25,7 @@
                 <button class="btn btn-primary" id="btnNuevoFao" style="display:none" onclick="abrirModal()">
                     <i class="fas fa-plus"></i> Nuevo Registro
                 </button>
-                <button class="btn btn-secondary" id="btnEjemploFao" style="display:none" onclick="cargarEjemplo()">
-                    <i class="fas fa-flask"></i> Datos Ejemplo
-                </button>
+                
             </div>
         </div>
 
@@ -193,7 +191,6 @@
         const puedeEditar = userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico';
         if (puedeEditar) {
             document.getElementById('btnNuevoFao').style.display = 'inline-flex';
-            document.getElementById('btnEjemploFao').style.display = 'inline-flex';
         }
 
         function escapeHTML(str) {
@@ -334,26 +331,6 @@
                 tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--color-text-muted);padding:40px;">Error al cargar. Asegurate de haber creado la tabla <code>fao_passport</code> en Supabase.</td></tr>';
             }
         }
-
-        // Cargar datos de ejemplo
-        async function cargarEjemplo() {
-            if (!confirm('Cargar 3 registros de ejemplo?')) return;
-            const sample = [
-                {codigo:'EI-PIT-26-001',numero_acceso:'ACC-001',numero_colecta:'COL-001',genero:'Hylocereus',especie:'undatus',nombre_comun:'Pitahaya Roja',nombre_accesion:'Roja Orellana',pais:'Ecuador',ubicacion:'Orellana, 5 km sur El Coca',latitud:-0.6357,longitud:-77.0410,altitud:250,estado_biologico:'Silvestre',fuente_colecta:'Campo agricola'},
-                {codigo:'EI-PIT-26-002',numero_acceso:'ACC-002',numero_colecta:'COL-002',genero:'Hylocereus',especie:'megalanthus',nombre_comun:'Pitahaya Amarilla',nombre_accesion:'Amarilla Palora',pais:'Ecuador',ubicacion:'Palora, Morona Santiago',latitud:-1.7012,longitud:-77.9350,altitud:320,estado_biologico:'Cultivado',fuente_colecta:'Mercado local'},
-                {codigo:'EI-PIT-26-003',numero_acceso:'ACC-003',numero_colecta:'COL-003',genero:'Hylocereus',especie:'undatus',subtaxa:'american beauty',nombre_comun:'Pitahaya Rosa',nombre_accesion:'Rosa Santa Elena',pais:'Ecuador',ubicacion:'Santa Elena',latitud:-2.2260,longitud:-80.8580,altitud:15,estado_biologico:'Cultivado',fuente_colecta:'Vivero comercial'}
-            ];
-            try {
-                const res = await fetch('/api/fao-passport/bulk', {
-                    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sample)
-                });
-                const result = await res.json();
-                if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
-                alert(result.count + ' registros de ejemplo cargados');
-                cargarFao();
-            } catch(e) { alert('Error de conexion'); }
-        }
-
         cargarFao();
     </script>
 </body>
