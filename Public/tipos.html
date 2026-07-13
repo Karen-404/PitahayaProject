@@ -28,8 +28,14 @@
             </div>
         </div>
 
-        <div class="buscador" style="margin-bottom:24px;">
-            <input type="text" id="buscarVariedad" placeholder="Buscar variedad..." style="width:100%;max-width:400px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;">
+            <input type="text" id="buscarVariedad" placeholder="Buscar variedad..." style="flex:1;min-width:200px;height:44px;" oninput="cargarVariedadesDebounced()">
+            <select id="sortVariedad" style="width:auto;min-width:160px;height:44px;" onchange="cargarVariedades()">
+                <option value="created_at">M&aacute;s recientes</option>
+                <option value="nombre">Nombre A-Z</option>
+                <option value="localidad">Localidad</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="exportarCSV()" title="Exportar CSV para investigaci&oacute;n"><i class="fas fa-download"></i> Exportar CSV</button>
         </div>
 
         <div id="variedadesGrid" class="variedades-grid"></div>
@@ -85,6 +91,12 @@
                         <div class="form-group">
                             <label>Producci&oacute;n / Datos de cosecha</label>
                             <textarea id="vProduccion" rows="2" placeholder="Rendimiento, temporada, grados Brix..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-passport"></i> Pasaporte FAO asociado</label>
+                            <select id="vFaoPassport" style="height:44px;">
+                                <option value="">-- Sin pasaporte --</option>
+                            </select>
                         </div>
                     </div>
 
@@ -268,6 +280,7 @@
                 document.getElementById('vBeneficios').value = item.beneficios || '';
                 document.getElementById('vLocalidad').value = item.localidad || '';
                 document.getElementById('vProduccion').value = item.produccion || '';
+                document.getElementById('vFaoPassport').value = item.fao_passport_id || '';
                 try { var car = JSON.parse(item.caracteristicas || '{}'); objToCar(car); } catch(e) {}
                 var p = document.getElementById('vPreview');
                 if (item.imagen_url) { p.src = item.imagen_url; p.style.display = 'block'; } else { p.style.display = 'none'; }
@@ -275,6 +288,7 @@
                 document.getElementById('formTitle').textContent = 'Nueva Variedad';
                 document.getElementById('varForm').reset();
                 document.getElementById('varId').value = '';
+                document.getElementById('vFaoPassport').value = '';
                 document.getElementById('vPreview').style.display = 'none';
                 document.querySelectorAll('[id^=car_]').forEach(function(el) { el.value = ''; });
             }
@@ -339,6 +353,7 @@
                 + img
                 + (v.nombre_cientifico ? '<p style="font-style:italic;color:var(--color-text-muted);margin:0 0 16px 0;"><em>' + escapeHTML(v.nombre_cientifico) + '</em></p>' : '')
                 + (v.descripcion ? '<div style="margin-bottom:12px;"><h4 style="margin:0 0 6px 0;">Descripci&oacute;n</h4><p style="margin:0;color:var(--color-text-secondary);line-height:1.6;">' + escapeHTML(v.descripcion) + '</p></div>' : '')
+                + (v.fao_passport_id ? '<div style="margin-bottom:12px;padding:10px 14px;background:var(--color-primary-soft);border-radius:8px;display:flex;align-items:center;gap:8px;"><i class="fas fa-passport" style="color:var(--color-primary);"></i> <span style="font-size:0.88rem;">Pasaporte FAO asociado: <strong>#' + v.fao_passport_id + '</strong></span></div>' : '')
                 + '<div class="grid-2 gap-12">'
                 + (v.beneficios ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-heart"></i> Beneficios</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.beneficios) + '</p></div>' : '')
                 + (v.localidad ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-map-marker-alt"></i> Localidad</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.localidad) + '</p></div>' : '')
@@ -351,6 +366,7 @@
         document.getElementById('varForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var car = carToObj();
+            var faoId = document.getElementById('vFaoPassport').value;
             var data = {
                 nombre: document.getElementById('vNombre').value,
                 nombre_cientifico: document.getElementById('vCientifico').value || null,
@@ -359,7 +375,8 @@
                 beneficios: document.getElementById('vBeneficios').value || null,
                 localidad: document.getElementById('vLocalidad').value || null,
                 produccion: document.getElementById('vProduccion').value || null,
-                caracteristicas: JSON.stringify(car)
+                caracteristicas: JSON.stringify(car),
+                fao_passport_id: faoId ? parseInt(faoId) : null
             };
             var id = document.getElementById('varId').value;
             var url = id ? '/api/variedades/' + id : '/api/variedades';
@@ -382,10 +399,22 @@
             } catch(e) { alert('Error de conexion'); }
         }
 
+        var debounceTimer;
+
+        function cargarVariedadesDebounced() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(cargarVariedades, 300);
+        }
+
         async function cargarVariedades() {
             var grid = document.getElementById('variedadesGrid');
+            var q = document.getElementById('buscarVariedad').value;
+            var sort = document.getElementById('sortVariedad').value;
             try {
-                var res = await fetch('/api/variedades');
+                var params = new URLSearchParams();
+                if (q) params.set('q', q);
+                params.set('sort', sort);
+                var res = await fetch('/api/variedades?' + params.toString());
                 variedades = await res.json();
                 if (!variedades.length) {
                     grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">No hay variedades registradas. Agrega la primera.</p>';
@@ -401,6 +430,7 @@
                         + (v.nombre_cientifico ? '<p style="font-style:italic;font-size:0.82rem;color:var(--color-text-muted);margin:2px 0 8px;"><em>' + escapeHTML(v.nombre_cientifico) + '</em></p>' : '')
                         + (v.descripcion ? '<p style="font-size:0.82rem;color:var(--color-text-secondary);margin:0;">' + escapeHTML(v.descripcion.length > 80 ? v.descripcion.slice(0,80) + '...' : v.descripcion) + '</p>' : '')
                         + (v.localidad ? '<p style="font-size:0.78rem;color:var(--color-text-muted);margin:8px 0 0;"><i class="fas fa-map-marker-alt"></i> ' + escapeHTML(v.localidad) + '</p>' : '')
+                        + (v.fao_passport_id ? '<p style="font-size:0.78rem;color:var(--color-primary);margin:4px 0 0;"><i class="fas fa-passport"></i> FAo: ' + escapeHTML(v.codigo_fao || 'ID ' + v.fao_passport_id) + '</p>' : '')
                         + '</div>';
                 }).join('');
             } catch(e) {
@@ -408,13 +438,29 @@
             }
         }
 
-        document.getElementById('buscarVariedad').addEventListener('input', function() {
-            var q = this.value.toLowerCase();
-            document.querySelectorAll('.variedad-card').forEach(function(card) {
-                card.style.display = card.textContent.toLowerCase().includes(q) ? 'block' : 'none';
-            });
-        });
+        async function cargarFaoPassportOptions() {
+            try {
+                var res = await fetch('/api/fao-passport');
+                var list = await res.json();
+                var sel = document.getElementById('vFaoPassport');
+                sel.innerHTML = '<option value="">-- Sin pasaporte --</option>' + list.map(function(p) {
+                    return '<option value="' + p.id + '">' + escapeHTML(p.codigo || p.nombre_comun || 'FAO #' + p.id) + ' - ' + escapeHTML(p.genero || '') + ' ' + escapeHTML(p.especie || '') + '</option>';
+                }).join('');
+            } catch(e) { console.log('Error cargando FAO'); }
+        }
 
+        async function exportarCSV() {
+            try {
+                var res = await fetch('/api/investigacion/variedades?format=csv');
+                var blob = await res.blob();
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url; a.download = 'variedades_investigacion.csv'; a.click();
+                URL.revokeObjectURL(url);
+            } catch(e) { alert('Error al exportar'); }
+        }
+
+        cargarFaoPassportOptions();
         cargarVariedades();
     </script>
 </body>

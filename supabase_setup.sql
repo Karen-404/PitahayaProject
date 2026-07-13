@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS variedades (
   localidad TEXT,
   produccion TEXT,
   caracteristicas TEXT,
+  fao_passport_id INTEGER REFERENCES fao_passport(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

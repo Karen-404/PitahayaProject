@@ -273,23 +273,33 @@ app.delete('/api/fao-passport/:id', requireRole(['admin', 'investigador', 'tecni
 
 // ==================== VARIEDADES ====================
 app.get('/api/variedades', async (req, res) => {
-  const { data, error } = await supabase.from('variedades').select('*').order('created_at', { ascending: false });
+  const { q, sort, order, campo, valor } = req.query;
+  let query = supabase.from('variedades').select('*');
+  if (q) {
+    query = query.or(`nombre.ilike.%${q}%,nombre_cientifico.ilike.%${q}%,localidad.ilike.%${q}%`);
+  }
+  if (campo && valor) {
+    query = query.filter('caracteristicas->>' + campo, 'ilike', `%${valor}%`);
+  }
+  const sortCol = sort || 'created_at';
+  const sortOrd = order === 'asc' ? { ascending: true } : { ascending: false };
+  const { data, error } = await query.order(sortCol, sortOrd);
   if (error) return res.status(500).json({ error: error.message });
   res.json(data || []);
 });
 
 app.get('/api/variedades/:id', async (req, res) => {
-  const { data, error } = await supabase.from('variedades').select('*').eq('id', req.params.id).single();
+  const { data, error } = await supabase.from('variedades').select('*,fao_passport:fao_passport_id(*)').eq('id', req.params.id).single();
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
 app.post('/api/variedades', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
-    const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas } = req.body;
+    const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas, fao_passport_id } = req.body;
     if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
     const { data, error } = await supabase.from('variedades').insert({
-      nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas
+      nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas, fao_passport_id
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'CREAR', 'variedades', data.id);
@@ -299,7 +309,7 @@ app.post('/api/variedades', requireRole(['admin', 'investigador', 'tecnico']), a
 
 app.put('/api/variedades/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
-    const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas } = req.body;
+    const { nombre, nombre_cientifico, descripcion, imagen_url, beneficios, localidad, produccion, caracteristicas, fao_passport_id } = req.body;
     const updateData = {};
     if (nombre !== undefined) updateData.nombre = nombre;
     if (nombre_cientifico !== undefined) updateData.nombre_cientifico = nombre_cientifico;
@@ -309,6 +319,7 @@ app.put('/api/variedades/:id', requireRole(['admin', 'investigador', 'tecnico'])
     if (localidad !== undefined) updateData.localidad = localidad;
     if (produccion !== undefined) updateData.produccion = produccion;
     if (caracteristicas !== undefined) updateData.caracteristicas = caracteristicas;
+    if (fao_passport_id !== undefined) updateData.fao_passport_id = fao_passport_id;
     const { data, error } = await supabase.from('variedades').update(updateData).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'EDITAR', 'variedades', parseInt(req.params.id));
@@ -321,6 +332,33 @@ app.delete('/api/variedades/:id', requireRole(['admin', 'investigador', 'tecnico
   if (error) return res.status(500).json({ error: error.message });
   logActividad(req.authedUser.id, 'ELIMINAR', 'variedades', parseInt(req.params.id));
   res.json({ success: true });
+});
+
+// ==================== INVESTIGACION: DATOS COMBINADOS ====================
+app.get('/api/investigacion/variedades', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  const { format } = req.query;
+  const { data, error } = await supabase
+    .from('variedades')
+    .select('*,fao_passport:fao_passport_id(*)')
+    .order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  if (format === 'csv') {
+    const campos = ['id','nombre','nombre_cientifico','localidad','produccion','fao_passport_id'];
+    let csv = campos.join(',') + '\n';
+    (data || []).forEach(v => {
+      csv += campos.map(c => {
+        let val = v[c] !== null && v[c] !== undefined ? String(v[c]).replace(/"/g,'""') : '';
+        if (c === 'caracteristicas' && v.caracteristicas) {
+          try { val = Object.values(JSON.parse(v.caracteristicas)).join('; ').replace(/"/g,'""'); } catch(e) {}
+        }
+        return '"' + val + '"';
+      }).join(',') + '\n';
+    });
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=variedades_investigacion.csv');
+    return res.send(csv);
+  }
+  res.json(data || []);
 });
 
 // ==================== LIKES ====================
