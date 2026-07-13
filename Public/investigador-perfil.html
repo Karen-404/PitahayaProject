@@ -41,7 +41,7 @@
             </label>
             <input type="hidden" id="foto_url" name="foto_url">
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="grid-2 gap-md">
             <div class="form-group">
               <label>Nombres</label>
               <input type="text" id="nombres" name="nombres" required>
@@ -85,7 +85,7 @@
       <!-- ENLACES PROFESIONALES -->
       <section class="content-card" style="margin-top:20px;">
         <div class="section-title"><i class="fas fa-link"></i> Enlaces Profesionales</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="grid-2 gap-md">
           <div class="form-group">
             <label><i class="fab fa-orcid" style="color:#A6CE39;"></i> ORCID</label>
             <input type="url" id="enlace_orcid" name="enlace_orcid" placeholder="https://orcid.org/0000-0000-0000-0000">
@@ -170,7 +170,7 @@
           <label>Descripcion</label>
           <textarea id="invDescripcion" rows="4"></textarea>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="grid-2 gap-md">
           <div class="form-group">
             <label>Fecha</label>
             <input type="date" id="invFecha">
@@ -295,7 +295,7 @@
     function agregarItem(type) {
       const cfg = itemConfig[type];
       let html = '<div class="item-form" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;">';
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+      html += '<div class="grid-2 gap-12">';
       cfg.fields.forEach(f => {
         html += '<div class="form-group" style="margin:0;">';
         html += '<label style="font-size:0.85rem;">' + f.label + '</label>';
