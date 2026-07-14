@@ -490,9 +490,9 @@
             if (!confirm('Eliminar esta caracterizaci&oacute;n?')) return;
             try {
                 var res = await fetch('/api/caracterizacion/' + id, { method:'DELETE', headers:{'Content-Type':'application/json'} });
-                if (!res.ok) { var r = await res.json(); alert('Error: ' + r.error); return; }
+                if (!res.ok) { var r; try { r = await res.json(); } catch(ee) { r = {}; } alert('Error (' + res.status + '): ' + (r.error || res.statusText)); return; }
                 cargarVariedades();
-            } catch(e) { alert('Error de conexion'); }
+            } catch(e) { alert('Error de conexion: ' + e.message); }
         }
 
         var debounceTimer;
