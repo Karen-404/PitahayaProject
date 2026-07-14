@@ -46,7 +46,7 @@
       items: [
         { label: 'Investigadores', page: 'investigadores.html', roles: null },
         { label: 'Publicaciones', page: 'publicaciones.html', roles: null },
-        { label: 'FAO Passport', page: 'fao.html', roles: null },
+        { label: 'Caracterizaci&oacute;n', page: 'tipos.html', roles: null },
         { label: 'Semillas', page: 'semillas.html', roles: null },
         { label: 'Mapa', page: 'mapa.html', roles: null }
       ]
@@ -66,7 +66,6 @@
       items: [
         { label: 'Perfil', page: 'perfil.html', roles: null },
         { label: 'Soporte', page: 'soporte.html', roles: null },
-        { label: 'Tipos', page: 'tipos.html', roles: null },
         { label: 'Mi Perfil Profesional', page: 'investigador-perfil.html', roles: ['investigador'] },
         { label: 'Admin', page: 'admin.html', roles: ['admin'] }
       ]

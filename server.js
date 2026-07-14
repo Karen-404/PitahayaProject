@@ -334,6 +334,74 @@ app.delete('/api/variedades/:id', requireRole(['admin', 'investigador', 'tecnico
   res.json({ success: true });
 });
 
+// ==================== CARACTERIZACION (FAO + VARIEDADES COMBINADO) ====================
+app.get('/api/caracterizacion', async (req, res) => {
+  const { q, sort } = req.query;
+  let query = supabase.from('variedades').select('*,fao_passport:fao_passport_id(*)');
+  if (q) {
+    query = query.or(`nombre.ilike.%${q}%,nombre_cientifico.ilike.%${q}%,localidad.ilike.%${q}%`);
+  }
+  const sortCol = sort || 'created_at';
+  const { data, error } = await query.order(sortCol, { ascending: sort === 'nombre' ? true : false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data || []);
+});
+
+app.post('/api/caracterizacion', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  try {
+    const { fao_data, variedad_data, caracteristicas } = req.body;
+    if (!variedad_data || !variedad_data.nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
+    let faoId = null;
+    if (fao_data) {
+      const { data: fao, error: faoErr } = await supabase.from('fao_passport').insert(fao_data).select().single();
+      if (faoErr) return res.status(500).json({ error: faoErr.message });
+      faoId = fao.id;
+    }
+    const insertData = { ...variedad_data, fao_passport_id: faoId, caracteristicas: JSON.stringify(caracteristicas || {}) };
+    const { data, error } = await supabase.from('variedades').insert(insertData).select('*,fao_passport:fao_passport_id(*)').single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'CREAR', 'caracterizacion', data.id);
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/caracterizacion/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  try {
+    const { fao_data, variedad_data, caracteristicas } = req.body;
+    const existing = await supabase.from('variedades').select('fao_passport_id').eq('id', req.params.id).single();
+    if (existing.error) return res.status(500).json({ error: existing.error.message });
+    let faoId = existing.data?.fao_passport_id;
+    if (fao_data) {
+      if (faoId) {
+        const { error: upErr } = await supabase.from('fao_passport').update(fao_data).eq('id', faoId);
+        if (upErr) return res.status(500).json({ error: upErr.message });
+      } else {
+        const { data: newFao, error: newErr } = await supabase.from('fao_passport').insert(fao_data).select().single();
+        if (newErr) return res.status(500).json({ error: newErr.message });
+        faoId = newFao.id;
+      }
+    }
+    const updateData = { ...variedad_data, fao_passport_id: faoId };
+    if (caracteristicas) updateData.caracteristicas = JSON.stringify(caracteristicas);
+    const { data, error } = await supabase.from('variedades').update(updateData).eq('id', req.params.id).select('*,fao_passport:fao_passport_id(*)').single();
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'EDITAR', 'caracterizacion', parseInt(req.params.id));
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/caracterizacion/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
+  const { data: v, error: getErr } = await supabase.from('variedades').select('fao_passport_id').eq('id', req.params.id).single();
+  if (getErr) return res.status(500).json({ error: getErr.message });
+  if (v.fao_passport_id) {
+    await supabase.from('fao_passport').delete().eq('id', v.fao_passport_id);
+  }
+  const { error } = await supabase.from('variedades').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  logActividad(req.authedUser.id, 'ELIMINAR', 'caracterizacion', parseInt(req.params.id));
+  res.json({ success: true });
+});
+
 // ==================== INVESTIGACION: DATOS COMBINADOS ====================
 app.get('/api/investigacion/variedades', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { format } = req.query;

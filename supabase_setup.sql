@@ -73,6 +73,9 @@ CREATE TABLE IF NOT EXISTS publicaciones (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Si ya existe la tabla variedades sin fao_passport_id:
+-- ALTER TABLE variedades ADD COLUMN fao_passport_id INTEGER REFERENCES fao_passport(id) ON DELETE SET NULL;
+
 -- 6. SOPORTE TECNICO (chat de ayuda)
 CREATE TABLE IF NOT EXISTS soporte_mensajes (
   id SERIAL PRIMARY KEY,
