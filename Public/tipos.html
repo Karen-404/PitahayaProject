@@ -332,9 +332,10 @@
             });
         }
 
-        function abrirModal(item) {
+        function abrirModal(idOrItem) {
             document.getElementById('varFormModal').style.display = 'flex';
-            switchTabVar('ident');
+            switchTabVar('general');
+            var item = (typeof idOrItem === 'number') ? variedades.find(function(x) { return x.id === idOrItem; }) : idOrItem;
             if (item) {
                 document.getElementById('formTitle').textContent = 'Editar Caracterizaci&oacute;n';
                 document.getElementById('varId').value = item.id;
@@ -346,7 +347,7 @@
                 document.getElementById('vLocalidad').value = item.localidad || '';
                 document.getElementById('vProduccion').value = item.produccion || '';
                 try { var car = JSON.parse(item.caracteristicas || '{}'); objToCar(car); } catch(e) {}
-                objToFao(item.fao_passport || {});
+                objToFao((item.fao_passport || {}));
                 var p = document.getElementById('vPreview');
                 if (item.imagen_url) { p.src = item.imagen_url; p.style.display = 'block'; } else { p.style.display = 'none'; }
             } else {
@@ -395,7 +396,7 @@
             if (!v) return;
             var fao = v.fao_passport || {};
             var img = v.imagen_url ? '<img src="' + escapeHTML(v.imagen_url) + '" alt="' + escapeHTML(v.nombre) + '" style="width:100%;max-height:280px;object-fit:contain;border-radius:8px;margin-bottom:16px;">' : '';
-            var json = escapeHTML(JSON.stringify(v));
+            var vid = v.id;
             var carHtml = '';
             try {
                 var car = JSON.parse(v.caracteristicas || '{}');
@@ -424,7 +425,7 @@
                 + '<h2 style="margin:0;">' + escapeHTML(v.nombre) + '</h2>'
                 + (puedeEditar
                     ? '<div>' +
-                        '<button class="btn-edit" onclick="cerrarDetalle();abrirModal(' + json + ')" title="Editar"><i class="fas fa-edit"></i> Editar</button> ' +
+                        '<button class="btn-edit" onclick="cerrarDetalle();abrirModal(' + vid + ')" title="Editar"><i class="fas fa-edit"></i> Editar</button> ' +
                         '<button class="btn-delete" onclick="cerrarDetalle();eliminarVar(' + v.id + ')" title="Eliminar"><i class="fas fa-trash"></i></button>'
                       + '</div>'
                     : '')
