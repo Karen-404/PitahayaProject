@@ -351,7 +351,7 @@
                 var p = document.getElementById('vPreview');
                 if (item.imagen_url) { p.src = item.imagen_url; p.style.display = 'block'; } else { p.style.display = 'none'; }
             } else {
-                document.getElementById('formTitle').textContent = 'Nueva Caracterizaci&oacute;n';
+                document.getElementById('formTitle').innerHTML = 'Nueva Caracterización';
                 document.getElementById('varForm').reset();
                 document.getElementById('varId').value = '';
                 document.getElementById('vPreview').style.display = 'none';
