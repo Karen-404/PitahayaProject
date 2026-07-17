@@ -32,9 +32,17 @@
   </style>
 </head>
 <body class="login-page-wrapper">
-  <nav class="login-nav-bar">
-    <i class="fas fa-leaf"></i>
-    <div class="brand">PITAHAYA <span>BIOTEC</span></div>
+  <nav class="login-nav-bar" style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <i class="fas fa-leaf"></i>
+      <div class="brand">PITAHAYA <span>BIOTEC</span></div>
+    </div>
+    <select id="loginLangSwitcher" onchange="if(window.switchLanguage)switchLanguage(this.value)" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:6px 12px;font-size:0.8rem;cursor:pointer;">
+      <option value="es" style="color:#000;">Español</option>
+      <option value="en" style="color:#000;">English</option>
+      <option value="qu" style="color:#000;">Kichwa</option>
+      <option value="sh" style="color:#000;">Shuar</option>
+    </select>
   </nav>
 
   <header class="hero" style="height:180px;padding:16px 20px;">
@@ -87,6 +95,11 @@
         icon.classList.replace('fa-eye-slash', 'fa-eye');
       }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var sw = document.getElementById('loginLangSwitcher');
+      if (sw && window.getLang) sw.value = getLang();
+    });
   </script>
 </body>
 </html>
