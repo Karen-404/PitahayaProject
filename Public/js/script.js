@@ -91,42 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================
-    // PEDIDOS
-    // =========================
-    const pedidoForm = document.getElementById('pedidoForm');
-    if (pedidoForm) {
-        pedidoForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const producto = document.getElementById('producto').value;
-            const cantidad = document.getElementById('cantidad').value;
-            const mensaje = document.getElementById('mensaje').value;
-            const usuarioId = localStorage.getItem('userId');
-
-            try {
-                const res = await fetch('/api/pedidos', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        usuario_id: usuarioId ? parseInt(usuarioId) : null,
-                        producto,
-                        cantidad: parseInt(cantidad),
-                        mensaje
-                    })
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    document.getElementById('respuesta').innerText = '❌ Error al enviar pedido';
-                    return;
-                }
-                document.getElementById('respuesta').innerText = '✅ Pedido enviado correctamente';
-                pedidoForm.reset();
-            } catch (err) {
-                document.getElementById('respuesta').innerText = '❌ Error de conexión';
-            }
-        });
-    }
-
-    // =========================
     // PERFIL
     // =========================
     const nombreUsuario = document.getElementById('nombreUsuario');

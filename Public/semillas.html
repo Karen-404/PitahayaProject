@@ -94,27 +94,51 @@
   <script src="js/script.js"></script>
   <script src="js/lang.js"></script>
   <script src="js/nav.js"></script>
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:400px;">
+      <span class="modal-close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+      <h3 style="margin:0 0 16px;color:var(--color-primary-dark);">Inicia sesi&oacute;n para solicitar semillas</h3>
+      <form id="miniLoginForm">
+        <div class="form-group">
+          <label>Correo Electr&oacute;nico</label>
+          <input type="text" id="miniEmail" placeholder="correo@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label>Contrase&ntilde;a</label>
+          <input type="password" id="miniPassword" placeholder="********" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Iniciar Sesi&oacute;n</button>
+      </form>
+      <p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--color-text-secondary);">
+        &iquest;No tienes cuenta? <a href="registro.html" style="color:var(--color-primary);font-weight:600;">Reg&iacute;strate como Cliente</a>
+      </p>
+      <p id="miniLoginError" style="color:var(--color-danger);font-size:0.85rem;text-align:center;margin:8px 0 0;display:none;"></p>
+    </div>
+  </div>
   <script>
-    const uid = localStorage.getItem('userId');
+    function uid() { return localStorage.getItem('userId'); }
 
     document.getElementById('semillaForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = {
-        usuario_id: parseInt(uid),
+      var u = uid();
+      if (!u) { document.getElementById('loginModal').style.display = 'flex'; return; }
+      var data = {
+        usuario_id: parseInt(u),
         variedad: document.getElementById('semillaVariedad').value,
         cantidad: parseInt(document.getElementById('semillaCantidad').value),
         direccion: document.getElementById('semillaDireccion').value
       };
       try {
-        const res = await fetch('/api/semillas', {
+        var res = await fetch('/api/semillas', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify(data)
         });
-        const result = await res.json();
-        const resp = document.getElementById('semillaRespuesta');
+        var result = await res.json();
+        var resp = document.getElementById('semillaRespuesta');
         if (res.ok) {
-          resp.innerHTML = '<div class="alert-success"><i class="fas fa-check-circle"></i> Solicitud enviada exitosamente. Recibira notificaciones cuando sea aprobada.</div>';
+          resp.innerHTML = '<div class="alert-success"><i class="fas fa-check-circle"></i> Solicitud enviada exitosamente.</div>';
           document.getElementById('semillaForm').reset();
           cargarMisSemillas();
         } else {
@@ -125,19 +149,43 @@
       }
     });
 
-    async function cargarMisSemillas() {
-      const tbody = document.getElementById('misSemillasBody');
+    document.getElementById('miniLoginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email = document.getElementById('miniEmail').value.trim();
+      var password = document.getElementById('miniPassword').value.trim();
       try {
-        const res = await fetch('/api/semillas');
-        const todas = await res.json();
-        const misSemillas = todas.filter(s => s.usuario_id === parseInt(uid));
+        var res = await fetch('/api/login', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ correo: email, password })
+        });
+        var data = await res.json();
+        if (!res.ok) { document.getElementById('miniLoginError').textContent = data.error; document.getElementById('miniLoginError').style.display = 'block'; return; }
+        localStorage.setItem('userRole', data.role);
+        localStorage.setItem('userName', data.nombre);
+        localStorage.setItem('userId', data.id);
+        localStorage.setItem('userEmail', data.correo);
+        if (data.token) localStorage.setItem('userToken', data.token);
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('semillaForm').dispatchEvent(new Event('submit'));
+      } catch(e) { document.getElementById('miniLoginError').textContent = 'Error de conexion'; document.getElementById('miniLoginError').style.display = 'block'; }
+    });
+
+    async function cargarMisSemillas() {
+      var tbody = document.getElementById('misSemillasBody');
+      var u = uid();
+      if (!u) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--color-text-muted)">Inicia sesi&oacute;n para ver tus solicitudes</td></tr>'; return; }
+      try {
+        var res = await fetch('/api/semillas');
+        var todas = await res.json();
+        var misSemillas = todas.filter(function(s) { return s.usuario_id === parseInt(u); });
         if (misSemillas.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--color-text-muted)">No has realizado solicitudes aun</td></tr>';
           return;
         }
-        tbody.innerHTML = misSemillas.map(s => {
-          const estados = { pendiente:'Pendiente', aprobado:'Aprobado', rechazado:'Rechazado', enviado:'Enviado' };
-          const colores = { pendiente:'#ff9800', aprobado:'#4caf50', rechazado:'#f44336', enviado:'#2196f3' };
+        tbody.innerHTML = misSemillas.map(function(s) {
+          var estados = { pendiente:'Pendiente', aprobado:'Aprobado', rechazado:'Rechazado', enviado:'Enviado' };
+          var colores = { pendiente:'#ff9800', aprobado:'#4caf50', rechazado:'#f44336', enviado:'#2196f3' };
           return '<tr>'
             + '<td>' + s.id + '</td>'
             + '<td>' + s.variedad + '</td>'

@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
   --color-primary: #167538;
-  --color-primary-hover: #125F2E;
+  --color-primary-hover: #1B8F44;
   --color-primary-dark: #0F4F27;
   --color-primary-soft: #E3F6E9;
 
@@ -8,7 +10,7 @@
   --color-accent-hover: #D8BD00;
   --color-accent-soft: #FFF8CE;
 
-  --color-background: #F3F7FB;
+  --color-background: #F0F4F8;
   --color-surface: #FFFFFF;
   --color-surface-secondary: #F7F9FC;
 
@@ -16,8 +18,8 @@
   --color-text-secondary: #5F6878;
   --color-text-muted: #8A93A3;
 
-  --color-border: #DDE4EC;
-  --color-border-soft: #E9EEF3;
+  --color-border: #E2E8F0;
+  --color-border-soft: #EDF2F7;
 
   --color-info: #2367D1;
   --color-info-soft: #E3EEFF;
@@ -31,20 +33,20 @@
   --color-danger: #D14343;
   --color-danger-soft: #FDE7E7;
 
-  --color-dark-footer: #101A2C;
+  --color-dark-footer: #0F1A2E;
 
-  --font-family: Georgia, 'Times New Roman', Times, serif;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 
   --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 14px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
 
-  --nav-height: 62px;
+  --nav-height: 64px;
   --max-width: 1200px;
-  --content-padding: 0 50px;
+  --content-padding: 0 48px;
   --card-padding: 28px 32px;
 }

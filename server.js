@@ -81,7 +81,7 @@ app.post('/api/register', async (req, res) => {
   const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
   if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
   const hashedPassword = await bcrypt.hash(password, 10);
-  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: 'productor' }).select().single();
+  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: 'cliente' }).select().single();
   if (error) return res.status(500).json({ error: error.message });
   const token = jwt.sign({ id: data.id, role: data.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
   res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role, token });
@@ -150,7 +150,7 @@ app.get('/api/usuarios/:id', async (req, res) => {
 app.post('/api/admin/crear-usuario', requireRole(['admin']), async (req, res) => {
   const { nombre, correo, password, role } = req.body;
   if (!nombre || !correo || !password || !role) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-  const rolesValidos = ['admin', 'investigador', 'tecnico', 'productor'];
+  const rolesValidos = ['admin', 'investigador', 'tecnico', 'productor', 'cliente'];
   if (!rolesValidos.includes(role)) return res.status(400).json({ error: 'Rol invalido' });
   const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
   if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
