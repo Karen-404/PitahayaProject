@@ -92,10 +92,10 @@
   </div>
 
   <script src="js/script.js"></script>
+  <script src="js/lang.js"></script>
   <script src="js/nav.js"></script>
   <script>
     const uid = localStorage.getItem('userId');
-    if (!uid) window.location.href = 'index.html';
 
     document.getElementById('semillaForm').addEventListener('submit', async (e) => {
       e.preventDefault();

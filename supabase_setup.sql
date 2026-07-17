@@ -56,8 +56,16 @@ CREATE TABLE IF NOT EXISTS variedades (
   produccion TEXT,
   caracteristicas TEXT,
   fao_passport_id INTEGER REFERENCES fao_passport(id) ON DELETE SET NULL,
+  recolector_nombre TEXT,
+  recolector_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+  finca TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Para tablas existentes:
+-- ALTER TABLE variedades ADD COLUMN recolector_nombre TEXT;
+-- ALTER TABLE variedades ADD COLUMN recolector_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL;
+-- ALTER TABLE variedades ADD COLUMN finca TEXT;
 
 -- 5. PUBLICACIONES CIENTIFICAS (tesis y articulos)
 CREATE TABLE IF NOT EXISTS publicaciones (

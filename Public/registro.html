@@ -37,35 +37,28 @@
 
     <main>
         <section class="login-container">
-            <h2>Crear Cuenta</h2>
+            <h2 data-i18n="registro.title">Crear Cuenta</h2>
             <form id="registroForm">
                 <div class="form-group">
-                    <label>Nombre Completo</label>
+                    <label data-i18n="registro.name">Nombre Completo</label>
                     <input type="text" id="nombre" placeholder="Tu nombre" required>
                 </div>
                 <div class="form-group">
-                    <label>Correo Electr&oacute;nico</label>
+                    <label data-i18n="registro.email">Correo Electr&oacute;nico</label>
                     <input type="email" id="correo" placeholder="correo@ejemplo.com" required>
                 </div>
+                <input type="hidden" id="roleReg" value="productor">
                 <div class="form-group">
-                    <label>Tipo de Usuario</label>
-                    <select id="roleReg" required>
-                        <option value="productor">Productor</option>
-                        <option value="investigador">Investigador</option>
-                        <option value="tecnico">T&eacute;cnico</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Contrase&ntilde;a</label>
+                    <label data-i18n="registro.password">Contrase&ntilde;a</label>
                     <div class="password-wrapper">
                         <input type="password" id="passwordReg" placeholder="********" required>
                         <i class="fas fa-eye toggle-password" onclick="togglePassword('passwordReg')"></i>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-user-check"></i> Registrarse</button>
+                <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="registro.register_btn"><i class="fas fa-user-check"></i> Registrarse</button>
             </form>
-            <p style="margin-top:20px;color:var(--color-text-muted);text-align:center;">
-                &iquest;Ya tienes cuenta? <a href="index.html" style="color:var(--color-primary);font-weight:600;">Inicia sesi&oacute;n</a>
+            <p style="margin-top:20px;color:var(--color-text-muted);text-align:center;" data-i18n="registro.have_account">
+                &iquest;Ya tienes cuenta? <a href="index.html" style="color:var(--color-primary);font-weight:600;" data-i18n="registro.login">Inicia sesi&oacute;n</a>
             </p>
         </section>
     </main>

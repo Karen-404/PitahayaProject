@@ -25,6 +25,7 @@
   };
 
   var role = localStorage.getItem('userRole');
+  var userName = localStorage.getItem('userName');
   var currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
   var isActive = function(page) {
@@ -72,13 +73,29 @@
     }
   ];
 
+  var lang = window.getLang ? getLang() : 'es';
+  var codes = { es:'Español', en:'English', qu:'Kichwa', sh:'Shuar' };
+  var langOptions = '';
+  for (var c in codes) {
+    langOptions += '<option value="' + c + '"' + (lang === c ? ' selected' : '') + '>' + codes[c] + '</option>';
+  }
+
   var html = '<nav class="system-nav">';
   html += '<div class="system-nav-inner">';
   html += '<div class="system-nav-left">';
   html += '<i class="fas fa-leaf nav-leaf-icon"></i>';
   html += '<span class="nav-brand"><span class="nav-brand-white">PITAHAYA</span> <span class="nav-brand-yellow">BIOTEC</span></span>';
   html += '</div>';
-  html += '<button class="nav-toggle" id="navToggle" aria-label="Men\u00fa">';
+  html += '<div class="system-nav-right">';
+  html += '<select class="lang-switcher" onchange="if(window.switchLanguage)switchLanguage(this.value)" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 8px;font-size:0.8rem;cursor:pointer;">' + langOptions + '</select>';
+  if (role) {
+    html += '<span class="nav-user-badge"><i class="fas fa-user-circle"></i> ' + (userName || role) + '</span>';
+  } else {
+    html += '<a href="index.html" class="nav-login-link" data-i18n="nav.login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesion</a>';
+    html += '<a href="registro.html" class="nav-register-link" data-i18n="nav.register"><i class="fas fa-user-plus"></i> Registrarse</a>';
+  }
+  html += '</div>';
+  html += '<button class="nav-toggle" id="navToggle" aria-label="Menu">';
   html += '<span></span><span></span><span></span>';
   html += '</button>';
   html += '</div>';
@@ -107,7 +124,12 @@
   }
 
   html += '<li class="nav-section-header" style="border-top:1px solid rgba(255,255,255,0.15);margin-top:6px;padding-top:12px;">&nbsp;</li>';
-  html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button></li>';
+  if (role) {
+    html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> ' + (__.call ? __('nav.logout') : 'Salir') + '</button></li>';
+  } else {
+    html += '<li><a href="index.html" class="nav-login-btn" data-i18n="nav.login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesion</a></li>';
+    html += '<li><a href="registro.html" class="nav-register-btn" data-i18n="nav.register"><i class="fas fa-user-plus"></i> Registrarse</a></li>';
+  }
   html += '</ul>';
 
   var placeholder = document.getElementById('app-nav');

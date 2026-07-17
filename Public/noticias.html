@@ -68,11 +68,11 @@
   </div>
 
   <script src="js/script.js"></script>
+  <script src="js/lang.js"></script>
   <script src="js/nav.js"></script>
   <script>
     const userId = localStorage.getItem('userId');
     const userRole = localStorage.getItem('userRole');
-    if (!userId) window.location.href = 'index.html';
 
     if (userRole === 'admin' || userRole === 'investigador' || userRole === 'tecnico') {
       document.getElementById('btnNuevaNoticia').style.display = 'inline-flex';

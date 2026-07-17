@@ -24,6 +24,22 @@
 
     <section class="content-card">
       <div class="section-title"><i class="fas fa-users"></i> Usuarios</div>
+      <details style="margin-bottom:16px;">
+        <summary style="cursor:pointer;font-weight:600;color:var(--color-primary);padding:8px 0;"><i class="fas fa-user-plus"></i> Crear Nuevo Usuario</summary>
+        <form id="createUserForm" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;padding:12px 0;">
+          <div><label style="font-size:0.8rem;display:block;margin-bottom:4px;">Nombre</label><input type="text" id="newUserName" placeholder="Nombre" required style="width:100%;padding:8px 10px;border:1px solid var(--color-border);border-radius:6px;"></div>
+          <div><label style="font-size:0.8rem;display:block;margin-bottom:4px;">Correo</label><input type="email" id="newUserEmail" placeholder="correo@ejemplo.com" required style="width:100%;padding:8px 10px;border:1px solid var(--color-border);border-radius:6px;"></div>
+          <div><label style="font-size:0.8rem;display:block;margin-bottom:4px;">Rol</label>
+            <select id="newUserRole" style="width:100%;padding:8px 10px;border:1px solid var(--color-border);border-radius:6px;">
+              <option value="investigador">Investigador</option>
+              <option value="tecnico">Tecnico</option>
+              <option value="productor">Productor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Crear</button>
+        </form>
+      </details>
       <div class="table-responsive">
         <table class="data-table" id="usuariosTable">
           <thead>
@@ -113,6 +129,7 @@
   </div>
 
   <script src="js/script.js"></script>
+  <script src="js/lang.js"></script>
   <script src="js/nav.js"></script>
   <script>
     const userRole = localStorage.getItem('userRole');
@@ -155,7 +172,29 @@
       try {
         const res = await fetch('/api/usuarios/' + id, { method: 'DELETE' });
         if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+    document.getElementById('createUserForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var nombre = document.getElementById('newUserName').value.trim();
+      var correo = document.getElementById('newUserEmail').value.trim();
+      var role = document.getElementById('newUserRole').value;
+      var password = prompt('Contrasena para el nuevo usuario:');
+      if (!password || password.length < 4) { alert('La contrasena debe tener al menos 4 caracteres'); return; }
+      try {
+        var res = await fetch('/api/admin/crear-usuario', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, correo, password, role })
+        });
+        var data = await res.json();
+        if (!res.ok) { alert('Error: ' + data.error); return; }
+        alert('Usuario ' + data.nombre + ' creado como ' + data.role);
+        document.getElementById('newUserName').value = '';
+        document.getElementById('newUserEmail').value = '';
         cargarUsuarios();
+      } catch(e) { alert('Error de conexion'); }
+    });
+
+    cargarUsuarios();
       } catch(err) { alert('Error de conexion'); }
     }
 

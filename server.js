@@ -76,14 +76,12 @@ async function logActividad(usuario_id, accion, tabla, registro_id, detalles) {
 
 // ==================== AUTH ====================
 app.post('/api/register', async (req, res) => {
-  const { nombre, correo, password, role } = req.body;
+  const { nombre, correo, password } = req.body;
   if (!nombre || !correo || !password) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-  const rolesValidos = ['productor', 'investigador', 'tecnico', 'admin'];
-  const finalRole = rolesValidos.includes(role) ? role : 'productor';
   const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
   if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
   const hashedPassword = await bcrypt.hash(password, 10);
-  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: finalRole }).select().single();
+  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: 'productor' }).select().single();
   if (error) return res.status(500).json({ error: error.message });
   const token = jwt.sign({ id: data.id, role: data.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
   res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role, token });
@@ -113,23 +111,53 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ==================== USUARIOS (Admin) ====================
-app.get('/api/usuarios', async (req, res) => {
+app.get('/api/usuarios', requireRole(['admin']), async (req, res) => {
   const { data, error } = await supabase.from('usuarios').select('id, nombre, correo, role, created_at').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
-app.put('/api/usuarios/:id/role', async (req, res) => {
+app.put('/api/usuarios/:id/role', requireRole(['admin']), async (req, res) => {
   const { role } = req.body;
   const { error } = await supabase.from('usuarios').update({ role }).eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
-app.delete('/api/usuarios/:id', async (req, res) => {
+app.delete('/api/usuarios/:id', requireRole(['admin']), async (req, res) => {
   const { error } = await supabase.from('usuarios').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
+});
+
+// Search users for autocomplete (public) - must be before :id route
+app.get('/api/usuarios/buscar', async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.length < 2) return res.json([]);
+  const { data, error } = await supabase.from('usuarios').select('id, nombre, correo, role').ilike('nombre', `%${q}%`).limit(10);
+  if (error) return res.json([]);
+  res.json(data || []);
+});
+
+// Get user by ID (public, limited info)
+app.get('/api/usuarios/:id', async (req, res) => {
+  const { data, error } = await supabase.from('usuarios').select('id, nombre, correo, role, created_at').eq('id', req.params.id).maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'Usuario no encontrado' });
+  res.json(data);
+});
+
+app.post('/api/admin/crear-usuario', requireRole(['admin']), async (req, res) => {
+  const { nombre, correo, password, role } = req.body;
+  if (!nombre || !correo || !password || !role) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  const rolesValidos = ['admin', 'investigador', 'tecnico', 'productor'];
+  if (!rolesValidos.includes(role)) return res.status(400).json({ error: 'Rol invalido' });
+  const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
+  if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role }).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role });
 });
 
 // ==================== PERFIL ====================

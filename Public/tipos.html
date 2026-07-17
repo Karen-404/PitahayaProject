@@ -17,8 +17,8 @@
                     <i class="fas fa-microscope"></i>
                 </div>
                 <div>
-                    <h1>Caracterizaci&oacute;n Agron&oacute;mica</h1>
-                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Pasaporte FAO + Caracterizaci&oacute;n de variedades de pitahaya</p>
+                    <h1 data-i18n="tipos.title">Caracterizaci&oacute;n Agron&oacute;mica</h1>
+                    <p style="color:var(--color-text-muted);margin:2px 0 0 0;" data-i18n="tipos.subtitle">Pasaporte FAO + Caracterizaci&oacute;n de variedades de pitahaya</p>
                 </div>
             </div>
             <div class="page-header-right">
@@ -140,6 +140,19 @@
                             <label>Producci&oacute;n / Datos de cosecha</label>
                             <textarea id="vProduccion" rows="2" placeholder="Rendimiento, temporada, grados Brix..."></textarea>
                         </div>
+                        <div class="form-group">
+                            <label data-i18n="tipos.collector">Nombre del Recolector</label>
+                            <input type="text" id="vRecolector" placeholder="Nombre de quien recolecto la muestra" style="margin-bottom:4px;">
+                            <div style="position:relative;">
+                                <input type="text" id="vRecolectorSearch" placeholder="Buscar usuario registrado..." style="font-size:0.8rem;padding:6px 10px;border:1px solid var(--color-border);border-radius:6px;width:100%;">
+                                <div id="vRecolectorResults" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;max-height:160px;overflow-y:auto;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+                            </div>
+                            <input type="hidden" id="vRecolectorId" value="">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="tipos.farm">Finca / Predio</label>
+                            <input type="text" id="vFinca" placeholder="Nombre de la finca o predio">
+                        </div>
                     </div>
 
                     <!-- VEGETATIVA -->
@@ -248,6 +261,7 @@
     </div>
 
     <script src="js/script.js"></script>
+    <script src="js/lang.js"></script>
     <script src="js/nav.js"></script>
     <script>
         const userId = localStorage.getItem('userId');
@@ -257,11 +271,7 @@
 
         let variedades = [];
 
-        function escapeHTML(str) {
-            return String(str).replace(/[&<>"']/g, function(m) {
-                if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;';
-            });
-        }
+        function escapeHTML(str) { return String(str).replace(/[&<>"']/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;'; }); }
 
         function carToObj() {
             var ids = ['accesion','cladodios','long_cladodio','ancho_cladodio','aristas','alt_arista','esp_arista','long_costilla','ancho_costilla','margen_costilla','dist_areolas','alt_areola','espinas','long_espina','ancho_espina','cera','flor_long','flor_diam_medio','flor_diam_basal','flor_peso','flor_pedunculo','flor_brateas','flor_ancho_brateas','flor_petalos','flor_long_petalos','flor_ancho_petalos','fruto_forma','fruto_long','fruto_diam','fruto_peso','fruto_brateas','fruto_long_brateas','fruto_ancho_mamila','fruto_largo_mamila','fruto_color_cascara','fruto_espesor_cascara','fruto_peso_cascara','fruto_peso_pulpa','fruto_color_pulpa','fruto_relacion','fruto_brix','fruto_acidez','fruto_long_semilla','fruto_ancho_semilla','fruto_tam_semilla','fruto_peso_semillas','raices_aereas','patogenos','dano','clorosis','rajadura','severidad'];
@@ -332,6 +342,46 @@
             });
         }
 
+        // Buscador de recolector (usuarios registrados)
+        var recolectorTimeout;
+        document.getElementById('vRecolectorSearch').addEventListener('input', function() {
+            clearTimeout(recolectorTimeout);
+            var q = this.value.trim();
+            if (q.length < 2) { document.getElementById('vRecolectorResults').style.display = 'none'; return; }
+            recolectorTimeout = setTimeout(async function() {
+                try {
+                    var res = await fetch('/api/usuarios/buscar?q=' + encodeURIComponent(q));
+                    var users = await res.json();
+                    var cont = document.getElementById('vRecolectorResults');
+                    if (users && users.length) {
+                        cont.innerHTML = users.map(function(u) {
+                            return '<div class="rec-result" data-id="' + u.id + '" data-name="' + escapeHTML(u.nombre) + '" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--color-border-soft);font-size:0.85rem;display:flex;justify-content:space-between;align-items:center;" onmouseover="this.style.background=\'var(--color-primary-soft)\'" onmouseout="this.style.background=\'\'" onclick="seleccionarRecolector(' + u.id + ',\'' + escapeHTML(u.nombre) + '\')">' +
+                                '<span><i class="fas fa-user"></i> ' + escapeHTML(u.nombre) + '</span>' +
+                                '<span style="font-size:0.75rem;color:var(--color-text-muted);">' + escapeHTML(u.correo) + ' (' + u.role + ')</span>' +
+                                '</div>';
+                        }).join('');
+                        cont.style.display = 'block';
+                    } else {
+                        cont.style.display = 'none';
+                    }
+                } catch(e) { /* silencio */ }
+            }, 300);
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#vRecolectorSearch') && !e.target.closest('#vRecolectorResults')) {
+                document.getElementById('vRecolectorResults').style.display = 'none';
+            }
+        });
+
+        function seleccionarRecolector(id, nombre) {
+            document.getElementById('vRecolector').value = nombre;
+            document.getElementById('vRecolectorId').value = id;
+            document.getElementById('vRecolectorSearch').value = '';
+            document.getElementById('vRecolectorResults').style.display = 'none';
+        }
+
+        function escapeHTML(str) { return String(str).replace(/[&<>"']/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#39;'; }); }
+
         function abrirModal(idOrItem) {
             document.getElementById('varFormModal').style.display = 'flex';
             switchTabVar('general');
@@ -346,6 +396,9 @@
                 document.getElementById('vBeneficios').value = item.beneficios || '';
                 document.getElementById('vLocalidad').value = item.localidad || '';
                 document.getElementById('vProduccion').value = item.produccion || '';
+                document.getElementById('vRecolector').value = item.recolector_nombre || '';
+                document.getElementById('vRecolectorId').value = item.recolector_usuario_id || '';
+                document.getElementById('vFinca').value = item.finca || '';
                 try { var car = JSON.parse(item.caracteristicas || '{}'); objToCar(car); } catch(e) {}
                 objToFao((item.fao_passport || {}));
                 var p = document.getElementById('vPreview');
@@ -356,6 +409,9 @@
                 document.getElementById('varId').value = '';
                 document.getElementById('vPreview').style.display = 'none';
                 document.querySelectorAll('[id^=car_]').forEach(function(el) { el.value = ''; });
+                document.getElementById('vRecolector').value = '';
+                document.getElementById('vRecolectorId').value = '';
+                document.getElementById('vFinca').value = '';
             }
         }
 
@@ -438,6 +494,8 @@
                 + (v.beneficios ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-heart"></i> Beneficios</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.beneficios) + '</p></div>' : '')
                 + (v.localidad ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-map-marker-alt"></i> Localidad</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.localidad) + '</p></div>' : '')
                 + (v.produccion ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-chart-line"></i> Producci&oacute;n</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.produccion) + '</p></div>' : '')
+                + (v.recolector_nombre ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-user"></i> Recolector</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + (v.recolector_usuario_id ? '<a href="#" onclick="verRecolector(' + v.recolector_usuario_id + ');return false;" style="color:var(--color-primary);text-decoration:underline;cursor:pointer;">' + escapeHTML(v.recolector_nombre) + '</a>' : escapeHTML(v.recolector_nombre)) + '</p></div>' : '')
+                + (v.finca ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-home"></i> Finca / Predio</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.finca) + '</p></div>' : '')
                 + '</div>'
                 + carHtml;
             document.getElementById('varDetailModal').style.display = 'flex';
@@ -472,7 +530,10 @@
                 imagen_url: document.getElementById('vImagen').value || null,
                 beneficios: document.getElementById('vBeneficios').value || null,
                 localidad: document.getElementById('vLocalidad').value || null,
-                produccion: document.getElementById('vProduccion').value || null
+                produccion: document.getElementById('vProduccion').value || null,
+                recolector_nombre: document.getElementById('vRecolector').value || null,
+                recolector_usuario_id: document.getElementById('vRecolectorId').value || null,
+                finca: document.getElementById('vFinca').value || null
             };
             var id = document.getElementById('varId').value;
             var url = id ? '/api/caracterizacion/' + id : '/api/caracterizacion';
@@ -485,6 +546,15 @@
                 cargarVariedades();
             } catch(e) { alert('Error de conexion'); }
         });
+
+        async function verRecolector(userId) {
+            try {
+                var res = await fetch('/api/usuarios/' + userId);
+                var u = await res.json();
+                if (!u || u.error) { alert('Usuario no encontrado'); return; }
+                alert('Recolector: ' + u.nombre + '\nCorreo: ' + u.correo + '\nRol: ' + u.role + '\nRegistro: ' + new Date(u.created_at).toLocaleDateString());
+            } catch(e) { alert('Error al cargar info del recolector'); }
+        }
 
         async function eliminarVar(id) {
             if (!confirm('Eliminar esta caracterizaci&oacute;n?')) return;
