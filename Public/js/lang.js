@@ -27,6 +27,19 @@
         operations: 'Operaciones y Gestión de Campo',
         config: 'Configuración y Usuario'
       },
+      dashboard: {
+        welcome: 'Panel de Control',
+        request_quote: 'Solicitar Cotización'
+      },
+      map: {
+        farm: 'Finca',
+        variety: 'Variedad',
+        status: 'Estado',
+        view_analysis: 'Ver Análisis',
+        loading_analysis: 'Cargando análisis biotecnológico para el punto ID: ',
+        example_farm: 'Finca Experimental Palora',
+        example_variety: 'Variedad: Pitahaya Amarilla.'
+      },
       common: {
         loading: 'Cargando...',
         error: 'Error',
@@ -41,7 +54,8 @@
         close: 'Cerrar',
         send: 'Enviar',
         yes: 'Sí',
-        no: 'No'
+        no: 'No',
+        error_loading: 'Error al cargar los datos.'
       },
       index: {
         title: 'Gestión Sostenible de la Pitahaya',
@@ -119,6 +133,19 @@
         operations: 'Field Operations & Management',
         config: 'Settings & User'
       },
+      dashboard: {
+        welcome: 'Control Panel',
+        request_quote: 'Request Quote'
+      },
+      map: {
+        farm: 'Farm',
+        variety: 'Variety',
+        status: 'Status',
+        view_analysis: 'View Analysis',
+        loading_analysis: 'Loading biotechnological analysis for point ID: ',
+        example_farm: 'Palora Experimental Farm',
+        example_variety: 'Variety: Yellow Pitahaya.'
+      },
       common: {
         loading: 'Loading...',
         error: 'Error',
@@ -133,7 +160,8 @@
         close: 'Close',
         send: 'Send',
         yes: 'Yes',
-        no: 'No'
+        no: 'No',
+        error_loading: 'Error loading data.'
       },
       index: {
         title: 'Sustainable Pitahaya Management',
@@ -211,6 +239,19 @@
         operations: 'Llankay kamachiy',
         config: 'Allichiy'
       },
+      dashboard: {
+        welcome: 'Kamachik Tawka',
+        request_quote: 'Ma' + String.fromCharCode(0x79) + 'llana'
+      },
+      map: {
+        farm: 'Chakra',
+        variety: 'Rikuchina',
+        status: 'Kawsay',
+        view_analysis: 'Rikuna',
+        loading_analysis: 'Yachayta kargachkan ID: ',
+        example_farm: 'Palora Yachay Chakra',
+        example_variety: 'Rikuchina: Pitahaya Amarilla.'
+      },
       common: {
         loading: 'Kargachkan...',
         error: 'Panta',
@@ -225,7 +266,8 @@
         close: 'Wichkana',
         send: 'Kachana',
         yes: 'Ari',
-        no: 'Ama'
+        no: 'Ama',
+        error_loading: 'Pantashka'
       },
       index: {
         title: 'Pitahaya Alli Kawsay',
@@ -303,6 +345,19 @@
         operations: 'Yapimiat Jintiatai',
         config: 'Nekapratai'
       },
+      dashboard: {
+        welcome: 'Uunt Kuntuts',
+        request_quote: 'Awajsamu'
+      },
+      map: {
+        farm: 'Yapimiat',
+        variety: 'Nekatin',
+        status: 'Kuitamiat',
+        view_analysis: 'Nekapratai',
+        loading_analysis: 'Nekatin karakchatai ID: ',
+        example_farm: 'Palora Yapimiat',
+        example_variety: 'Nekatin: Pitahaya Amarilla.'
+      },
       common: {
         loading: 'Karakchatai...',
         error: 'Nekasa',
@@ -317,7 +372,8 @@
         close: 'Uwitat',
         send: 'Awe',
         yes: 'Ee',
-        no: 'Atse'
+        no: 'Atse',
+        error_loading: 'Nekasa karakchatai'
       },
       index: {
         title: 'Pitahaya Kuitamiat',
@@ -451,11 +507,13 @@
     for (var i = 0; i < switchers.length; i++) {
       switchers[i].value = lang;
     }
+    var loginSwitcher = document.getElementById('loginLangSwitcher');
+    if (loginSwitcher) loginSwitcher.value = lang;
+    var evt = new CustomEvent('languageChanged', { detail: { lang: lang } });
+    document.dispatchEvent(evt);
   };
-  window.renderLangSwitcher = renderLangSwitcher;
 
   document.addEventListener('DOMContentLoaded', function() {
     translateDOM();
-    renderLangSwitcher();
   });
 })();

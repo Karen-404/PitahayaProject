@@ -134,7 +134,7 @@
   <script>
     const userRole = localStorage.getItem('userRole');
     const userId = localStorage.getItem('userId');
-    if (!userId || userRole !== 'admin') { window.location.href = 'inicio.html'; }
+    if (!userId || userRole !== 'admin') { window.location.href = 'inicio.html'; return; }
 
     async function cargarUsuarios() {
       const tbody = document.getElementById('usuariosBody');
@@ -172,6 +172,10 @@
       try {
         const res = await fetch('/api/usuarios/' + id, { method: 'DELETE' });
         if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
+        cargarUsuarios();
+      } catch(err) { alert('Error de conexion'); }
+    }
+
     document.getElementById('createUserForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       var nombre = document.getElementById('newUserName').value.trim();
@@ -193,10 +197,6 @@
         cargarUsuarios();
       } catch(e) { alert('Error de conexion'); }
     });
-
-    cargarUsuarios();
-      } catch(err) { alert('Error de conexion'); }
-    }
 
     async function cargarSemillas() {
       const tbody = document.getElementById('semillasBody');

@@ -188,10 +188,12 @@ async function responder() {
     chat.scrollTop = chat.scrollHeight;
 }
 
-document.getElementById("userInput")
-    .addEventListener("keypress", function (e) {
+var userInputEl = document.getElementById("userInput");
+if (userInputEl) {
+    userInputEl.addEventListener("keypress", function (e) {
         if (e.key === "Enter") responder();
     });
+}
 
 window.onload = () => {
     const chat = document.getElementById("chatBox");

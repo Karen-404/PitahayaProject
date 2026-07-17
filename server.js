@@ -492,20 +492,20 @@ app.post('/api/semillas', async (req, res) => {
   res.json({ success: true, solicitud: data });
 });
 
-app.get('/api/semillas', async (req, res) => {
+app.get('/api/semillas', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { data, error } = await supabase.from('semillas').select('*, usuarios(nombre, correo)').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
-app.put('/api/semillas/:id', async (req, res) => {
+app.put('/api/semillas/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { estado } = req.body;
   const { error } = await supabase.from('semillas').update({ estado }).eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
-app.delete('/api/semillas/:id', async (req, res) => {
+app.delete('/api/semillas/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { error } = await supabase.from('semillas').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -607,13 +607,13 @@ app.get('/api/pedidos/:usuario_id', async (req, res) => {
   res.json(data);
 });
 
-app.get('/api/pedidos', async (req, res) => {
+app.get('/api/pedidos', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { data, error } = await supabase.from('pedidos').select('*, usuarios(nombre, correo)').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
-app.put('/api/pedidos/:id/estado', async (req, res) => {
+app.put('/api/pedidos/:id/estado', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   const { estado } = req.body;
   if (!['pendiente','aceptado','enviado'].includes(estado)) return res.status(400).json({ error: 'Estado invalido' });
   const { error } = await supabase.from('pedidos').update({ estado }).eq('id', req.params.id);
@@ -868,7 +868,7 @@ app.get('/api/soporte/:usuario_id', async (req, res) => {
   res.json(data || []);
 });
 
-app.get('/api/soporte', async (req, res) => {
+app.get('/api/soporte', requireRole(['admin', 'tecnico']), async (req, res) => {
   const { data, error } = await supabase.from('soporte_mensajes').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data || []);

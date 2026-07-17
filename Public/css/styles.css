@@ -67,6 +67,12 @@ body {
   padding: 5px 14px;
   border-radius: 20px;
 }
+.nav-right-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
 .nav-login-link, .nav-register-link {
   color: white;
   text-decoration: none;
@@ -349,6 +355,7 @@ body {
 
 .btn-sm { padding: 6px 16px; font-size: 0.8rem; }
 .btn-icon { padding: 8px; min-width: 38px; min-height: 38px; }
+.btn-block { width: 100%; }
 
 /* Legacy button override */
 button:not(.nav-logout-btn):not(.chat-boton):not(.menu-toggle):not(.nav-toggle) {
@@ -464,6 +471,94 @@ input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
 .admin-table tbody tr:hover td { background: #F5F8FC; }
 
 .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ====================================
+   SECTION TITLE
+   ==================================== */
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title i { color: var(--color-primary); }
+
+/* ====================================
+   FAO TABS
+   ==================================== */
+.fao-tab {
+  display: none;
+}
+.fao-tab.active {
+  display: block;
+}
+.tab-fao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.tab-fao:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.tab-fao.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* ====================================
+   EMPTY STATE
+   ==================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+  grid-column: 1 / -1;
+}
+.empty-state i {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+.empty-state p {
+  font-size: 0.95rem;
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* ====================================
+   MAP LEGEND DOTS
+   ==================================== */
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.dot-activo { background: var(--color-success); }
+.dot-inactivo { background: var(--color-warning); }
+.dot-mantenimiento { background: var(--color-danger); }
 
 /* ====================================
    STATUS BADGES
@@ -741,6 +836,7 @@ input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
   padding: 16px 40px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
@@ -753,14 +849,29 @@ input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
   background: linear-gradient(135deg, rgba(15,79,39,0.85) 0%, rgba(22,117,56,0.75) 100%);
   background-size: cover;
   background-position: center;
-  height: 240px;
+  height: 200px;
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0 20px;
+  padding: 16px 20px;
+}
+
+.hero h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero p {
+  font-size: 0.88rem;
+  opacity: 0.9;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 .hero h1 { font-size: 1.8rem; font-weight: 700; margin: 0 0 8px 0; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
@@ -800,6 +911,13 @@ input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
 .reg-link { text-align: center; font-size: 0.85rem; margin-top: 18px; color: var(--color-text-secondary); }
 .reg-link a { color: var(--color-primary); font-weight: 600; text-decoration: none; transition: color 0.2s; }
 .reg-link a:hover { text-decoration: underline; color: var(--color-primary-hover); }
+
+.registro-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--color-background) 0%, #E0EDE3 100%);
+}
 
 .info-inst { display: none; }
 

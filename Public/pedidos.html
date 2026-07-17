@@ -79,8 +79,7 @@
     </div>
     <script>
         var pedidoForm = document.getElementById('pedidoForm');
-        var originalHandler = pedidoForm.on submit;
-        pedidoForm.on submit = null;
+        pedidoForm.onsubmit = null;
 
         pedidoForm.addEventListener('submit', async function(e) {
             e.preventDefault();

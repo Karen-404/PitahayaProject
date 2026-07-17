@@ -32,43 +32,43 @@
     return currentPage === page ? ' class="active"' : '';
   };
 
+  var t = function(key, fallback) {
+    return typeof __ === 'function' ? (__(key) || fallback) : fallback;
+  };
+
   var sections = [
     {
-      name: 'Panel Principal',
-      icon: 'fa-home',
+      nameKey: 'nav.panel', icon: 'fa-home',
       items: [
-        { label: 'Inicio', page: 'biotec-dashboard.html', roles: null },
-        { label: 'Noticias', page: 'noticias.html', roles: null }
+        { labelKey: 'nav.home', page: 'biotec-dashboard.html', roles: null },
+        { labelKey: 'nav.news', page: 'noticias.html', roles: null }
       ]
     },
     {
-      name: 'Investigaci&oacute;n y Datos Cient&iacute;ficos',
-      icon: 'fa-flask',
+      nameKey: 'nav.research', icon: 'fa-flask',
       items: [
-        { label: 'Investigadores', page: 'investigadores.html', roles: null },
-        { label: 'Publicaciones', page: 'publicaciones.html', roles: null },
-        { label: 'Caracterizaci&oacute;n', page: 'tipos.html', roles: null },
-        { label: 'Semillas', page: 'semillas.html', roles: null },
-        { label: 'Mapa', page: 'mapa.html', roles: null }
+        { labelKey: 'nav.researchers', page: 'investigadores.html', roles: null },
+        { labelKey: 'nav.publications', page: 'publicaciones.html', roles: null },
+        { labelKey: 'nav.characterization', page: 'tipos.html', roles: null },
+        { labelKey: 'nav.seeds', page: 'semillas.html', roles: null },
+        { labelKey: 'nav.map', page: 'mapa.html', roles: null }
       ]
     },
     {
-      name: 'Operaciones y Gesti&oacute;n de Campo',
-      icon: 'fa-tractor',
+      nameKey: 'nav.operations', icon: 'fa-tractor',
       items: [
-        { label: 'Fertirriego', page: 'fertirriego.html', roles: null },
-        { label: 'Bioproductos', page: 'bioproductos.html', roles: null },
-        { label: 'Pedidos', page: 'pedidos.html', roles: null }
+        { labelKey: 'nav.fertirrigation', page: 'fertirriego.html', roles: null },
+        { labelKey: 'nav.bioproducts', page: 'bioproductos.html', roles: null },
+        { labelKey: 'nav.orders', page: 'pedidos.html', roles: null }
       ]
     },
     {
-      name: 'Configuraci&oacute;n y Usuario',
-      icon: 'fa-cog',
+      nameKey: 'nav.config', icon: 'fa-cog',
       items: [
-        { label: 'Perfil', page: 'perfil.html', roles: null },
-        { label: 'Soporte', page: 'soporte.html', roles: null },
-        { label: 'Mi Perfil Profesional', page: 'investigador-perfil.html', roles: ['investigador'] },
-        { label: 'Admin', page: 'admin.html', roles: ['admin'] }
+        { labelKey: 'nav.profile', page: 'perfil.html', roles: null },
+        { labelKey: 'nav.support', page: 'soporte.html', roles: null },
+        { labelKey: 'nav.myProfile', page: 'investigador-perfil.html', roles: ['investigador'] },
+        { labelKey: 'nav.admin', page: 'admin.html', roles: ['admin'] }
       ]
     }
   ];
@@ -87,7 +87,6 @@
   html += '<span class="nav-brand"><span class="nav-brand-white">PITAHAYA</span> <span class="nav-brand-yellow">BIOTEC</span></span>';
   html += '</div>';
   html += '<div class="system-nav-right">';
-  html += '<select class="lang-switcher" onchange="if(window.switchLanguage)switchLanguage(this.value)" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 8px;font-size:0.8rem;cursor:pointer;">' + langOptions + '</select>';
   if (role) {
     html += '<span class="nav-user-badge"><i class="fas fa-user-circle"></i> ' + (userName || role) + '</span>';
   } else {
@@ -95,9 +94,12 @@
     html += '<a href="registro.html" class="nav-register-link" data-i18n="nav.register"><i class="fas fa-user-plus"></i> Registrarse</a>';
   }
   html += '</div>';
+  html += '<div class="nav-right-group">';
+  html += '<select class="lang-switcher" onchange="if(window.switchLanguage)switchLanguage(this.value)" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 8px;font-size:0.8rem;cursor:pointer;">' + langOptions + '</select>';
   html += '<button class="nav-toggle" id="navToggle" aria-label="Menu">';
   html += '<span></span><span></span><span></span>';
   html += '</button>';
+  html += '</div>';
   html += '</div>';
   html += '</nav>';
   html += '<div class="nav-overlay" id="navOverlay"></div>';
@@ -114,18 +116,18 @@
     }
     if (!hasVisible) continue;
 
-    html += '<li class="nav-section-header"><i class="fas ' + sec.icon + '"></i> ' + sec.name + '</li>';
+    html += '<li class="nav-section-header"><i class="fas ' + sec.icon + '"></i> ' + t(sec.nameKey, sec.nameKey) + '</li>';
 
     for (var i = 0; i < sec.items.length; i++) {
       var item = sec.items[i];
       if (item.roles && (!role || item.roles.indexOf(role) === -1)) continue;
-      html += '<li><a href="' + item.page + '"' + isActive(item.page) + '>' + item.label + '</a></li>';
+      html += '<li><a href="' + item.page + '"' + isActive(item.page) + '>' + t(item.labelKey, item.labelKey) + '</a></li>';
     }
   }
 
   html += '<li class="nav-section-header" style="border-top:1px solid rgba(255,255,255,0.15);margin-top:6px;padding-top:12px;">&nbsp;</li>';
   if (role) {
-    html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> ' + (__.call ? __('nav.logout') : 'Salir') + '</button></li>';
+    html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> ' + t('nav.logout', 'Salir') + '</button></li>';
   } else {
     html += '<li><a href="index.html" class="nav-login-btn" data-i18n="nav.login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesion</a></li>';
     html += '<li><a href="registro.html" class="nav-register-btn" data-i18n="nav.register"><i class="fas fa-user-plus"></i> Registrarse</a></li>';

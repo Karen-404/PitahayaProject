@@ -224,8 +224,8 @@
   <script>
     const usuarioId = localStorage.getItem('userId');
     const userRole = localStorage.getItem('userRole');
-    if (!usuarioId) window.location.href = 'index.html';
-    if (userRole !== 'investigador') { window.location.href = 'inicio.html'; alert('Solo los investigadores pueden acceder a esta seccion.'); }
+    if (!usuarioId) { window.location.href = 'index.html'; return; }
+    if (userRole !== 'investigador') { alert('Solo los investigadores pueden acceder a esta seccion.'); window.location.href = 'inicio.html'; return; }
 
     let perfilId = null;
     let investigaciones = [];
