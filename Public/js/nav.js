@@ -116,18 +116,18 @@
     }
     if (!hasVisible) continue;
 
-    html += '<li class="nav-section-header"><i class="fas ' + sec.icon + '"></i> ' + t(sec.nameKey, sec.nameKey) + '</li>';
+    html += '<li class="nav-section-header"><i class="fas ' + sec.icon + '"></i> <span data-i18n="' + sec.nameKey + '">' + t(sec.nameKey, sec.nameKey) + '</span></li>';
 
     for (var i = 0; i < sec.items.length; i++) {
       var item = sec.items[i];
       if (item.roles && (!role || item.roles.indexOf(role) === -1)) continue;
-      html += '<li><a href="' + item.page + '"' + isActive(item.page) + '>' + t(item.labelKey, item.labelKey) + '</a></li>';
+      html += '<li><a href="' + item.page + '"' + isActive(item.page) + ' data-i18n="' + item.labelKey + '">' + t(item.labelKey, item.labelKey) + '</a></li>';
     }
   }
 
   html += '<li class="nav-section-header" style="border-top:1px solid rgba(255,255,255,0.15);margin-top:6px;padding-top:12px;">&nbsp;</li>';
   if (role) {
-    html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> ' + t('nav.logout', 'Salir') + '</button></li>';
+    html += '<li><button id="logoutBtnNav" class="nav-logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.logout">' + t('nav.logout', 'Salir') + '</span></button></li>';
   } else {
     html += '<li><a href="index.html" class="nav-login-btn" data-i18n="nav.login"><i class="fas fa-sign-in-alt"></i> Iniciar Sesion</a></li>';
     html += '<li><a href="registro.html" class="nav-register-btn" data-i18n="nav.register"><i class="fas fa-user-plus"></i> Registrarse</a></li>';
@@ -169,6 +169,10 @@
   for (var j = 0; j < links.length; j++) {
     links[j].addEventListener('click', closeMenu);
   }
+
+  document.addEventListener('languageChanged', function() {
+    if (typeof translateDOM === 'function') translateDOM();
+  });
 })();
 
 function cerrarSesion() {
