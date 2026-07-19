@@ -74,7 +74,7 @@
   ];
 
   var lang = window.getLang ? getLang() : 'es';
-  var codes = { es:'Español', en:'English', qu:'Kichwa', sh:'Shuar' };
+  var codes = { es:'ES', en:'EN', qu:'QZ', sh:'SH' };
   var langOptions = '';
   for (var c in codes) {
     langOptions += '<option value="' + c + '"' + (lang === c ? ' selected' : '') + '>' + codes[c] + '</option>';
@@ -95,7 +95,7 @@
   }
   html += '</div>';
   html += '<div class="nav-right-group">';
-  html += '<select class="lang-switcher" onchange="if(window.switchLanguage)switchLanguage(this.value)" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 8px;font-size:0.8rem;cursor:pointer;">' + langOptions + '</select>';
+  html += '<select class="lang-switcher" onchange="if(window.switchLanguage)switchLanguage(this.value)" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);border-radius:4px;padding:2px 4px;font-size:0.7rem;cursor:pointer;max-width:55px;">' + langOptions + '</select>';
   html += '<button class="nav-toggle" id="navToggle" aria-label="Menu">';
   html += '<span></span><span></span><span></span>';
   html += '</button>';

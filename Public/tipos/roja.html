@@ -30,7 +30,7 @@
             </div>
 
             <div class="content-card">
-                <div class="section-title"><i class="fas fa-file-alt"></i> Ficha T&eacute;cnica</div>
+                <div class="section-title"><i class="fas fa-file-alt"></i> <span data-i18n="tipos.tech_sheet">Ficha T&eacute;cnica</span></div>
                 <table class="data-table">
                     <tr><th>C&oacute;digo</th><td>EI</td></tr>
                     <tr><th>N&uacute;mero de acceso</th><td>EI-PIT-26-001</td></tr>
@@ -54,7 +54,7 @@
 
         <div class="grid-2" style="margin-top:20px;">
             <div class="content-card">
-                <div class="section-title"><i class="fas fa-leaf"></i> Caracterizaci&oacute;n Vegetativa</div>
+                <div class="section-title"><i class="fas fa-leaf"></i> <span data-i18n="tipos.vegetative_char">Caracterizaci&oacute;n Vegetativa</span></div>
                 <table class="data-table">
                     <tr><th>N&uacute;mero de cladodios</th><td>12</td></tr>
                     <tr><th>Longitud de cladodio</th><td>35 cm</td></tr>
@@ -66,7 +66,7 @@
             </div>
 
             <div class="content-card">
-                <div class="section-title"><i class="fas fa-flower"></i> Caracterizaci&oacute;n Floral</div>
+                <div class="section-title"><i class="fas fa-flower"></i> <span data-i18n="tipos.floral_char">Caracterizaci&oacute;n Floral</span></div>
                 <table class="data-table">
                     <tr><th>Longitud de la flor</th><td>25 cm</td></tr>
                     <tr><th>Di&aacute;metro de la flor</th><td>15 cm</td></tr>
@@ -77,7 +77,7 @@
 
         <div class="grid-2" style="margin-top:20px;">
             <div class="content-card">
-                <div class="section-title"><i class="fas fa-apple-alt"></i> Caracterizaci&oacute;n del Fruto</div>
+                <div class="section-title"><i class="fas fa-apple-alt"></i> <span data-i18n="tipos.fruit_char">Caracterizaci&oacute;n del Fruto</span></div>
                 <table class="data-table">
                     <tr><th>Forma del fruto</th><td>Ovalado</td></tr>
                     <tr><th>Peso del fruto</th><td>350 g</td></tr>
@@ -86,7 +86,7 @@
             </div>
 
             <div class="content-card">
-                <div class="section-title"><i class="fas fa-shield-alt"></i> Sanidad y Resistencia</div>
+                <div class="section-title"><i class="fas fa-shield-alt"></i> <span data-i18n="tipos.health_sanidad">Sanidad y Resistencia</span></div>
                 <table class="data-table">
                     <tr><th>Clorosis</th><td>No</td></tr>
                     <tr><th>Rajadura del fruto</th><td>Leve</td></tr>
@@ -96,6 +96,12 @@
     </main>
 
     <script src="../js/script.js"></script>
+    <script src="../js/lang.js"></script>
     <script src="../js/nav.js"></script>
+    <script>
+        document.addEventListener('languageChanged', function() {
+            if (typeof translateDOM === 'function') translateDOM();
+        });
+    </script>
 </body>
 </html>

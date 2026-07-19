@@ -23,19 +23,19 @@
             </div>
             <div class="page-header-right">
                 <button class="btn btn-primary" id="btnNuevaVariedad" style="display:none" onclick="abrirModal()">
-                    <i class="fas fa-plus"></i> Nueva Caracterizaci&oacute;n
+                    <i class="fas fa-plus"></i> <span data-i18n="tipos.new">Nueva Caracterizaci&oacute;n</span>
                 </button>
             </div>
         </div>
 
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;">
-            <input type="text" id="buscarVariedad" placeholder="Buscar variedad..." style="flex:1;min-width:200px;height:44px;" oninput="cargarVariedadesDebounced()">
+            <input type="text" id="buscarVariedad" placeholder="Buscar variedad..." style="flex:1;min-width:200px;height:44px;" oninput="cargarVariedadesDebounced()" data-i18n-placeholder="tipos.search">
             <select id="sortVariedad" style="width:auto;min-width:160px;height:44px;" onchange="cargarVariedades()">
-                <option value="created_at">M&aacute;s recientes</option>
-                <option value="nombre">Nombre A-Z</option>
-                <option value="localidad">Localidad</option>
+                <option value="created_at" data-i18n="tipos.sort_recent">M&aacute;s recientes</option>
+                <option value="nombre" data-i18n="tipos.sort_name">Nombre A-Z</option>
+                <option value="localidad" data-i18n="tipos.sort_location">Localidad</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="exportarCSV()" title="Exportar CSV para investigaci&oacute;n"><i class="fas fa-download"></i> Exportar CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportarCSV()" title="Exportar CSV para investigaci&oacute;n" data-i18n-title="tipos.export_csv_title"><i class="fas fa-download"></i> <span data-i18n="tipos.export_csv">Exportar CSV</span></button>
         </div>
 
         <div id="variedadesGrid" class="variedades-grid"></div>
@@ -44,21 +44,21 @@
         <div id="varFormModal" class="modal" style="display:none">
             <div class="modal-content" style="max-width:800px;">
                 <span class="modal-close" onclick="cerrarForm()">&times;</span>
-                <h2 id="formTitle">Nueva Caracterizaci&oacute;n</h2>
+                <h2 id="formTitle" data-i18n="tipos.new">Nueva Caracterizaci&oacute;n</h2>
                 <form id="varForm">
                     <input type="hidden" id="varId">
                     <input type="hidden" id="vCaracterizacion">
 
                     <div style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;">
-                        <button type="button" class="tab-variedad active" data-tab="ident" onclick="switchTabVar('ident')" style="flex:1;padding:7px;border-radius:6px;border:none;font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-primary);color:white;"><i class="fas fa-tag"></i> Ident.</button>
-                        <button type="button" class="tab-variedad" data-tab="taxo" onclick="switchTabVar('taxo')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-dna"></i> Taxo.</button>
-                        <button type="button" class="tab-variedad" data-tab="origen" onclick="switchTabVar('origen')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-map-marker-alt"></i> Origen</button>
-                        <button type="button" class="tab-variedad" data-tab="colec" onclick="switchTabVar('colec')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-leaf"></i> Colecta</button>
-                        <button type="button" class="tab-variedad" data-tab="general" onclick="switchTabVar('general')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-info-circle"></i> General</button>
-                        <button type="button" class="tab-variedad" data-tab="vegetativa" onclick="switchTabVar('vegetativa')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-leaf"></i> Veget.</button>
-                        <button type="button" class="tab-variedad" data-tab="floral" onclick="switchTabVar('floral')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-flower"></i> Floral</button>
-                        <button type="button" class="tab-variedad" data-tab="fruto" onclick="switchTabVar('fruto')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-apple-alt"></i> Fruto</button>
-                        <button type="button" class="tab-variedad" data-tab="sanidad" onclick="switchTabVar('sanidad')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-shield-alt"></i> Sanidad</button>
+                        <button type="button" class="tab-variedad active" data-tab="ident" onclick="switchTabVar('ident')" style="flex:1;padding:7px;border-radius:6px;border:none;font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-primary);color:white;"><i class="fas fa-tag"></i> <span data-i18n="tipos.tab_ident">Ident.</span></button>
+                        <button type="button" class="tab-variedad" data-tab="taxo" onclick="switchTabVar('taxo')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-dna"></i> <span data-i18n="tipos.tab_taxo">Taxo.</span></button>
+                        <button type="button" class="tab-variedad" data-tab="origen" onclick="switchTabVar('origen')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-map-marker-alt"></i> <span data-i18n="tipos.tab_origen">Origen</span></button>
+                        <button type="button" class="tab-variedad" data-tab="colec" onclick="switchTabVar('colec')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-leaf"></i> <span data-i18n="tipos.tab_colec">Colecta</span></button>
+                        <button type="button" class="tab-variedad" data-tab="general" onclick="switchTabVar('general')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-info-circle"></i> <span data-i18n="tipos.tab_general">General</span></button>
+                        <button type="button" class="tab-variedad" data-tab="vegetativa" onclick="switchTabVar('vegetativa')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-leaf"></i> <span data-i18n="tipos.tab_vegetativa">Veget.</span></button>
+                        <button type="button" class="tab-variedad" data-tab="floral" onclick="switchTabVar('floral')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-flower"></i> <span data-i18n="tipos.tab_floral">Floral</span></button>
+                        <button type="button" class="tab-variedad" data-tab="fruto" onclick="switchTabVar('fruto')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-apple-alt"></i> <span data-i18n="tipos.tab_fruto">Fruto</span></button>
+                        <button type="button" class="tab-variedad" data-tab="sanidad" onclick="switchTabVar('sanidad')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-shield-alt"></i> <span data-i18n="tipos.tab_sanidad">Sanidad</span></button>
                     </div>
 
                     <!-- TAB FAO: IDENTIFICACION -->
@@ -435,6 +435,7 @@
 
         function faoTableHTML(fao) {
             if (!fao || !Object.keys(fao).length) return '';
+            var t = function(key, fb) { return typeof __ === 'function' ? (__(key) || fb) : fb; };
             var rows = [
                 ['C&oacute;digo', fao.codigo], ['N° Acceso', fao.numero_acceso], ['N° Colecta', fao.numero_colecta],
                 ['G&eacute;nero', fao.genero], ['Especie', fao.especie], ['Subtaxa', fao.subtaxa],
@@ -444,10 +445,11 @@
                 ['Estado Biol&oacute;gico', fao.estado_biologico], ['Fuente Colecta', fao.fuente_colecta]
             ].filter(function(r) { return r[1]; });
             if (!rows.length) return '';
-            return '<div style="margin-bottom:16px;"><h4 style="margin:0 0 8px;font-size:0.9rem;color:var(--color-primary);"><i class="fas fa-passport"></i> Pasaporte FAO</h4><table class="data-table">' + rows.map(function(r) { return '<tr><th style="padding:4px 10px;font-size:0.8rem;">' + r[0] + '</th><td style="padding:4px 10px;font-size:0.82rem;">' + escapeHTML(String(r[1])) + '</td></tr>'; }).join('') + '</table></div>';
+            return '<div style="margin-bottom:16px;"><h4 style="margin:0 0 8px;font-size:0.9rem;color:var(--color-primary);"><i class="fas fa-passport"></i> ' + t('tipos.fao_tab', 'Pasaporte FAO') + '</h4><table class="data-table">' + rows.map(function(r) { return '<tr><th style="padding:4px 10px;font-size:0.8rem;">' + r[0] + '</th><td style="padding:4px 10px;font-size:0.82rem;">' + escapeHTML(String(r[1])) + '</td></tr>'; }).join('') + '</table></div>';
         }
 
         function verDetalle(id) {
+            var t = function(key, fallback) { return typeof __ === 'function' ? (__(key) || fallback) : fallback; };
             var v = variedades.find(function(x) { return x.id === id; });
             if (!v) return;
             var fao = v.fao_passport || {};
@@ -457,19 +459,19 @@
             try {
                 var car = JSON.parse(v.caracteristicas || '{}');
                 if (Object.keys(car).length) {
-                    carHtml += '<div style="margin-top:20px;"><h3 style="margin:0 0 12px;font-size:1.05rem;color:var(--color-primary-dark);"><i class="fas fa-microscope"></i> Caracterizaci&oacute;n Agron&oacute;mica</h3>';
+                    carHtml += '<div style="margin-top:20px;"><h3 style="margin:0 0 12px;font-size:1.05rem;color:var(--color-primary-dark);"><i class="fas fa-microscope"></i> ' + t('tipos.agronomic_characterization', 'Caracterizaci\u00f3n Agron\u00f3mica') + '</h3>';
                     carHtml += renderCarTable(car, [
-                        {title:'Vegetativa', icon:'fa-leaf', fields:[
-                            {id:'accesion',label:'C&oacute;digo de accesi&oacute;n'},{id:'cladodios',label:'N° cladodios vegetativos'},{id:'long_cladodio',label:'Longitud de cladodio (cm)'},{id:'ancho_cladodio',label:'Ancho de cladodio (cm)'},{id:'aristas',label:'N° de aristas'},{id:'alt_arista',label:'Altura de arista (mm)'},{id:'esp_arista',label:'Espesor de arista (mm)'},{id:'long_costilla',label:'Longitud de costilla (cm)'},{id:'ancho_costilla',label:'Ancho de costilla (mm)'},{id:'margen_costilla',label:'Margen de costilla'},{id:'dist_areolas',label:'Distancia entre areolas (mm)'},{id:'alt_areola',label:'Altura de areola (mm)'},{id:'espinas',label:'N° espinas por areola'},{id:'long_espina',label:'Longitud de espina (mm)'},{id:'ancho_espina',label:'Ancho de espina (mm)'},{id:'cera',label:'Presencia de cera'}
+                        {title:t('tipos.tab_vegetativa','Vegetativa'), icon:'fa-leaf', fields:[
+                            {id:'accesion',label:'C\u00f3digo de accesi\u00f3n'},{id:'cladodios',label:'N\u00b0 cladodios vegetativos'},{id:'long_cladodio',label:'Longitud de cladodio (cm)'},{id:'ancho_cladodio',label:'Ancho de cladodio (cm)'},{id:'aristas',label:'N\u00b0 de aristas'},{id:'alt_arista',label:'Altura de arista (mm)'},{id:'esp_arista',label:'Espesor de arista (mm)'},{id:'long_costilla',label:'Longitud de costilla (cm)'},{id:'ancho_costilla',label:'Ancho de costilla (mm)'},{id:'margen_costilla',label:'Margen de costilla'},{id:'dist_areolas',label:'Distancia entre areolas (mm)'},{id:'alt_areola',label:'Altura de areola (mm)'},{id:'espinas',label:'N\u00b0 espinas por areola'},{id:'long_espina',label:'Longitud de espina (mm)'},{id:'ancho_espina',label:'Ancho de espina (mm)'},{id:'cera',label:'Presencia de cera'}
                         ]},
-                        {title:'Floral', icon:'fa-flower', fields:[
-                            {id:'flor_long',label:'Longitud de la flor (mm)'},{id:'flor_diam_medio',label:'Di&aacute;metro medio de la flor (mm)'},{id:'flor_diam_basal',label:'Di&aacute;metro basal de la flor (mm)'},{id:'flor_peso',label:'Peso de la flor (g)'},{id:'flor_pedunculo',label:'Peso del ped&uacute;nculo floral (g)'},{id:'flor_brateas',label:'N° br&aacute;cteas de la flor'},{id:'flor_ancho_brateas',label:'Ancho de br&aacute;cteas (mm)'},{id:'flor_petalos',label:'N° de p&eacute;talos'},{id:'flor_long_petalos',label:'Longitud de p&eacute;talos (mm)'},{id:'flor_ancho_petalos',label:'Ancho de p&eacute;talos (mm)'}
+                        {title:t('tipos.tab_floral','Floral'), icon:'fa-flower', fields:[
+                            {id:'flor_long',label:'Longitud de la flor (mm)'},{id:'flor_diam_medio',label:'Di\u00e1metro medio de la flor (mm)'},{id:'flor_diam_basal',label:'Di\u00e1metro basal de la flor (mm)'},{id:'flor_peso',label:'Peso de la flor (g)'},{id:'flor_pedunculo',label:'Peso del ped\u00fanculo floral (g)'},{id:'flor_brateas',label:'N\u00b0 br\u00e1cteas de la flor'},{id:'flor_ancho_brateas',label:'Ancho de br\u00e1cteas (mm)'},{id:'flor_petalos',label:'N\u00b0 de p\u00e9talos'},{id:'flor_long_petalos',label:'Longitud de p\u00e9talos (mm)'},{id:'flor_ancho_petalos',label:'Ancho de p\u00e9talos (mm)'}
                         ]},
-                        {title:'Fruto', icon:'fa-apple-alt', fields:[
-                            {id:'fruto_forma',label:'Forma del fruto'},{id:'fruto_long',label:'Longitud del fruto (mm)'},{id:'fruto_diam',label:'Di&aacute;metro del fruto (mm)'},{id:'fruto_peso',label:'Peso de fruto (g)'},{id:'fruto_brateas',label:'N° br&aacute;cteas del fruto'},{id:'fruto_long_brateas',label:'Longitud br&aacute;cteas apicales (mm)'},{id:'fruto_ancho_mamila',label:'Ancho de mamila (mm)'},{id:'fruto_largo_mamila',label:'Largo de mamila (mm)'},{id:'fruto_color_cascara',label:'Color de c&aacute;scara'},{id:'fruto_espesor_cascara',label:'Espesor de c&aacute;scara (mm)'},{id:'fruto_peso_cascara',label:'Peso de c&aacute;scara (g)'},{id:'fruto_peso_pulpa',label:'Peso de pulpa (g)'},{id:'fruto_color_pulpa',label:'Color de pulpa'},{id:'fruto_relacion',label:'Relaci&oacute;n c&aacute;scara/pulpa'},{id:'fruto_brix',label:'S&oacute;lidos solubles totales (°Brix)'},{id:'fruto_acidez',label:'Acidez titulable (%)'},{id:'fruto_long_semilla',label:'Longitud de semilla (mm)'},{id:'fruto_ancho_semilla',label:'Ancho de semilla (mm)'},{id:'fruto_tam_semilla',label:'Tama&ntilde;o promedio de semilla (mm)'},{id:'fruto_peso_semillas',label:'Peso de semillas por fruto (g)'}
+                        {title:t('tipos.tab_fruto','Fruto'), icon:'fa-apple-alt', fields:[
+                            {id:'fruto_forma',label:'Forma del fruto'},{id:'fruto_long',label:'Longitud del fruto (mm)'},{id:'fruto_diam',label:'Di\u00e1metro del fruto (mm)'},{id:'fruto_peso',label:'Peso de fruto (g)'},{id:'fruto_brateas',label:'N\u00b0 br\u00e1cteas del fruto'},{id:'fruto_long_brateas',label:'Longitud br\u00e1cteas apicales (mm)'},{id:'fruto_ancho_mamila',label:'Ancho de mamila (mm)'},{id:'fruto_largo_mamila',label:'Largo de mamila (mm)'},{id:'fruto_color_cascara',label:'Color de c\u00e1scara'},{id:'fruto_espesor_cascara',label:'Espesor de c\u00e1scara (mm)'},{id:'fruto_peso_cascara',label:'Peso de c\u00e1scara (g)'},{id:'fruto_peso_pulpa',label:'Peso de pulpa (g)'},{id:'fruto_color_pulpa',label:'Color de pulpa'},{id:'fruto_relacion',label:'Relaci\u00f3n c\u00e1scara/pulpa'},{id:'fruto_brix',label:'S\u00f3lidos solubles totales (\u00b0Brix)'},{id:'fruto_acidez',label:'Acidez titulable (%)'},{id:'fruto_long_semilla',label:'Longitud de semilla (mm)'},{id:'fruto_ancho_semilla',label:'Ancho de semilla (mm)'},{id:'fruto_tam_semilla',label:'Tama\u00f1o promedio de semilla (mm)'},{id:'fruto_peso_semillas',label:'Peso de semillas por fruto (g)'}
                         ]},
-                        {title:'Sanidad', icon:'fa-shield-alt', fields:[
-                            {id:'raices_aereas',label:'Presencia de ra&iacute;ces a&eacute;reas'},{id:'patogenos',label:'Presencia de pat&oacute;genos basales'},{id:'dano',label:'Da&ntilde;o mec&aacute;nico o microbiano'},{id:'clorosis',label:'Presencia de clorosis'},{id:'rajadura',label:'Rajadura del fruto'},{id:'severidad',label:'Severidad de la enfermedad'}
+                        {title:t('tipos.tab_sanidad','Sanidad'), icon:'fa-shield-alt', fields:[
+                            {id:'raices_aereas',label:'Presencia de ra\u00edces a\u00e9reas'},{id:'patogenos',label:'Presencia de pat\u00f3genos basales'},{id:'dano',label:'Da\u00f1o mec\u00e1nico o microbiano'},{id:'clorosis',label:'Presencia de clorosis'},{id:'rajadura',label:'Rajadura del fruto'},{id:'severidad',label:'Severidad de la enfermedad'}
                         ]}
                     ]);
                     carHtml += '</div>';
@@ -481,21 +483,21 @@
                 + '<h2 style="margin:0;">' + escapeHTML(v.nombre) + '</h2>'
                 + (puedeEditar
                     ? '<div>' +
-                        '<button class="btn-edit" onclick="cerrarDetalle();abrirModal(' + vid + ')" title="Editar"><i class="fas fa-edit"></i> Editar</button> ' +
-                        '<button class="btn-delete" onclick="cerrarDetalle();eliminarVar(' + v.id + ')" title="Eliminar"><i class="fas fa-trash"></i></button>'
+                        '<button class="btn-edit" onclick="cerrarDetalle();abrirModal(' + vid + ')" title="' + t('common.edit','Editar') + '"><i class="fas fa-edit"></i> ' + t('common.edit','Editar') + '</button> ' +
+                        '<button class="btn-delete" onclick="cerrarDetalle();eliminarVar(' + v.id + ')" title="' + t('common.delete','Eliminar') + '"><i class="fas fa-trash"></i></button>'
                       + '</div>'
                     : '')
                 + '</div>'
                 + img
                 + (v.nombre_cientifico ? '<p style="font-style:italic;color:var(--color-text-muted);margin:0 0 16px 0;"><em>' + escapeHTML(v.nombre_cientifico) + '</em></p>' : '')
                 + faoTableHTML(fao)
-                + (v.descripcion ? '<div style="margin-bottom:12px;"><h4 style="margin:0 0 6px 0;">Descripci&oacute;n</h4><p style="margin:0;color:var(--color-text-secondary);line-height:1.6;">' + escapeHTML(v.descripcion) + '</p></div>' : '')
+                + (v.descripcion ? '<div style="margin-bottom:12px;"><h4 style="margin:0 0 6px 0;">' + t('tipos.description','Descripci\u00f3n') + '</h4><p style="margin:0;color:var(--color-text-secondary);line-height:1.6;">' + escapeHTML(v.descripcion) + '</p></div>' : '')
                 + '<div class="grid-2 gap-12">'
-                + (v.beneficios ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-heart"></i> Beneficios</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.beneficios) + '</p></div>' : '')
-                + (v.localidad ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-map-marker-alt"></i> Localidad</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.localidad) + '</p></div>' : '')
-                + (v.produccion ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-chart-line"></i> Producci&oacute;n</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.produccion) + '</p></div>' : '')
-                + (v.recolector_nombre ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-user"></i> Recolector</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + (v.recolector_usuario_id ? '<a href="#" onclick="verRecolector(' + v.recolector_usuario_id + ');return false;" style="color:var(--color-primary);text-decoration:underline;cursor:pointer;">' + escapeHTML(v.recolector_nombre) + '</a>' : escapeHTML(v.recolector_nombre)) + '</p></div>' : '')
-                + (v.finca ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-home"></i> Finca / Predio</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.finca) + '</p></div>' : '')
+                + (v.beneficios ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-heart"></i> ' + t('tipos.benefits','Beneficios') + '</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.beneficios) + '</p></div>' : '')
+                + (v.localidad ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-map-marker-alt"></i> ' + t('tipos.location','Localidad') + '</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.localidad) + '</p></div>' : '')
+                + (v.produccion ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-chart-line"></i> ' + t('tipos.production','Producci\u00f3n') + '</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.produccion) + '</p></div>' : '')
+                + (v.recolector_nombre ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-user"></i> ' + t('tipos.collector','Recolector') + '</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + (v.recolector_usuario_id ? '<a href="#" onclick="verRecolector(' + v.recolector_usuario_id + ');return false;" style="color:var(--color-primary);text-decoration:underline;cursor:pointer;">' + escapeHTML(v.recolector_nombre) + '</a>' : escapeHTML(v.recolector_nombre)) + '</p></div>' : '')
+                + (v.finca ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-home"></i> ' + t('tipos.farm','Finca / Predio') + '</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.finca) + '</p></div>' : '')
                 + '</div>'
                 + carHtml;
             document.getElementById('varDetailModal').style.display = 'flex';
@@ -618,6 +620,10 @@
         }
 
         cargarVariedades();
+
+        document.addEventListener('languageChanged', function() {
+            if (typeof translateDOM === 'function') translateDOM();
+        });
     </script>
 </body>
 </html>
