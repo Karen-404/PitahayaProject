@@ -130,6 +130,21 @@
         orders: 'Pedidos de Clientes',
         support: 'Solicitudes de Soporte',
         create_user: 'Crear Nuevo Usuario'
+      },
+      inicio: {
+        welcome: 'Bienvenido al Sistema Pitahaya',
+        description: 'Gestión biotecnológica, monitoreo y comercialización.',
+        dashboard_btn: 'Dashboard Biotec',
+        news_btn: 'Noticias',
+        map_title: 'Mapa de Monitoreo',
+        map_desc: 'Puntos de monitoreo con información de salud y variedad.',
+        map_btn: 'Ir al Mapa',
+        varieties_title: 'Variedades',
+        varieties_desc: 'Catálogo completo de variedades de pitahaya.',
+        varieties_btn: 'Ver Variedades',
+        bioproducts_title: 'Bioproductos',
+        bioproducts_desc: 'Productos biotecnológicos para el cultivo.',
+        bioproducts_btn: 'Ver Productos'
       }
     },
 
@@ -261,6 +276,21 @@
         orders: 'Customer Orders',
         support: 'Support Requests',
         create_user: 'Create New User'
+      },
+      inicio: {
+        welcome: 'Welcome to Pitahaya System',
+        description: 'Biotechnological management, monitoring and commercialization.',
+        dashboard_btn: 'Biotec Dashboard',
+        news_btn: 'News',
+        map_title: 'Monitoring Map',
+        map_desc: 'Monitoring points with health and variety information.',
+        map_btn: 'Go to Map',
+        varieties_title: 'Varieties',
+        varieties_desc: 'Complete catalog of pitahaya varieties.',
+        varieties_btn: 'View Varieties',
+        bioproducts_title: 'Bioproducts',
+        bioproducts_desc: 'Biotechnological products for cultivation.',
+        bioproducts_btn: 'View Products'
       }
     },
 
@@ -392,6 +422,21 @@
         orders: 'Rantik Ma' + String.fromCharCode(0x79) + 'llakuna',
         support: 'Yanapana Ma' + String.fromCharCode(0x79) + 'llakuna',
         create_user: 'Mushuk Runata Ruray'
+      },
+      inicio: {
+        welcome: 'Pitahaya Sistemaman Alli Shamushka',
+        description: 'Kawsay allichiy, rikuchina, rantikuna.',
+        dashboard_btn: 'Kamachik Tawka',
+        news_btn: 'Willaykuna',
+        map_title: 'Rikuchina Mapa',
+        map_desc: 'Alli kawsay rikuchina punkukuna.',
+        map_btn: 'Mapaman Ri',
+        varieties_title: 'Rikuchina',
+        varieties_desc: 'Pitahaya rikuchina tukuy.',
+        varieties_btn: 'Rikuchinakunata Riku',
+        bioproducts_title: 'Kawsay Mikuna',
+        bioproducts_desc: 'Yapimiat kawsay mikuna.',
+        bioproducts_btn: 'Rikuna'
       }
     },
 
@@ -523,6 +568,21 @@
         orders: 'Chicham Awajsamu',
         support: 'Yanapamuri Awajsamu',
         create_user: 'Yamaram Aents Najanatai'
+      },
+      inicio: {
+        welcome: 'Pitahaya Sistemnum Weti',
+        description: 'Tuke yapimiat, nekatin, awajsamu.',
+        dashboard_btn: 'Uunt Kuntuts',
+        news_btn: 'Nekapmatai',
+        map_title: 'Mapa Kuitamiat',
+        map_desc: 'Kuitamiat nekatin nuka ainau.',
+        map_btn: 'Mapanum Wet',
+        varieties_title: 'Nekatin',
+        varieties_desc: 'Pitahaya nekatin iwiaku.',
+        varieties_btn: 'Nekatin Nekapratai',
+        bioproducts_title: 'Yurumkramu',
+        bioproducts_desc: 'Yapimiat yurumkramu.',
+        bioproducts_btn: 'Nekapratai'
       }
     }
   };

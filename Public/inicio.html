@@ -47,36 +47,36 @@
       <div style="width:64px;height:64px;border-radius:16px;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;color:var(--color-primary);">
         <i class="fas fa-leaf"></i>
       </div>
-      <h1 style="font-size:1.8rem;font-weight:700;color:var(--color-primary-dark);margin:0 0 8px 0;">
+      <h1 style="font-size:1.8rem;font-weight:700;color:var(--color-primary-dark);margin:0 0 8px 0;" data-i18n="inicio.welcome">
         Bienvenido al Sistema Pitahaya
       </h1>
-      <p style="font-size:1rem;color:var(--color-text-secondary);max-width:500px;margin:0 auto 24px;">
+      <p style="font-size:1rem;color:var(--color-text-secondary);max-width:500px;margin:0 auto 24px;" data-i18n="inicio.description">
         Gesti&oacute;n biotecnol&oacute;gica, monitoreo y comercializaci&oacute;n.
       </p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <a href="biotec-dashboard.html" class="btn btn-primary"><i class="fas fa-chart-bar"></i> Dashboard Biotec</a>
-        <a href="noticias.html" class="btn btn-secondary"><i class="fas fa-newspaper"></i> Noticias</a>
+        <a href="biotec-dashboard.html" class="btn btn-primary"><i class="fas fa-chart-bar"></i> <span data-i18n="inicio.dashboard_btn">Dashboard Biotec</span></a>
+        <a href="noticias.html" class="btn btn-secondary"><i class="fas fa-newspaper"></i> <span data-i18n="inicio.news_btn">Noticias</span></a>
       </div>
     </section>
 
     <div class="inicio-grid">
       <div class="inicio-card">
         <div class="icono"><i class="fas fa-map-marker-alt"></i></div>
-        <h3>Mapa de Monitoreo</h3>
-        <p>Puntos de monitoreo con informaci&oacute;n de salud y variedad.</p>
-        <a href="mapa.html" class="btn btn-primary">Ir al Mapa</a>
+        <h3 data-i18n="inicio.map_title">Mapa de Monitoreo</h3>
+        <p data-i18n="inicio.map_desc">Puntos de monitoreo con informaci&oacute;n de salud y variedad.</p>
+        <a href="mapa.html" class="btn btn-primary"><span data-i18n="inicio.map_btn">Ir al Mapa</span></a>
       </div>
       <div class="inicio-card">
         <div class="icono"><i class="fas fa-seedling"></i></div>
-        <h3>Variedades</h3>
-        <p>Cat&aacute;logo completo de variedades de pitahaya.</p>
-        <a href="tipos.html" class="btn btn-primary">Ver Variedades</a>
+        <h3 data-i18n="inicio.varieties_title">Variedades</h3>
+        <p data-i18n="inicio.varieties_desc">Cat&aacute;logo completo de variedades de pitahaya.</p>
+        <a href="tipos.html" class="btn btn-primary"><span data-i18n="inicio.varieties_btn">Ver Variedades</span></a>
       </div>
       <div class="inicio-card">
         <div class="icono"><i class="fas fa-flask"></i></div>
-        <h3>Bioproductos</h3>
-        <p>Productos biotecnol&oacute;gicos para el cultivo.</p>
-        <a href="bioproductos.html" class="btn btn-primary">Ver Productos</a>
+        <h3 data-i18n="inicio.bioproducts_title">Bioproductos</h3>
+        <p data-i18n="inicio.bioproducts_desc">Productos biotecnol&oacute;gicos para el cultivo.</p>
+        <a href="bioproductos.html" class="btn btn-primary"><span data-i18n="inicio.bioproducts_btn">Ver Productos</span></a>
       </div>
     </div>
   </main>
@@ -97,5 +97,10 @@
   <script src="js/script.js"></script>
   <script src="js/lang.js"></script>
   <script src="js/nav.js"></script>
+  <script>
+    document.addEventListener('languageChanged', function() {
+      if (typeof translateDOM === 'function') translateDOM();
+    });
+  </script>
 </body>
 </html>
