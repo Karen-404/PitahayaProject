@@ -31,6 +31,12 @@
         welcome: 'Panel de Control',
         request_quote: 'Solicitar Cotización'
       },
+      chat: {
+        welcome: 'Hola 👋 soy tu asistente de pitahaya ¿En qué puedo ayudarte?',
+        typing: 'Escribiendo...',
+        write: 'Escribe...',
+        send: 'Enviar'
+      },
       map: {
         farm: 'Finca',
         variety: 'Variedad',
@@ -38,7 +44,8 @@
         view_analysis: 'Ver Análisis',
         loading_analysis: 'Cargando análisis biotecnológico para el punto ID: ',
         example_farm: 'Finca Experimental Palora',
-        example_variety: 'Variedad: Pitahaya Amarilla.'
+        example_variety: 'Variedad: Pitahaya Amarilla.',
+        belleza_farm: 'Finca Experimental La Belleza'
       },
       common: {
         loading: 'Cargando...',
@@ -121,7 +128,38 @@
         vegetative_char: 'Caracterización Vegetativa',
         floral_char: 'Caracterización Floral',
         fruit_char: 'Caracterización del Fruto',
-        health_sanidad: 'Sanidad y Resistencia'
+        health_sanidad: 'Sanidad y Resistencia',
+        edit_title: 'Editar Caracterización',
+        no_records: 'No hay registros. Crea la primera caracterización.',
+        error_load: 'Error al cargar.',
+        error_network: 'Error de conexión',
+        user_not_found: 'Usuario no encontrado',
+        collector_label: 'Recolector',
+        registro_label: 'Registro',
+        export_error: 'Error al exportar'
+      },
+      noticias: {
+        title: 'Noticias e Investigaciones',
+        new: 'Nueva Noticia',
+        title_field: 'Titulo',
+        content: 'Contenido',
+        images: 'Imágenes (hasta 10)',
+        uploading: 'Subiendo imágenes...',
+        publish: 'Publicar',
+        edit_title: 'Editar Noticia',
+        update: 'Actualizar',
+        max_images: 'Máximo 10 imágenes',
+        wait_upload: 'Espera a que terminen de subir las imágenes',
+        confirm_delete: '¿Eliminar esta noticia?',
+        error_network: 'Error de conexión',
+        error_load: 'Error al cargar noticias',
+        no_comments: 'Sin comentarios',
+        error_comments: 'Error al cargar comentarios',
+        error_send: 'Error al enviar comentario',
+        comment_heading: 'Comentarios',
+        comment_placeholder: 'Escribe un comentario...',
+        author_anon: 'Anónimo',
+        anon: 'Anónimo'
       },
       admin: {
         title: 'Panel de Administración',
@@ -177,6 +215,12 @@
         welcome: 'Control Panel',
         request_quote: 'Request Quote'
       },
+      chat: {
+        welcome: 'Hi 👋 I\'m your pitahaya assistant. How can I help you?',
+        typing: 'Typing...',
+        write: 'Write...',
+        send: 'Send'
+      },
       map: {
         farm: 'Farm',
         variety: 'Variety',
@@ -184,7 +228,8 @@
         view_analysis: 'View Analysis',
         loading_analysis: 'Loading biotechnological analysis for point ID: ',
         example_farm: 'Palora Experimental Farm',
-        example_variety: 'Variety: Yellow Pitahaya.'
+        example_variety: 'Variety: Yellow Pitahaya.',
+        belleza_farm: 'La Belleza Experimental Farm'
       },
       common: {
         loading: 'Loading...',
@@ -267,7 +312,38 @@
         vegetative_char: 'Vegetative Characterization',
         floral_char: 'Floral Characterization',
         fruit_char: 'Fruit Characterization',
-        health_sanidad: 'Health and Resistance'
+        health_sanidad: 'Health and Resistance',
+        edit_title: 'Edit Characterization',
+        no_records: 'No records. Create the first characterization.',
+        error_load: 'Error loading.',
+        error_network: 'Connection error',
+        user_not_found: 'User not found',
+        collector_label: 'Collector',
+        registro_label: 'Registration',
+        export_error: 'Export error'
+      },
+      noticias: {
+        title: 'News and Research',
+        new: 'New News',
+        title_field: 'Title',
+        content: 'Content',
+        images: 'Images (up to 10)',
+        uploading: 'Uploading images...',
+        publish: 'Publish',
+        edit_title: 'Edit News',
+        update: 'Update',
+        max_images: 'Maximum 10 images',
+        wait_upload: 'Wait for images to finish uploading',
+        confirm_delete: 'Delete this news?',
+        error_network: 'Connection error',
+        error_load: 'Error loading news',
+        no_comments: 'No comments',
+        error_comments: 'Error loading comments',
+        error_send: 'Error sending comment',
+        comment_heading: 'Comments',
+        comment_placeholder: 'Write a comment...',
+        author_anon: 'Anonymous',
+        anon: 'Anonymous'
       },
       admin: {
         title: 'Administration Panel',
@@ -323,6 +399,12 @@
         welcome: 'Kamachik Tawka',
         request_quote: 'Ma' + String.fromCharCode(0x79) + 'llana'
       },
+      chat: {
+        welcome: 'Ima shuk yanapaitak?',
+        typing: 'Killkachkan...',
+        write: 'Killkay...',
+        send: 'Kachana'
+      },
       map: {
         farm: 'Chakra',
         variety: 'Rikuchina',
@@ -330,7 +412,8 @@
         view_analysis: 'Rikuna',
         loading_analysis: 'Yachayta kargachkan ID: ',
         example_farm: 'Palora Yachay Chakra',
-        example_variety: 'Rikuchina: Pitahaya Amarilla.'
+        example_variety: 'Rikuchina: Pitahaya Amarilla.',
+        belleza_farm: 'La Belleza Yachay Chakra'
       },
       common: {
         loading: 'Kargachkan...',
@@ -413,7 +496,38 @@
         vegetative_char: 'Wi' + String.fromCharCode(0x6e) + 'ay Rikuchina',
         floral_char: 'Sisa Rikuchina',
         fruit_char: 'Ruru Rikuchina',
-        health_sanidad: 'Alli Kawsay'
+        health_sanidad: 'Alli Kawsay',
+        edit_title: 'Rikuchinata Allichiy',
+        no_records: 'Na killkashkachu. Shuk rikuchinata ruray.',
+        error_load: 'Pantashka kargachka.',
+        error_network: 'Pantashka',
+        user_not_found: 'Mana riksishka',
+        collector_label: 'Pallak',
+        registro_label: 'Killkakuna',
+        export_error: 'Kachay pantashka'
+      },
+      noticias: {
+        title: 'Willaykuna',
+        new: 'Mushuk Willay',
+        title_field: 'Shuti',
+        content: 'Willana',
+        images: 'Rikchakuna (10 kam)',
+        uploading: 'Rikchakuna kargachkan...',
+        publish: 'Kachana',
+        edit_title: 'Willayta Allichiy',
+        update: 'Kunanchay',
+        max_images: '10 rikchakunamanta ashtawan',
+        wait_upload: 'Rikchakuna kargachun shuyay',
+        confirm_delete: 'Kay willayta pichanachu?',
+        error_network: 'Pantashka',
+        error_load: 'Willaykuna pantashka',
+        no_comments: 'Na killkashkachu',
+        error_comments: 'Killkakuna pantashka',
+        error_send: 'Killkata kachay pantashka',
+        comment_heading: 'Killkakuna',
+        comment_placeholder: 'Killkay...',
+        author_anon: 'Mana riksishka',
+        anon: 'Mana riksishka'
       },
       admin: {
         title: 'Kamachik Tawka',
@@ -469,6 +583,12 @@
         welcome: 'Uunt Kuntuts',
         request_quote: 'Awajsamu'
       },
+      chat: {
+        welcome: 'Wari itiursamta?',
+        typing: 'Karakchatai...',
+        write: 'Aujmattsa...',
+        send: 'Awe'
+      },
       map: {
         farm: 'Yapimiat',
         variety: 'Nekatin',
@@ -476,7 +596,8 @@
         view_analysis: 'Nekapratai',
         loading_analysis: 'Nekatin karakchatai ID: ',
         example_farm: 'Palora Yapimiat',
-        example_variety: 'Nekatin: Pitahaya Amarilla.'
+        example_variety: 'Nekatin: Pitahaya Amarilla.',
+        belleza_farm: 'La Belleza Yapimiat'
       },
       common: {
         loading: 'Karakchatai...',
@@ -559,7 +680,38 @@
         vegetative_char: 'Najanmatai Nekatin',
         floral_char: 'Tsapau Nekatin',
         fruit_char: 'Nuka Nekatin',
-        health_sanidad: 'Kuitamiat'
+        health_sanidad: 'Kuitamiat',
+        edit_title: 'Nekatin Nekapratai',
+        no_records: 'Atse nekapratai. Yamaram nekatin najanatai.',
+        error_load: 'Nekasa.',
+        error_network: 'Nekasa',
+        user_not_found: 'Aents nekasa',
+        collector_label: 'Uwejai',
+        registro_label: 'Aentramu',
+        export_error: 'Awe nekasa'
+      },
+      noticias: {
+        title: 'Nekapmatai',
+        new: 'Yamaram Nekapmatai',
+        title_field: 'Neka',
+        content: 'Chicham',
+        images: 'Nekapratai (10 kam)',
+        uploading: 'Nekapratai karakchatai...',
+        publish: 'Awe',
+        edit_title: 'Nekapmatai Nekapratai',
+        update: 'Kuitamiat',
+        max_images: '10 nekapratai yaunchuk',
+        wait_upload: 'Nekapratai karakchatin shuyay',
+        confirm_delete: 'Yamaik pachimiatashtam?',
+        error_network: 'Nekasa',
+        error_load: 'Nekapmatai nekasa',
+        no_comments: 'Atse chicham',
+        error_comments: 'Chicham nekasa',
+        error_send: 'Chicham awe nekasa',
+        comment_heading: 'Chicham ainau',
+        comment_placeholder: 'Aujmattsa...',
+        author_anon: 'Nekasa',
+        anon: 'Nekasa'
       },
       admin: {
         title: 'Uunt Kuntuts',

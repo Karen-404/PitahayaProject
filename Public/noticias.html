@@ -17,12 +17,12 @@
           <i class="fas fa-newspaper"></i>
         </div>
         <div>
-          <h1>Noticias e Investigaciones</h1>
+          <h1 data-i18n="noticias.title">Noticias e Investigaciones</h1>
         </div>
       </div>
       <div class="page-header-right">
         <button class="btn btn-primary" id="btnNuevaNoticia" style="display:none" onclick="abrirModal()">
-          <i class="fas fa-plus"></i> Nueva Noticia
+          <i class="fas fa-plus"></i> <span data-i18n="noticias.new">Nueva Noticia</span>
         </button>
       </div>
     </div>
@@ -32,25 +32,25 @@
     <div id="noticiaModal" class="modal" style="display:none">
       <div class="modal-content">
         <span class="modal-close" onclick="cerrarModal()">&times;</span>
-        <h2 id="modalTitle">Nueva Noticia</h2>
+        <h2 id="modalTitle" data-i18n="noticias.new">Nueva Noticia</h2>
         <form id="noticiaForm">
           <input type="hidden" id="noticiaId">
           <div class="form-group">
-            <label>Titulo</label>
+            <label data-i18n="noticias.title_field">Titulo</label>
             <input type="text" id="noticiaTitulo" required>
           </div>
           <div class="form-group">
-            <label>Contenido</label>
+            <label data-i18n="noticias.content">Contenido</label>
             <textarea id="noticiaContenido" rows="6" required></textarea>
           </div>
           <div class="form-group">
-            <label>Im&aacute;genes (hasta 10)</label>
+            <label data-i18n="noticias.images">Im&aacute;genes (hasta 10)</label>
             <input type="file" id="noticiaFiles" accept="image/*" multiple style="height:auto;padding:8px 0;border:none;">
-            <div id="imagenSubiendo" style="display:none;color:var(--color-text-muted);font-size:0.85rem;margin-top:6px;"><i class="fas fa-spinner fa-spin"></i> Subiendo im&aacute;genes...</div>
+            <div id="imagenSubiendo" style="display:none;color:var(--color-text-muted);font-size:0.85rem;margin-top:6px;"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="noticias.uploading">Subiendo im&aacute;genes...</span></div>
             <div id="previewsContainer" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
             <input type="hidden" id="noticiaImagenes">
           </div>
-          <button type="submit" class="btn btn-primary" style="width:100%;" id="btnGuardarNoticia">Publicar</button>
+          <button type="submit" class="btn btn-primary" style="width:100%;" id="btnGuardarNoticia" data-i18n="noticias.publish">Publicar</button>
         </form>
       </div>
     </div>
@@ -61,8 +61,8 @@
     <div class="chat-container oculto" id="chatContainer">
       <div id="chatBox" class="chat-box"></div>
       <div class="chat-input">
-        <input type="text" id="userInput" placeholder="Escribe...">
-        <button onclick="responder()">Enviar</button>
+        <input type="text" id="userInput" data-i18n-placeholder="chat.write" placeholder="Escribe...">
+        <button onclick="responder()" data-i18n="chat.send">Enviar</button>
       </div>
     </div>
   </div>
@@ -86,8 +86,8 @@
       document.getElementById('noticiaFiles').value = '';
       document.getElementById('previewsContainer').innerHTML = '';
       if (noticia) {
-        document.getElementById('modalTitle').textContent = 'Editar Noticia';
-        document.getElementById('btnGuardarNoticia').textContent = 'Actualizar';
+        document.getElementById('modalTitle').textContent = __('noticias.edit_title');
+        document.getElementById('btnGuardarNoticia').textContent = __('noticias.update');
         document.getElementById('noticiaId').value = noticia.id;
         document.getElementById('noticiaTitulo').value = noticia.titulo;
         document.getElementById('noticiaContenido').value = noticia.contenido;
@@ -99,7 +99,7 @@
         });
         document.getElementById('noticiaImagenes').value = JSON.stringify(imagenesUrls);
       } else {
-        document.getElementById('modalTitle').textContent = 'Nueva Noticia';
+        document.getElementById('modalTitle').textContent = __('noticias.new');
         document.getElementById('noticiaForm').reset();
         document.getElementById('noticiaId').value = '';
         document.getElementById('noticiaImagenes').value = '';
@@ -112,7 +112,7 @@
     document.getElementById('noticiaFiles').addEventListener('change', async function(e) {
       const files = Array.from(e.target.files);
       if (!files.length || subiendo) return;
-      if (imagenesUrls.length + files.length > 10) { alert('Maximo 10 imagenes'); return; }
+      if (imagenesUrls.length + files.length > 10) { alert(__('noticias.max_images')); return; }
       subiendo = true;
       document.getElementById('imagenSubiendo').style.display = 'block';
       for (const file of files) {
@@ -134,7 +134,7 @@
 
     document.getElementById('noticiaForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (subiendo) { alert('Espera a que terminen de subir las imagenes'); return; }
+      if (subiendo) { alert(__('noticias.wait_upload')); return; }
       const data = {
         titulo: document.getElementById('noticiaTitulo').value,
         contenido: document.getElementById('noticiaContenido').value,
@@ -150,16 +150,16 @@
         if (!res.ok) { alert('Error: ' + result.error); return; }
         cerrarModal();
         cargarNoticias();
-      } catch(err) { alert('Error de conexion'); }
+      } catch(err) { alert(__('noticias.error_network')); }
     });
 
     async function eliminarNoticia(id) {
-      if (!confirm('Eliminar esta noticia?')) return;
+      if (!confirm(__('noticias.confirm_delete'))) return;
       try {
         const res = await fetch('/api/noticias/' + id, { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ usuario_id: parseInt(userId) }) });
         if (!res.ok) { const r = await res.json(); alert('Error: ' + r.error); return; }
         cargarNoticias();
-      } catch(err) { alert('Error de conexion'); }
+      } catch(err) { alert(__('noticias.error_network')); }
     }
 
     async function toggleLike(noticiaId) {
@@ -182,11 +182,11 @@
         container.innerHTML = comentarios.map(c => {
           const fecha = new Date(c.created_at).toLocaleDateString('es-EC', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
           return '<div style="padding:8px 0;border-bottom:1px solid var(--color-border-soft);font-size:0.85rem;">'
-            + '<strong>' + escapeHTML(c.usuarios?.nombre || 'Anonimo') + '</strong> '
+            + '<strong>' + escapeHTML(c.usuarios?.nombre || __('noticias.anon')) + '</strong> '
             + '<span style="color:var(--color-text-muted);font-size:0.75rem;">' + fecha + '</span>'
             + '<p style="margin:4px 0 0;">' + escapeHTML(c.contenido) + '</p></div>';
-        }).join('') || '<p style="color:var(--color-text-muted);font-size:0.85rem;">Sin comentarios</p>';
-      } catch(e) { container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.85rem;">Error al cargar comentarios</p>'; }
+        }).join('') || '<p style="color:var(--color-text-muted);font-size:0.85rem;">' + __('noticias.no_comments') + '</p>';
+      } catch(e) { container.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.85rem;">' + __('noticias.error_comments') + '</p>'; }
     }
 
     async function enviarComentario(noticiaId, input) {
@@ -194,11 +194,11 @@
       if (!contenido) return;
       try {
         const res = await fetch('/api/comentarios', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ noticia_id: noticiaId, usuario_id: parseInt(userId), contenido }) });
-        if (!res.ok) { alert('Error al enviar comentario'); return; }
+        if (!res.ok) { alert(__('noticias.error_send')); return; }
         input.value = '';
         const container = document.getElementById('comentarios-' + noticiaId);
         if (container) cargarComentarios(noticiaId, container);
-      } catch(e) { alert('Error de conexion'); }
+      } catch(e) { alert(__('noticias.error_network')); }
     }
 
     async function cargarNoticias() {
@@ -214,7 +214,7 @@
           let imagenes = [];
           try { imagenes = JSON.parse(n.imagen_url || '[]'); } catch(e) { if (n.imagen_url) imagenes = [n.imagen_url]; }
           const imgsHtml = imagenes.length ? '<div class="noticia-imgs">' + imagenes.map(url => '<img src="' + escapeHTML(url) + '" alt="' + escapeHTML(n.titulo) + '" class="noticia-img" loading="lazy">').join('') + '</div>' : '<div class="noticia-img-placeholder"><i class="fas fa-leaf"></i></div>';
-          const autor = n.usuarios ? n.usuarios.nombre : 'Anonimo';
+          const autor = n.usuarios ? n.usuarios.nombre : __('noticias.anon');
           const noticiaJson = escapeHTML(JSON.stringify(n));
           return '<div class="noticia-card">'
             + imgsHtml
@@ -233,10 +233,10 @@
             + '<button class="btn-share" onclick="window.open(\'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.origin + '/noticias.html?id=' + n.id) + '\',\'_blank\')" title="Facebook"><i class="fab fa-facebook"></i></button>'
             + '</div>'
             + '<div class="noticia-comentarios" style="margin-top:16px;border-top:1px solid var(--color-border);padding-top:12px;">'
-            + '<h4 style="margin:0 0 8px 0;font-size:0.9rem;"><i class="far fa-comment"></i> Comentarios</h4>'
+            + '<h4 style="margin:0 0 8px 0;font-size:0.9rem;"><i class="far fa-comment"></i> ' + __('noticias.comment_heading') + '</h4>'
             + '<div id="comentarios-' + n.id + '" style="max-height:200px;overflow-y:auto;"></div>'
             + '<div style="display:flex;gap:8px;margin-top:8px;">'
-            + '<input type="text" id="comentarioInput-' + n.id + '" placeholder="Escribe un comentario..." style="flex:1;height:38px;font-size:0.85rem;">'
+            + '<input type="text" id="comentarioInput-' + n.id + '" placeholder="' + __('noticias.comment_placeholder') + '" style="flex:1;height:38px;font-size:0.85rem;">'
             + '<button onclick="enviarComentario(' + n.id + ', document.getElementById(\'comentarioInput-' + n.id + '\'))" style="height:38px;padding:0 16px;background:var(--color-primary);color:white;border:none;border-radius:6px;cursor:pointer;"><i class="fas fa-paper-plane"></i></button>'
             + '</div></div></div></div>';
         }).join('');
@@ -246,11 +246,16 @@
           if (c) cargarComentarios(n.id, c);
         });
       } catch(err) {
-        container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">Error al cargar noticias</p>';
+        container.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;">' + __('noticias.error_load') + '</p>';
       }
     }
 
     cargarNoticias();
+
+    document.addEventListener('languageChanged', function() {
+      cargarNoticias();
+      if (typeof translateDOM === 'function') translateDOM();
+    });
   </script>
 </body>
 </html>

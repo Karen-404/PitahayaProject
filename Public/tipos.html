@@ -254,8 +254,8 @@
         <div class="chat-container oculto" id="chatContainer">
             <div id="chatBox" class="chat-box"></div>
             <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Escribe...">
-                <button onclick="responder()">Enviar</button>
+                <input type="text" id="userInput" data-i18n-placeholder="chat.write" placeholder="Escribe...">
+                <button onclick="responder()" data-i18n="chat.send">Enviar</button>
             </div>
         </div>
     </div>
@@ -310,7 +310,7 @@
                     var res = await fetch('/api/subir-imagen', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ imagen: ev.target.result }) });
                     var data = await res.json();
                     if (data.url) { document.getElementById('vImagen').value = data.url; document.getElementById('vPreview').src = data.url; document.getElementById('vPreview').style.display = 'block'; }
-                } catch(e) { alert('Error al subir imagen'); }
+                } catch(e) { alert(__('tipos.error_network')); }
             };
             reader.readAsDataURL(file);
         });
@@ -387,7 +387,7 @@
             switchTabVar('general');
             var item = (typeof idOrItem === 'number') ? variedades.find(function(x) { return x.id === idOrItem; }) : idOrItem;
             if (item) {
-                document.getElementById('formTitle').textContent = 'Editar Caracterizaci&oacute;n';
+                document.getElementById('formTitle').textContent = __('tipos.edit_title');
                 document.getElementById('varId').value = item.id;
                 document.getElementById('vNombre').value = item.nombre || '';
                 document.getElementById('vCientifico').value = item.nombre_cientifico || '';
@@ -404,7 +404,7 @@
                 var p = document.getElementById('vPreview');
                 if (item.imagen_url) { p.src = item.imagen_url; p.style.display = 'block'; } else { p.style.display = 'none'; }
             } else {
-                document.getElementById('formTitle').innerHTML = 'Nueva Caracterización';
+                document.getElementById('formTitle').innerHTML = __('tipos.new');
                 document.getElementById('varForm').reset();
                 document.getElementById('varId').value = '';
                 document.getElementById('vPreview').style.display = 'none';
@@ -546,25 +546,25 @@
                 if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
                 cerrarForm();
                 cargarVariedades();
-            } catch(e) { alert('Error de conexion'); }
+            } catch(e) { alert(__('tipos.error_network')); }
         });
 
         async function verRecolector(userId) {
             try {
                 var res = await fetch('/api/usuarios/' + userId);
                 var u = await res.json();
-                if (!u || u.error) { alert('Usuario no encontrado'); return; }
-                alert('Recolector: ' + u.nombre + '\nCorreo: ' + u.correo + '\nRol: ' + u.role + '\nRegistro: ' + new Date(u.created_at).toLocaleDateString());
-            } catch(e) { alert('Error al cargar info del recolector'); }
+                if (!u || u.error) { alert(__('tipos.user_not_found')); return; }
+                alert(__('tipos.collector_label') + ': ' + u.nombre + '\n' + __('index.email') + ': ' + u.correo + '\nRol: ' + u.role + '\n' + __('tipos.registro_label') + ': ' + new Date(u.created_at).toLocaleDateString());
+            } catch(e) { alert(__('tipos.error_network')); }
         }
 
         async function eliminarVar(id) {
-            if (!confirm('Eliminar esta caracterizaci&oacute;n?')) return;
+            if (!confirm(__('tipos.confirm_delete'))) return;
             try {
                 var res = await fetch('/api/caracterizacion/' + id, { method:'DELETE', headers:{'Content-Type':'application/json'} });
                 if (!res.ok) { var r; try { r = await res.json(); } catch(ee) { r = {}; } alert('Error (' + res.status + '): ' + (r.error || res.statusText)); return; }
                 cargarVariedades();
-            } catch(e) { alert('Error de conexion: ' + e.message); }
+            } catch(e) { alert(__('tipos.error_network') + ': ' + e.message); }
         }
 
         var debounceTimer;
@@ -585,7 +585,7 @@
                 var res = await fetch('/api/caracterizacion?' + params.toString());
                 variedades = await res.json();
                 if (!variedades.length) {
-                    grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">No hay registros. Crea la primera caracterizaci&oacute;n.</p>';
+                    grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">' + __('tipos.no_records') + '</p>';
                     return;
                 }
                 grid.innerHTML = variedades.map(function(v) {
@@ -604,7 +604,7 @@
                         + '</div>';
                 }).join('');
             } catch(e) {
-                grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">Error al cargar.</p>';
+                grid.innerHTML = '<p style="text-align:center;color:var(--color-text-muted);padding:40px;grid-column:1/-1;">' + __('tipos.error_load') + '</p>';
             }
         }
 
@@ -616,7 +616,7 @@
                 var a = document.createElement('a');
                 a.href = url; a.download = 'caracterizacion_investigacion.csv'; a.click();
                 URL.revokeObjectURL(url);
-            } catch(e) { alert('Error al exportar'); }
+            } catch(e) { alert(__('tipos.export_error')); }
         }
 
         cargarVariedades();

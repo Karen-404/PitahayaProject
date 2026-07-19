@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    alert('❌ ' + data.error);
+                    alert('\u274C ' + data.error);
                     return;
                 }
                 localStorage.setItem('userRole', data.role);
@@ -48,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.token) localStorage.setItem('userToken', data.token);
                 window.location.href = 'inicio.html';
             } catch (err) {
-                alert('❌ Error de conexión');
+                var connErr = typeof __ === 'function' ? __('common.error_loading') : 'Error de conexi\u00f3n';
+                alert('\u274C ' + connErr);
             }
         });
     }
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    alert('⚠️ ' + data.error);
+                    alert('\u26A0\uFE0F ' + data.error);
                     return;
                 }
                 if (data.token) {
@@ -82,10 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('userName', data.nombre);
                     localStorage.setItem('userId', data.id);
                 }
-                alert('✅ Registro exitoso');
+                var regSuccess = typeof __ === 'function' ? __('registro.success') : 'Registro exitoso';
+                alert('\u2705 ' + regSuccess);
                 window.location.href = 'inicio.html';
             } catch (err) {
-                alert('❌ Error de conexión');
+                var connErr2 = typeof __ === 'function' ? __('common.error_loading') : 'Error de conexi\u00f3n';
+                alert('\u274C ' + connErr2);
             }
         });
     }
@@ -150,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).addTo(window.miMapa);
         L.marker([lat, lon])
             .addTo(window.miMapa)
-            .bindPopup("<b>Finca Experimental La Belleza 🌱</b><br>ESPOCH")
+            .bindPopup("<b>" + (typeof __ === 'function' ? __('map.belleza_farm') : 'Finca Experimental La Belleza') + " 🌱</b><br>ESPOCH")
             .openPopup();
         setTimeout(() => {
             window.miMapa.invalidateSize();
@@ -168,7 +171,8 @@ async function responder() {
     if (!mensaje) return;
     chat.innerHTML += `<div class="mensaje usuario">${mensaje}</div>`;
     input.value = "";
-    chat.innerHTML += `<div class="mensaje bot" id="chatPensando"><i>Escribiendo...</i></div>`;
+    var typingMsg = typeof __ === 'function' ? __('chat.typing') : 'Escribiendo...';
+    chat.innerHTML += `<div class="mensaje bot" id="chatPensando"><i>${typingMsg}</i></div>`;
     chat.scrollTop = chat.scrollHeight;
     try {
         const res = await fetch('/api/chat', {
@@ -183,7 +187,8 @@ async function responder() {
     } catch (e) {
         const pensando = document.getElementById('chatPensando');
         if (pensando) pensando.remove();
-        chat.innerHTML += `<div class="mensaje bot">Error de conexi\u00f3n. Intenta de nuevo.</div>`;
+        var errMsg = typeof __ === 'function' ? __('common.error_loading') : 'Error de conexi\u00f3n. Intenta de nuevo.';
+        chat.innerHTML += `<div class="mensaje bot">${errMsg}</div>`;
     }
     chat.scrollTop = chat.scrollHeight;
 }
@@ -196,12 +201,15 @@ if (userInputEl) {
 }
 
 window.onload = () => {
-    const chat = document.getElementById("chatBox");
-    if (chat) chat.innerHTML += `<div class="mensaje bot">Hola 👋 soy tu asistente de pitahaya ¿En qué puedo ayudarte?</div>`;
+    var chat = document.getElementById("chatBox");
+    if (chat) {
+        var msg = typeof __ === 'function' ? __('chat.welcome') : 'Hola 👋 soy tu asistente de pitahaya \u00bfEn qu\u00e9 puedo ayudarte?';
+        chat.innerHTML += '<div class="mensaje bot">' + msg + '</div>';
+    }
 };
 
 function toggleChat() {
-    const chat = document.getElementById("chatContainer");
+    var chat = document.getElementById("chatContainer");
     chat.classList.toggle("oculto");
 }
 
