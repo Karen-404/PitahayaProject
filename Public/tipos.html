@@ -59,16 +59,23 @@
                         <button type="button" class="tab-variedad" data-tab="floral" onclick="switchTabVar('floral')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-flower"></i> <span data-i18n="tipos.tab_floral">Floral</span></button>
                         <button type="button" class="tab-variedad" data-tab="fruto" onclick="switchTabVar('fruto')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-apple-alt"></i> <span data-i18n="tipos.tab_fruto">Fruto</span></button>
                         <button type="button" class="tab-variedad" data-tab="sanidad" onclick="switchTabVar('sanidad')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-shield-alt"></i> <span data-i18n="tipos.tab_sanidad">Sanidad</span></button>
+                        <button type="button" class="tab-variedad" data-tab="propietario" onclick="switchTabVar('propietario')" style="flex:1;padding:7px;border-radius:6px;border:1px solid var(--color-border);font-weight:600;font-size:0.78rem;cursor:pointer;background:var(--color-surface);color:var(--color-text-secondary);"><i class="fas fa-user-friends"></i> <span data-i18n="tipos.tab_propietario">Propiet.</span></button>
                     </div>
 
                     <!-- TAB FAO: IDENTIFICACION -->
                     <div id="tab-ident" class="vartab">
-                        <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 12px;"><i class="fas fa-passport"></i> Datos del pasaporte FAO (MCPD)</p>
+                        <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 12px;"><i class="fas fa-passport"></i> Datos del pasaporte FAO (MCPD alineado WIEWS)</p>
                         <div class="grid-2 gap-xs">
-                            <div class="form-group"><label>C&oacute;digo</label><input type="text" id="fCodigo" placeholder="EI-PIT-26-001"></div>
-                            <div class="form-group"><label>N&uacute;mero de Acceso</label><input type="text" id="fAcceso" placeholder="ACC-001"></div>
-                            <div class="form-group"><label>N&uacute;mero de Colecta</label><input type="text" id="fColecta" placeholder="COL-001"></div>
-                            <div class="form-group"><label>Nombre de Accesi&oacute;n</label><input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana"></div>
+                            <div class="form-group"><label>INSTCODE</label><input type="text" id="fCodigo" placeholder="EI"></div>
+                            <div class="form-group"><label>ACCENUMB</label><input type="text" id="fAcceso" placeholder="EI-PIT-26-01-01"></div>
+                            <div class="form-group"><label>COLLNUMB</label><input type="text" id="fColecta" placeholder="RT-001"></div>
+                            <div class="form-group"><label>COLLCODE</label><input type="text" id="fCollCode" placeholder="EI"></div>
+                            <div class="form-group"><label>BREDCODE</label><input type="text" id="fBredCode" placeholder="N/A"></div>
+                            <div class="form-group"><label>DONORCODE</label><input type="text" id="fDonorCode" placeholder="N/A"></div>
+                            <div class="form-group"><label>DONORNUMB</label><input type="text" id="fDonorNumb" placeholder="N/A"></div>
+                            <div class="form-group"><label>OTHERNUMB</label><input type="text" id="fOtherNumb" placeholder="N/A"></div>
+                            <div class="form-group"><label>DUPLSITE</label><input type="text" id="fDuplSite" placeholder="EECA-INIAP"></div>
+                            <div class="form-group"><label>STORAGE</label><input type="text" id="fStorage" placeholder="Coleccion Activa"></div>
                         </div>
                     </div>
 
@@ -76,10 +83,13 @@
                     <div id="tab-taxo" class="vartab" style="display:none;">
                         <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 12px;"><i class="fas fa-dna"></i> Clasificaci&oacute;n taxon&oacute;mica</p>
                         <div class="grid-2 gap-xs">
-                            <div class="form-group"><label>G&eacute;nero</label><input type="text" id="fGenero" placeholder="Hylocereus"></div>
-                            <div class="form-group"><label>Especie</label><input type="text" id="fEspecie" placeholder="undatus"></div>
-                            <div class="form-group"><label>Subtaxa</label><input type="text" id="fSubtaxa" placeholder="american beauty"></div>
-                            <div class="form-group"><label>Nombre Com&uacute;n</label><input type="text" id="fNombreComun" placeholder="Pitahaya roja"></div>
+                            <div class="form-group"><label>GENUS</label><input type="text" id="fGenero" placeholder="Hylocereus"></div>
+                            <div class="form-group"><label>SPECIES</label><input type="text" id="fEspecie" placeholder="undatus"></div>
+                            <div class="form-group"><label>SPAUTHOR</label><input type="text" id="fSpAuthority" placeholder="Adrian Hardy Haworth (1830)"></div>
+                            <div class="form-group"><label>SUBTAXA</label><input type="text" id="fSubtaxa" placeholder="american beauty"></div>
+                            <div class="form-group"><label>SUBTAUTHOR</label><input type="text" id="fSubtauthor" placeholder="N/A"></div>
+                            <div class="form-group"><label>CROPNAME</label><input type="text" id="fNombreComun" placeholder="Pitahaya roja"></div>
+                            <div class="form-group" style="grid-column:span 2;"><label>ACCENAME</label><input type="text" id="fNombreAcc" placeholder="Pitahaya Roja Orellana"></div>
                         </div>
                     </div>
 
@@ -87,12 +97,15 @@
                     <div id="tab-origen" class="vartab" style="display:none;">
                         <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 12px;"><i class="fas fa-map-marker-alt"></i> Origen geogr&aacute;fico</p>
                         <div class="grid-2 gap-xs">
-                            <div class="form-group"><label>Pa&iacute;s</label><input type="text" id="fPais" placeholder="Ecuador"></div>
-                            <div class="form-group" style="grid-column:span 2;"><label>Ubicaci&oacute;n / Zona</label><input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca"></div>
-                            <div class="form-group"><label>Latitud</label><input type="number" id="fLat" step="any" placeholder="-0.6357312"></div>
-                            <div class="form-group"><label>Longitud</label><input type="number" id="fLng" step="any" placeholder="-77.0409702"></div>
-                            <div class="form-group"><label>Altitud (m)</label><input type="number" id="fAltitud" step="any" placeholder="250"></div>
-                            <div class="form-group"><label>Fecha Adquisici&oacute;n</label><input type="date" id="fFecha"></div>
+                            <div class="form-group"><label>ORIGCTY</label><input type="text" id="fPais" placeholder="ECU"></div>
+                            <div class="form-group" style="grid-column:span 2;"><label>COLLSITE</label><input type="text" id="fUbicacion" placeholder="Orellana, 5 km sur El Coca"></div>
+                            <div class="form-group"><label>LATITUDE</label><input type="text" id="fLat" placeholder="005025S"></div>
+                            <div class="form-group"><label>LONGITUDE</label><input type="text" id="fLng" placeholder="0763005W"></div>
+                            <div class="form-group"><label>ELEVATION</label><input type="number" id="fAltitud" step="any" placeholder="250 m s.n.m."></div>
+                            <div class="form-group"><label>ACQDATE</label><input type="date" id="fFecha"></div>
+                            <div class="form-group"><label>COLLDATE</label><input type="date" id="fCollDate"></div>
+                            <div class="form-group"><label>CLIMZONE</label><input type="text" id="fClimZone" placeholder="Ej: Tropical humedo"></div>
+                            <div class="form-group"><label>SOILTYPE</label><input type="text" id="fSoilType" placeholder="Ej: Franco arenoso"></div>
                         </div>
                     </div>
 
@@ -100,8 +113,12 @@
                     <div id="tab-colec" class="vartab" style="display:none;">
                         <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 12px;"><i class="fas fa-leaf"></i> Informaci&oacute;n de colecta</p>
                         <div class="grid-2 gap-xs">
-                            <div class="form-group"><label>Estado Biol&oacute;gico</label><select id="fEstadoBio"><option value="Silvestre">Silvestre</option><option value="Cultivado">Cultivado</option><option value="Mejorado">Mejorado</option><option value="Hibrido">H&iacute;brido</option></select></div>
-                            <div class="form-group" style="grid-column:span 2;"><label>Fuente de Colecta</label><input type="text" id="fFuente" placeholder="Campo agricola, Mercado, Banco germoplasma..."></div>
+                            <div class="form-group"><label>SAMPSTAT</label><select id="fEstadoBio"><option value="">--</option><option value="Silvestre">Silvestre</option><option value="Variedad Tradicional">Variedad Tradicional</option><option value="Cultivado">Cultivado</option><option value="Mejorado">Mejorado</option><option value="Hibrido">H&iacute;brido</option></select></div>
+                            <div class="form-group"><label>COLLSRC</label><input type="text" id="fFuente" placeholder="20_Campo agricola"></div>
+                            <div class="form-group" style="grid-column:span 2;"><label>ANCEST</label><textarea id="fAncest" rows="2" placeholder="Datos ancestrales / Informaci&oacute;n de parentesco"></textarea></div>
+                            <div class="form-group" style="grid-column:span 2;"><label>REMARKS</label><textarea id="fRemarks" rows="2" placeholder="Observaciones"></textarea></div>
+                            <div class="form-group"><label>DISRES</label><input type="text" id="fDisRes" placeholder="Tolerancia / resistencia a enfermedad"></div>
+                            <div class="form-group"><label>SELFCOMP</label><input type="text" id="fSelfComp" placeholder="Autocompatibilidad"></div>
                         </div>
                     </div>
 
@@ -235,6 +252,30 @@
                         </div>
                     </div>
 
+                    <!-- PROPIETARIO -->
+                    <div id="tab-propietario" class="vartab" style="display:none;">
+                        <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 12px;"><i class="fas fa-user-friends"></i> Informaci&oacute;n del colector y propietario</p>
+                        <div class="grid-2 gap-xs">
+                            <div style="border:1px solid var(--color-border);border-radius:8px;padding:12px;">
+                                <h4 style="margin:0 0 8px;font-size:0.85rem;color:var(--color-primary);"><i class="fas fa-user"></i> Colector</h4>
+                                <div class="form-group"><label>Nombre del colector</label><input type="text" id="fCollName" placeholder="Alexis Zambrano"></div>
+                                <div class="form-group"><label>Correo</label><input type="email" id="fCollEmail" placeholder="dilan.zambrano@espoch.edu.ec"></div>
+                                <div class="form-group"><label>Cargo</label><input type="text" id="fCollCharge" placeholder="Estudiante"></div>
+                                <div class="form-group"><label>Celular</label><input type="text" id="fCollPhone" placeholder="979022646"></div>
+                                <div class="form-group"><label>Lugar</label><input type="text" id="fCollLugar" placeholder="Joya de los Sachas"></div>
+                            </div>
+                            <div style="border:1px solid var(--color-border);border-radius:8px;padding:12px;">
+                                <h4 style="margin:0 0 8px;font-size:0.85rem;color:var(--color-primary);"><i class="fas fa-tractor"></i> Propietario</h4>
+                                <div class="form-group"><label>N&uacute;mero de accesi&oacute;n</label><input type="text" id="fPropAcc" placeholder="EI-PIT-26-01-01"></div>
+                                <div class="form-group"><label>Nombre de Finca / banco</label><input type="text" id="fPropFinca" placeholder="La Carolina"></div>
+                                <div class="form-group"><label>Nombre del productor</label><input type="text" id="fPropName" placeholder="Narcisa Pacheco"></div>
+                                <div class="form-group"><label>C&eacute;dula</label><input type="text" id="fPropCedula" placeholder="N&uacute;mero de c&eacute;dula"></div>
+                                <div class="form-group"><label>Celular</label><input type="text" id="fPropPhone" placeholder="Tel&eacute;fono"></div>
+                                <div class="form-group"><label>Cultivo / Variedad</label><input type="text" id="fPropCultivo" placeholder="Pitahaya roja"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px;">Guardar Variedad</button>
                 </form>
             </div>
@@ -321,7 +362,11 @@
         });
 
         function faoFieldIds() {
-            return ['fCodigo','fAcceso','fColecta','fNombreAcc','fGenero','fEspecie','fSubtaxa','fNombreComun','fPais','fUbicacion','fLat','fLng','fAltitud','fFecha','fEstadoBio','fFuente'];
+            return ['fCodigo','fAcceso','fColecta','fCollCode','fBredCode','fDonorCode','fDonorNumb','fOtherNumb','fDuplSite','fStorage','fNombreAcc','fGenero','fEspecie','fSpAuthority','fSubtaxa','fSubtauthor','fNombreComun','fPais','fUbicacion','fLat','fLng','fAltitud','fFecha','fCollDate','fClimZone','fSoilType','fEstadoBio','fFuente','fAncest','fRemarks','fDisRes','fSelfComp'];
+        }
+
+        function propFieldIds() {
+            return ['fCollName','fCollEmail','fCollCharge','fCollPhone','fCollLugar','fPropAcc','fPropFinca','fPropName','fPropCedula','fPropPhone','fPropCultivo'];
         }
 
         function faoToObj() {
@@ -333,9 +378,27 @@
             return obj;
         }
 
+        function propToObj() {
+            var obj = {};
+            propFieldIds().forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) { var val = el.value.trim(); if (val) obj[id.replace('f','').toLowerCase()] = val; }
+            });
+            return obj;
+        }
+
+        function objToProp(p) {
+            if (!p) return;
+            var map = {collname:'fCollName',collemail:'fCollEmail',collcharge:'fCollCharge',collphone:'fCollPhone',colllugar:'fCollLugar',propacc:'fPropAcc',propfinca:'fPropFinca',propname:'fPropName',propcedula:'fPropCedula',propphone:'fPropPhone',propcultivo:'fPropCultivo'};
+            Object.keys(map).forEach(function(k) {
+                var el = document.getElementById(map[k]);
+                if (el && p[k] !== null && p[k] !== undefined) el.value = p[k];
+            });
+        }
+
         function objToFao(fao) {
             if (!fao) return;
-            var map = {codigo:'fCodigo',numero_acceso:'fAcceso',numero_colecta:'fColecta',nombre_accesion:'fNombreAcc',genero:'fGenero',especie:'fEspecie',subtaxa:'fSubtaxa',nombre_comun:'fNombreComun',pais:'fPais',ubicacion:'fUbicacion',latitud:'fLat',longitud:'fLng',altitud:'fAltitud',fecha_adquisicion:'fFecha',estado_biologico:'fEstadoBio',fuente_colecta:'fFuente'};
+            var map = {codigo:'fCodigo',numero_acceso:'fAcceso',numero_colecta:'fColecta',coll_code:'fCollCode',bred_code:'fBredCode',donor_code:'fDonorCode',donor_numb:'fDonorNumb',other_numb:'fOtherNumb',dupl_site:'fDuplSite',storage:'fStorage',nombre_accesion:'fNombreAcc',genero:'fGenero',especie:'fEspecie',sp_authority:'fSpAuthority',subtaxa:'fSubtaxa',subtauthor:'fSubtauthor',nombre_comun:'fNombreComun',pais:'fPais',ubicacion:'fUbicacion',latitud:'fLat',longitud:'fLng',altitud:'fAltitud',fecha_adquisicion:'fFecha',coll_date:'fCollDate',clim_zone:'fClimZone',soil_type:'fSoilType',estado_biologico:'fEstadoBio',fuente_colecta:'fFuente',ancest:'fAncest',remarks:'fRemarks',dis_res:'fDisRes',self_comp:'fSelfComp'};
             Object.keys(map).forEach(function(k) {
                 var el = document.getElementById(map[k]);
                 if (el && fao[k] !== null && fao[k] !== undefined) el.value = fao[k];
@@ -401,6 +464,7 @@
                 document.getElementById('vFinca').value = item.finca || '';
                 try { var car = JSON.parse(item.caracteristicas || '{}'); objToCar(car); } catch(e) {}
                 objToFao((item.fao_passport || {}));
+                objToProp((item.propietario || {}));
                 var p = document.getElementById('vPreview');
                 if (item.imagen_url) { p.src = item.imagen_url; p.style.display = 'block'; } else { p.style.display = 'none'; }
             } else {
@@ -437,15 +501,35 @@
             if (!fao || !Object.keys(fao).length) return '';
             var t = function(key, fb) { return typeof __ === 'function' ? (__(key) || fb) : fb; };
             var rows = [
-                ['C&oacute;digo', fao.codigo], ['N° Acceso', fao.numero_acceso], ['N° Colecta', fao.numero_colecta],
-                ['G&eacute;nero', fao.genero], ['Especie', fao.especie], ['Subtaxa', fao.subtaxa],
-                ['Nombre Com&uacute;n', fao.nombre_comun], ['Nombre Accesi&oacute;n', fao.nombre_accesion],
-                ['Fecha Adquisici&oacute;n', fao.fecha_adquisicion], ['Pa&iacute;s', fao.pais], ['Ubicaci&oacute;n', fao.ubicacion],
-                ['Latitud', fao.latitud], ['Longitud', fao.longitud], ['Altitud', fao.altitud ? fao.altitud + ' m' : ''],
-                ['Estado Biol&oacute;gico', fao.estado_biologico], ['Fuente Colecta', fao.fuente_colecta]
+                ['INSTCODE', fao.codigo], ['ACCENUMB', fao.numero_acceso], ['COLLNUMB', fao.numero_colecta],
+                ['COLLCODE', fao.coll_code], ['BREDCODE', fao.bred_code],
+                ['GENUS', fao.genero], ['SPECIES', fao.especie], ['SPAUTHOR', fao.sp_authority],
+                ['SUBTAXA', fao.subtaxa], ['SUBTAUTHOR', fao.subtauthor],
+                ['CROPNAME', fao.nombre_comun], ['ACCENAME', fao.nombre_accesion],
+                ['ACQDATE', fao.fecha_adquisicion], ['COLLDATE', fao.coll_date],
+                ['ORIGCTY', fao.pais], ['COLLSITE', fao.ubicacion],
+                ['LATITUDE', fao.latitud], ['LONGITUDE', fao.longitud], ['ELEVATION', fao.altitud ? fao.altitud + ' m' : ''],
+                ['SAMPSTAT', fao.estado_biologico], ['COLLSRC', fao.fuente_colecta],
+                ['ANCEST', fao.ancest], ['DONORCODE', fao.donor_code], ['DONORNUMB', fao.donor_numb],
+                ['OTHERNUMB', fao.other_numb], ['DUPLSITE', fao.dupl_site], ['STORAGE', fao.storage],
+                ['REMARKS', fao.remarks], ['DISRES', fao.dis_res],
+                ['CLIMZONE', fao.clim_zone], ['SELFCOMP', fao.self_comp], ['SOILTYPE', fao.soil_type]
             ].filter(function(r) { return r[1]; });
             if (!rows.length) return '';
             return '<div style="margin-bottom:16px;"><h4 style="margin:0 0 8px;font-size:0.9rem;color:var(--color-primary);"><i class="fas fa-passport"></i> ' + t('tipos.fao_tab', 'Pasaporte FAO') + '</h4><table class="data-table">' + rows.map(function(r) { return '<tr><th style="padding:4px 10px;font-size:0.8rem;">' + r[0] + '</th><td style="padding:4px 10px;font-size:0.82rem;">' + escapeHTML(String(r[1])) + '</td></tr>'; }).join('') + '</table></div>';
+        }
+
+        function propTableHTML(p) {
+            if (!p || !Object.keys(p).length) return '';
+            var rows = [
+                ['Colector', p.collname], ['Correo colector', p.collemail], ['Cargo', p.collcharge],
+                ['Celular colector', p.collphone], ['Lugar colector', p.colllugar],
+                ['N\u00famero de accesi\u00f3n', p.propacc], ['Finca / banco', p.propfinca],
+                ['Productor', p.propname], ['C\u00e9dula', p.propcedula],
+                ['Celular productor', p.propphone], ['Cultivo / Variedad', p.propcultivo]
+            ].filter(function(r) { return r[1]; });
+            if (!rows.length) return '';
+            return '<div style="margin-bottom:16px;"><h4 style="margin:0 0 8px;font-size:0.9rem;color:var(--color-primary);"><i class="fas fa-user-friends"></i> Informaci\u00f3n de colecta y propiedad</h4><table class="data-table">' + rows.map(function(r) { return '<tr><th style="padding:4px 10px;font-size:0.8rem;">' + r[0] + '</th><td style="padding:4px 10px;font-size:0.82rem;">' + escapeHTML(String(r[1])) + '</td></tr>'; }).join('') + '</table></div>';
         }
 
         function verDetalle(id) {
@@ -491,6 +575,7 @@
                 + img
                 + (v.nombre_cientifico ? '<p style="font-style:italic;color:var(--color-text-muted);margin:0 0 16px 0;"><em>' + escapeHTML(v.nombre_cientifico) + '</em></p>' : '')
                 + faoTableHTML(fao)
+                + propTableHTML(v.propietario)
                 + (v.descripcion ? '<div style="margin-bottom:12px;"><h4 style="margin:0 0 6px 0;">' + t('tipos.description','Descripci\u00f3n') + '</h4><p style="margin:0;color:var(--color-text-secondary);line-height:1.6;">' + escapeHTML(v.descripcion) + '</p></div>' : '')
                 + '<div class="grid-2 gap-12">'
                 + (v.beneficios ? '<div class="seccion-ficha"><h4 style="margin:0 0 6px 0;color:var(--color-primary);"><i class="fas fa-heart"></i> ' + t('tipos.benefits','Beneficios') + '</h4><p style="margin:0;font-size:0.88rem;color:var(--color-text-secondary);">' + escapeHTML(v.beneficios) + '</p></div>' : '')
@@ -506,25 +591,10 @@
         document.getElementById('varForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var car = carToObj();
-            var fao_data = null;
-            var faoFields = ['codigo','numero_acceso','numero_colecta','nombre_accesion','genero','especie','subtaxa','nombre_comun','pais','ubicacion','latitud','longitud','altitud','fecha_adquisicion','estado_biologico','fuente_colecta'];
-            var faoValues = {};
-            faoFields.forEach(function(k) {
-                var elId = 'f' + k.charAt(0).toUpperCase() + k.slice(1);
-                if (k === 'numero_acceso') elId = 'fAcceso';
-                if (k === 'numero_colecta') elId = 'fColecta';
-                if (k === 'nombre_accesion') elId = 'fNombreAcc';
-                if (k === 'nombre_comun') elId = 'fNombreComun';
-                if (k === 'fecha_adquisicion') elId = 'fFecha';
-                if (k === 'estado_biologico') elId = 'fEstadoBio';
-                if (k === 'fuente_colecta') elId = 'fFuente';
-                var el = document.getElementById(elId);
-                if (el && el.value.trim()) {
-                    if (k === 'latitud' || k === 'longitud' || k === 'altitud') faoValues[k] = parseFloat(el.value);
-                    else faoValues[k] = el.value.trim();
-                }
-            });
-            if (Object.keys(faoValues).length) fao_data = faoValues;
+            var fao_data = faoToObj();
+            if (!Object.keys(fao_data).length) fao_data = null;
+            var prop_data = propToObj();
+            if (!Object.keys(prop_data).length) prop_data = null;
             var variedad_data = {
                 nombre: document.getElementById('vNombre').value,
                 nombre_cientifico: document.getElementById('vCientifico').value || null,
@@ -541,7 +611,7 @@
             var url = id ? '/api/caracterizacion/' + id : '/api/caracterizacion';
             var method = id ? 'PUT' : 'POST';
             try {
-                var res = await fetch(url, { method: method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ fao_data: fao_data, variedad_data: variedad_data, caracteristicas: car }) });
+                var res = await fetch(url, { method: method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ fao_data: fao_data, variedad_data: variedad_data, caracteristicas: car, propietario: prop_data }) });
                 var result = await res.json();
                 if (!res.ok) { alert('Error: ' + (result.error || '')); return; }
                 cerrarForm();
