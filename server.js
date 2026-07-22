@@ -377,7 +377,7 @@ app.get('/api/caracterizacion', async (req, res) => {
 
 app.post('/api/caracterizacion', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
-    const { fao_data, variedad_data, caracteristicas } = req.body;
+    const { fao_data, variedad_data, caracteristicas, propietario } = req.body;
     if (!variedad_data || !variedad_data.nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
     let faoId = null;
     if (fao_data) {
@@ -385,7 +385,7 @@ app.post('/api/caracterizacion', requireRole(['admin', 'investigador', 'tecnico'
       if (faoErr) return res.status(500).json({ error: faoErr.message });
       faoId = fao.id;
     }
-    const insertData = { ...variedad_data, fao_passport_id: faoId, caracteristicas: JSON.stringify(caracteristicas || {}) };
+    const insertData = { ...variedad_data, fao_passport_id: faoId, caracteristicas: JSON.stringify(caracteristicas || {}), propietario: propietario ? JSON.stringify(propietario) : null };
     const { data, error } = await supabase.from('variedades').insert(insertData).select('*,fao_passport:fao_passport_id(*)').single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'CREAR', 'caracterizacion', data.id);
@@ -395,7 +395,7 @@ app.post('/api/caracterizacion', requireRole(['admin', 'investigador', 'tecnico'
 
 app.put('/api/caracterizacion/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
-    const { fao_data, variedad_data, caracteristicas } = req.body;
+    const { fao_data, variedad_data, caracteristicas, propietario } = req.body;
     const existing = await supabase.from('variedades').select('fao_passport_id').eq('id', req.params.id).single();
     if (existing.error) return res.status(500).json({ error: existing.error.message });
     let faoId = existing.data?.fao_passport_id;
@@ -411,6 +411,7 @@ app.put('/api/caracterizacion/:id', requireRole(['admin', 'investigador', 'tecni
     }
     const updateData = { ...variedad_data, fao_passport_id: faoId };
     if (caracteristicas) updateData.caracteristicas = JSON.stringify(caracteristicas);
+    if (propietario !== undefined) updateData.propietario = JSON.stringify(propietario);
     const { data, error } = await supabase.from('variedades').update(updateData).eq('id', req.params.id).select('*,fao_passport:fao_passport_id(*)').single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'EDITAR', 'caracterizacion', parseInt(req.params.id));

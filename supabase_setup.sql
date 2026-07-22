@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS variedades (
 -- ALTER TABLE variedades ADD COLUMN recolector_nombre TEXT;
 -- ALTER TABLE variedades ADD COLUMN recolector_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL;
 -- ALTER TABLE variedades ADD COLUMN finca TEXT;
+-- ALTER TABLE variedades ADD COLUMN propietario TEXT;
 
 -- 5. PUBLICACIONES CIENTIFICAS (tesis y articulos)
 CREATE TABLE IF NOT EXISTS publicaciones (
