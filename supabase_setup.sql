@@ -9,19 +9,35 @@ CREATE TABLE IF NOT EXISTS fao_passport (
   codigo TEXT,
   numero_acceso TEXT,
   numero_colecta TEXT,
+  coll_code TEXT,
+  bred_code TEXT,
+  donor_code TEXT,
+  donor_numb TEXT,
+  other_numb TEXT,
+  dupl_site TEXT,
+  storage TEXT,
   genero TEXT,
   especie TEXT,
+  sp_authority TEXT,
   subtaxa TEXT,
+  subtauthor TEXT,
   nombre_comun TEXT,
   nombre_accesion TEXT,
   fecha_adquisicion TEXT,
+  coll_date TEXT,
   pais TEXT,
   ubicacion TEXT,
   latitud DOUBLE PRECISION,
   longitud DOUBLE PRECISION,
   altitud DOUBLE PRECISION,
+  clim_zone TEXT,
+  soil_type TEXT,
   estado_biologico TEXT,
   fuente_colecta TEXT,
+  ancest TEXT,
+  remarks TEXT,
+  dis_res TEXT,
+  self_comp TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -67,6 +83,26 @@ CREATE TABLE IF NOT EXISTS variedades (
 -- ALTER TABLE variedades ADD COLUMN recolector_usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL;
 -- ALTER TABLE variedades ADD COLUMN finca TEXT;
 -- ALTER TABLE variedades ADD COLUMN propietario TEXT;
+
+-- Migracion: nuevas columnas MCPD para fao_passport
+-- ALTER TABLE fao_passport ADD COLUMN coll_code TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN bred_code TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN donor_code TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN donor_numb TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN other_numb TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN dupl_site TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN storage TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN sp_authority TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN subtauthor TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN coll_date TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN clim_zone TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN soil_type TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN ancest TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN remarks TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN dis_res TEXT;
+-- ALTER TABLE fao_passport ADD COLUMN self_comp TEXT;
+-- ALTER TABLE fao_passport ALTER COLUMN latitud TYPE TEXT;
+-- ALTER TABLE fao_passport ALTER COLUMN longitud TYPE TEXT;
 
 -- 5. PUBLICACIONES CIENTIFICAS (tesis y articulos)
 CREATE TABLE IF NOT EXISTS publicaciones (
