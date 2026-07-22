@@ -1,12 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const https = require('https');
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'pitahaya_secret_dev_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) { console.error('FATAL: JWT_SECRET no definido en .env'); process.exit(1); }
 const TOKEN_EXPIRY = '7d';
 
 const app = express();
@@ -43,8 +45,8 @@ function requireRole(roles) {
     if (auth && auth.startsWith('Bearer ')) {
       try {
         const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
-        req.authedUser = decoded;
-        if (uid === 0 || !roles.includes(decoded.role)) return res.status(403).json({ error: 'Permiso denegado' });
+        req.authedUser = { id: decoded.id, role: decoded.role };
+        if (!roles.includes(decoded.role)) return res.status(403).json({ error: 'Permiso denegado' });
         return next();
       } catch (e) { return res.status(401).json({ error: 'Token invalido o expirado' }); }
     }
@@ -57,7 +59,7 @@ function requireRole(roles) {
     if (isNaN(uid)) return res.status(401).json({ error: 'No autorizado - id invalido' });
     // admin hardcodeado (userId=0) del login local en script.js
     if (uid === 0) {
-      if (roles.includes('admin')) { req.authedUser = { role: 'admin', id: 1 }; return next(); }
+      if (roles.includes('admin')) { req.authedUser = { role: 'admin', id: 0 }; return next(); }
       return res.status(403).json({ error: 'Permiso denegado' });
     }
     const { data: user } = await supabase.from('usuarios').select('*').eq('id', uid).single();
@@ -76,15 +78,19 @@ async function logActividad(usuario_id, accion, tabla, registro_id, detalles) {
 
 // ==================== AUTH ====================
 app.post('/api/register', async (req, res) => {
-  const { nombre, correo, password } = req.body;
-  if (!nombre || !correo || !password) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-  const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
-  if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: 'cliente' }).select().single();
-  if (error) return res.status(500).json({ error: error.message });
-  const token = jwt.sign({ id: data.id, role: data.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
-  res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role, token });
+  try {
+    const { nombre, correo, password } = req.body;
+    if (!nombre || !correo || !password) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) return res.status(400).json({ error: 'Correo inválido' });
+    if (password.length < 6) return res.status(400).json({ error: 'Contraseña debe tener al menos 6 caracteres' });
+    const { data: existe } = await supabase.from('usuarios').select('id').eq('correo', correo).maybeSingle();
+    if (existe) return res.status(400).json({ error: 'El correo ya está registrado' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const { data, error } = await supabase.from('usuarios').insert({ nombre, correo, password: hashedPassword, role: 'cliente' }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    const token = jwt.sign({ id: data.id, role: data.role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+    res.json({ id: data.id, nombre: data.nombre, correo: data.correo, role: data.role, token });
+  } catch (e) { res.status(500).json({ error: 'Error interno del servidor' }); }
 });
 
 app.post('/api/login', async (req, res) => {
@@ -162,8 +168,9 @@ app.post('/api/admin/crear-usuario', requireRole(['admin']), async (req, res) =>
 
 // ==================== PERFIL ====================
 app.get('/api/perfil/:id', async (req, res) => {
-  const { data, error } = await supabase.from('usuarios').select('id, nombre, correo, role, created_at').eq('id', req.params.id).single();
+  const { data, error } = await supabase.from('usuarios').select('id, nombre, correo, role, created_at').eq('id', req.params.id).maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'Usuario no encontrado' });
   res.json(data);
 });
 
@@ -250,6 +257,14 @@ app.delete('/api/comentarios/:id', requireRole(['admin', 'investigador', 'tecnic
   res.json({ success: true });
 });
 
+const FAO_ALLOWED = ['codigo','numero_acceso','numero_colecta','coll_code','bred_code','donor_code','donor_numb','other_numb','dupl_site','storage','genero','especie','sp_authority','subtaxa','subtauthor','nombre_comun','nombre_accesion','fecha_adquisicion','coll_date','pais','ubicacion','latitud','longitud','altitud','clim_zone','soil_type','estado_biologico','fuente_colecta','ancest','remarks','dis_res','self_comp'];
+
+function sanitizeFao(body) {
+  var obj = {};
+  FAO_ALLOWED.forEach(function(k) { if (body[k] !== undefined && body[k] !== null) obj[k] = body[k]; });
+  return obj;
+}
+
 // ==================== FAO PASSPORT ====================
 app.get('/api/fao-passport', async (req, res) => {
   const { data, error } = await supabase.from('fao_passport').select('*').order('created_at', { ascending: false });
@@ -258,14 +273,17 @@ app.get('/api/fao-passport', async (req, res) => {
 });
 
 app.get('/api/fao-passport/:id', async (req, res) => {
-  const { data, error } = await supabase.from('fao_passport').select('*').eq('id', req.params.id).single();
+  const { data, error } = await supabase.from('fao_passport').select('*').eq('id', req.params.id).maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'No encontrado' });
   res.json(data);
 });
 
 app.post('/api/fao-passport', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
-    const { data, error } = await supabase.from('fao_passport').insert(req.body).select().single();
+    const clean = sanitizeFao(req.body);
+    if (!Object.keys(clean).length) return res.status(400).json({ error: 'Sin datos válidos' });
+    const { data, error } = await supabase.from('fao_passport').insert(clean).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'CREAR', 'fao_passport', data.id);
     res.json(data);
@@ -276,16 +294,20 @@ app.post('/api/fao-passport/bulk', requireRole(['admin', 'investigador', 'tecnic
   try {
     const records = req.body;
     if (!Array.isArray(records) || !records.length) return res.status(400).json({ error: 'Arreglo vacio' });
-    const { data, error } = await supabase.from('fao_passport').insert(records).select();
+    var cleaned = records.map(sanitizeFao).filter(function(r) { return Object.keys(r).length; });
+    if (!cleaned.length) return res.status(400).json({ error: 'Ningun registro valido' });
+    const { data, error } = await supabase.from('fao_passport').insert(cleaned).select();
     if (error) return res.status(500).json({ error: error.message });
-    logActividad(req.authedUser.id, 'IMPORTAR', 'fao_passport', records.length);
+    logActividad(req.authedUser.id, 'IMPORTAR', 'fao_passport', data.length);
     res.json({ count: data.length, data });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
   try {
-    const { data, error } = await supabase.from('fao_passport').update(req.body).eq('id', req.params.id).select().single();
+    const clean = sanitizeFao(req.body);
+    if (!Object.keys(clean).length) return res.status(400).json({ error: 'Sin datos válidos' });
+    const { data, error } = await supabase.from('fao_passport').update(clean).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     logActividad(req.authedUser.id, 'EDITAR', 'fao_passport', parseInt(req.params.id));
     res.json(data);
@@ -293,10 +315,12 @@ app.put('/api/fao-passport/:id', requireRole(['admin', 'investigador', 'tecnico'
 });
 
 app.delete('/api/fao-passport/:id', requireRole(['admin', 'investigador', 'tecnico']), async (req, res) => {
-  const { error } = await supabase.from('fao_passport').delete().eq('id', req.params.id);
-  if (error) return res.status(500).json({ error: error.message });
-  logActividad(req.authedUser.id, 'ELIMINAR', 'fao_passport', parseInt(req.params.id));
-  res.json({ success: true });
+  try {
+    const { error } = await supabase.from('fao_passport').delete().eq('id', req.params.id);
+    if (error) return res.status(500).json({ error: error.message });
+    logActividad(req.authedUser.id, 'ELIMINAR', 'fao_passport', parseInt(req.params.id));
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ==================== VARIEDADES ====================
@@ -307,6 +331,8 @@ app.get('/api/variedades', async (req, res) => {
     query = query.or(`nombre.ilike.%${q}%,nombre_cientifico.ilike.%${q}%,localidad.ilike.%${q}%`);
   }
   if (campo && valor) {
+    var camposPermitidos = ['accesion','cladodios','long_cladodio','ancho_cladodio','aristas','alt_arista','esp_arista','long_costilla','ancho_costilla','margen_costilla','dist_areolas','alt_areola','espinas','long_espina','ancho_espina','cera','flor_long','flor_diam_medio','flor_diam_basal','flor_peso','flor_pedunculo','flor_brateas','flor_ancho_brateas','flor_petalos','flor_long_petalos','flor_ancho_petalos','fruto_forma','fruto_long','fruto_diam','fruto_peso','fruto_brateas','fruto_long_brateas','fruto_ancho_mamila','fruto_largo_mamila','fruto_color_cascara','fruto_espesor_cascara','fruto_peso_cascara','fruto_peso_pulpa','fruto_color_pulpa','fruto_relacion','fruto_brix','fruto_acidez','fruto_long_semilla','fruto_ancho_semilla','fruto_tam_semilla','fruto_peso_semillas','raices_aereas','patogenos','dano','clorosis','rajadura','severidad'];
+    if (!camposPermitidos.includes(campo)) return res.status(400).json({ error: 'Campo de búsqueda no válido' });
     query = query.filter('caracteristicas->>' + campo, 'ilike', `%${valor}%`);
   }
   const sortCol = sort || 'created_at';
@@ -317,8 +343,9 @@ app.get('/api/variedades', async (req, res) => {
 });
 
 app.get('/api/variedades/:id', async (req, res) => {
-  const { data, error } = await supabase.from('variedades').select('*,fao_passport:fao_passport_id(*)').eq('id', req.params.id).single();
+  const { data, error } = await supabase.from('variedades').select('*,fao_passport:fao_passport_id(*)').eq('id', req.params.id).maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'Variedad no encontrada' });
   res.json(data);
 });
 
@@ -633,63 +660,74 @@ app.get('/api/investigador/perfil/:usuario_id', async (req, res) => {
   res.json(data || null);
 });
 
-app.put('/api/investigador/perfil', async (req, res) => {
+app.put('/api/investigador/perfil', requireRole(['investigador', 'admin']), async (req, res) => {
   const { usuario_id, ...fields } = req.body;
   if (!usuario_id) return res.status(400).json({ error: 'usuario_id requerido' });
-  // Verify investigator role
-  const { data: user } = await supabase.from('usuarios').select('role').eq('id', usuario_id).single();
-  if (!user || user.role !== 'investigador') return res.status(403).json({ error: 'Solo investigadores' });
-  // Upsert
+  if (req.authedUser.role !== 'admin' && req.authedUser.id !== Number(usuario_id)) return res.status(403).json({ error: 'Solo tu propio perfil' });
+  const { data: user } = await supabase.from('usuarios').select('role').eq('id', usuario_id).maybeSingle();
+  if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+  if (user.role !== 'investigador') return res.status(403).json({ error: 'Solo investigadores' });
   const { data: existing } = await supabase.from('perfiles_investigador').select('id').eq('usuario_id', usuario_id).maybeSingle();
-  if (existing) {
-    const { data, error } = await supabase.from('perfiles_investigador').update({ ...fields, updated_at: new Date().toISOString() }).eq('usuario_id', usuario_id).select().single();
-    if (error) return res.status(500).json({ error: error.message });
-    return res.json(data);
-  } else {
-    const { data, error } = await supabase.from('perfiles_investigador').insert({ usuario_id, ...fields }).select().single();
-    if (error) return res.status(500).json({ error: error.message });
-    return res.json(data);
-  }
+  try {
+    if (existing) {
+      const { data, error } = await supabase.from('perfiles_investigador').update({ ...fields, updated_at: new Date().toISOString() }).eq('usuario_id', usuario_id).select().single();
+      if (error) return res.status(500).json({ error: error.message });
+      return res.json(data);
+    } else {
+      const { data, error } = await supabase.from('perfiles_investigador').insert({ usuario_id, ...fields }).select().single();
+      if (error) return res.status(500).json({ error: error.message });
+      return res.json(data);
+    }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/investigador/perfil/foto', async (req, res) => {
+app.post('/api/investigador/perfil/foto', requireRole(['investigador', 'admin']), async (req, res) => {
   const { usuario_id, foto_url } = req.body;
   if (!usuario_id || !foto_url) return res.status(400).json({ error: 'Datos incompletos' });
-  const { data: existing } = await supabase.from('perfiles_investigador').select('id').eq('usuario_id', usuario_id).maybeSingle();
-  if (existing) {
-    const { error } = await supabase.from('perfiles_investigador').update({ foto_url }).eq('usuario_id', usuario_id);
-    if (error) return res.status(500).json({ error: error.message });
-  } else {
-    const { error } = await supabase.from('perfiles_investigador').insert({ usuario_id, foto_url });
-    if (error) return res.status(500).json({ error: error.message });
-  }
-  res.json({ success: true });
+  if (req.authedUser.role !== 'admin' && req.authedUser.id !== Number(usuario_id)) return res.status(403).json({ error: 'Solo tu propio perfil' });
+  try {
+    const { data: existing } = await supabase.from('perfiles_investigador').select('id').eq('usuario_id', usuario_id).maybeSingle();
+    if (existing) {
+      const { error } = await supabase.from('perfiles_investigador').update({ foto_url }).eq('usuario_id', usuario_id);
+      if (error) return res.status(500).json({ error: error.message });
+    } else {
+      const { error } = await supabase.from('perfiles_investigador').insert({ usuario_id, foto_url });
+      if (error) return res.status(500).json({ error: error.message });
+    }
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ==================== INVESTIGACIONES ====================
-app.post('/api/investigador/investigaciones', async (req, res) => {
+app.post('/api/investigador/investigaciones', requireRole(['investigador', 'admin']), async (req, res) => {
   const { perfil_id, titulo, descripcion, fecha, estado, area_investigacion, participantes, documento_url, imagen_url } = req.body;
   if (!perfil_id || !titulo) return res.status(400).json({ error: 'perfil_id y titulo requeridos' });
-  const { data, error } = await supabase.from('investigaciones').insert({
-    perfil_id, titulo, descripcion, fecha, estado, area_investigacion, participantes, documento_url, imagen_url
-  }).select().single();
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  try {
+    const { data, error } = await supabase.from('investigaciones').insert({
+      perfil_id, titulo, descripcion, fecha, estado, area_investigacion, participantes, documento_url, imagen_url
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/investigador/investigaciones/:id', async (req, res) => {
+app.put('/api/investigador/investigaciones/:id', requireRole(['investigador', 'admin']), async (req, res) => {
   const { titulo, descripcion, fecha, estado, area_investigacion, participantes, documento_url, imagen_url } = req.body;
-  const { data, error } = await supabase.from('investigaciones').update({
-    titulo, descripcion, fecha, estado, area_investigacion, participantes, documento_url, imagen_url
-  }).eq('id', req.params.id).select().single();
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  try {
+    const { data, error } = await supabase.from('investigaciones').update({
+      titulo, descripcion, fecha, estado, area_investigacion, participantes, documento_url, imagen_url
+    }).eq('id', req.params.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/investigador/investigaciones/:id', async (req, res) => {
-  const { error } = await supabase.from('investigaciones').delete().eq('id', req.params.id);
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true });
+app.delete('/api/investigador/investigaciones/:id', requireRole(['investigador', 'admin']), async (req, res) => {
+  try {
+    const { error } = await supabase.from('investigaciones').delete().eq('id', req.params.id);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ==================== INVESTIGADORES (Publico) ====================
@@ -763,7 +801,6 @@ app.post('/api/chat', async (req, res) => {
   const groqKey = process.env.GROQ_API_KEY;
   if (groqKey) {
     try {
-      const https = require('https');
       const systemPrompt = 'Eres un asistente experto en pitahaya (Hylocereus spp), biotecnología agrícola, agricultura sostenible y el proyecto Pitahaya Biotec de Ecuador. Responde en español de forma clara y concisa, máximo 3 párrafos. Si la pregunta no es sobre estos temas, responde cordialmente que solo puedes ayudar en temas relacionados con la pitahaya y la agricultura.';
       const body = JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: mensaje }], temperature: 0.7, max_tokens: 500 });
       const data = await new Promise((resolve, reject) => {
@@ -806,14 +843,17 @@ app.get('/api/exportar/:tabla', async (req, res) => {
   const { formato, usuario_id } = req.query;
   const tablasPermitidas = ['noticias', 'usuarios', 'pedidos', 'semillas', 'bioproductos'];
   if (!tablasPermitidas.includes(tabla)) return res.status(400).json({ error: 'Tabla no disponible para exportacion' });
+  var uid = parseInt(usuario_id);
+  if (usuario_id && !isNaN(uid)) logActividad(uid, 'EXPORTAR', tabla, null, 'Formato: ' + (formato || 'json'));
   const { data, error } = await supabase.from(tabla).select('*');
   if (error) return res.status(500).json({ error: error.message });
-  if (usuario_id) logActividad(parseInt(usuario_id), 'EXPORTAR', tabla, null, `Formato: ${formato || 'json'}`);
   if (formato === 'csv') {
-    const keys = Object.keys(data[0] || {});
-    const csv = [keys.join(','), ...data.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
+    if (!data.length) return res.send('\uFEFF');
+    const keys = Object.keys(data[0]);
+    function esc(v) { var s = String(v ?? ''); if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"'; return s; }
+    const csv = [keys.join(','), ...data.map(function(r) { return keys.map(function(k) { return esc(r[k]); }).join(','); })].join('\n');
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${tabla}.csv"`);
+    res.setHeader('Content-Disposition', 'attachment; filename="' + tabla + '.csv"');
     return res.send('\uFEFF' + csv);
   }
   if (formato === 'txt') {
