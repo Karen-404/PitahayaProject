@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soporte T&eacute;cnico - Pitahaya Biotec</title>
+    <title data-i18n="soporte.title">Soporte T&eacute;cnico - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -17,7 +17,7 @@
                     <i class="fas fa-headset"></i>
                 </div>
                 <div>
-                    <h1>Soporte T&eacute;cnico</h1>
+                    <h1 data-i18n="soporte.title">Soporte T&eacute;cnico</h1>
                     <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Solicita ayuda o reporta un problema</p>
                 </div>
             </div>
@@ -205,6 +205,7 @@
 
         cargarMensajes();
         if (userRole === 'admin' || userRole === 'tecnico') cargarBandeja();
+        document.addEventListener('languageChanged', function() { if (typeof translateDOM === 'function') translateDOM(); });
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fertirriego - Pitahaya Biotec</title>
+    <title data-i18n="fertirriego.title">Fertirriego - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -17,7 +17,7 @@
                     <i class="fas fa-tint"></i>
                 </div>
                 <div>
-                    <h1>Fertirriego de Pitahaya</h1>
+                    <h1 data-i18n="fertirriego.title">Fertirriego de Pitahaya</h1>
                     <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Requerimientos h&iacute;dricos y nutricionales por etapa fenol&oacute;gica</p>
                 </div>
             </div>
@@ -134,6 +134,7 @@
 
         calcularRiego();
         mostrarNutricion();
+        document.addEventListener('languageChanged', function() { if (typeof translateDOM === 'function') translateDOM(); });
     </script>
 </body>
 </html>

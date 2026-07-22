@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Biotec - Pitahaya</title>
+  <title data-i18n="dashboard.title">Dashboard Biotec - Pitahaya</title>
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/biotec-dashboard.css">
@@ -19,7 +19,7 @@
     <section class="atlas-card" aria-label="Atlas de la Pitahaya">
       <div class="atlas-header">
         <div class="atlas-header-left">
-          <h1 class="atlas-title">ATLAS DE LA PITAHAYA ECUATORIANA</h1>
+          <h1 class="atlas-title" data-i18n="dashboard.title">ATLAS DE LA PITAHAYA ECUATORIANA</h1>
           <p class="atlas-subtitle">Informaci&oacute;n estrat&eacute;gica y situacional a nivel nacional</p>
         </div>
         <span class="atlas-badge"><i class="fas fa-map-marker-alt"></i> Producci&oacute;n Nacional 2026</span>
@@ -279,6 +279,7 @@
       .catch(function() {
         document.getElementById('faoInventoryBody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Error al cargar inventario</td></tr>';
       });
+      document.addEventListener('languageChanged', function() { if (typeof translateDOM === 'function') translateDOM(); });
   </script>
 </body>
 </html>

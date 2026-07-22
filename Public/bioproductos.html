@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bioproductos - Pitahaya Biotec</title>
+    <title data-i18n="bioproductos.title">Bioproductos - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -17,7 +17,7 @@
                     <i class="fas fa-flask"></i>
                 </div>
                 <div>
-                    <h1>Bioproductos Disponibles</h1>
+                    <h1 data-i18n="bioproductos.title">Bioproductos Disponibles</h1>
                 </div>
             </div>
             <div class="page-header-right">
@@ -65,8 +65,8 @@
         <div class="chat-container oculto" id="chatContainer">
             <div id="chatBox" class="chat-box"></div>
             <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Escribe...">
-                <button onclick="responder()">Enviar</button>
+                <input type="text" id="userInput" placeholder="Escribe..." data-i18n-placeholder="chat.write">
+                <button onclick="responder()" data-i18n="chat.send">Enviar</button>
             </div>
         </div>
     </div>
@@ -203,6 +203,7 @@
         }
 
         cargarProductos();
+        document.addEventListener('languageChanged', function() { if (typeof translateDOM === 'function') translateDOM(); });
     </script>
 </body>
 </html>

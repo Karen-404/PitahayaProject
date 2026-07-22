@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Cultivos - Pitahaya Biotec</title>
+    <title data-i18n="map.title">Mapa de Cultivos - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -31,7 +31,7 @@
                     <i class="fas fa-map-marked-alt"></i>
                 </div>
                 <div>
-                    <h1>Mapa de Cultivos</h1>
+                    <h1 data-i18n="map.title">Mapa de Cultivos</h1>
                     <p style="color:var(--color-text-muted);margin:2px 0 0 0;">Parcelas experimentales ESPOCH / INIAP</p>
                 </div>
             </div>
@@ -115,8 +115,8 @@
         <div class="chat-container oculto" id="chatContainer">
             <div id="chatBox" class="chat-box"></div>
             <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Escribe...">
-                <button onclick="responder()">Enviar</button>
+                <input type="text" id="userInput" placeholder="Escribe..." data-i18n-placeholder="chat.write">
+                <button onclick="responder()" data-i18n="chat.send">Enviar</button>
             </div>
         </div>
     </div>
@@ -285,6 +285,7 @@
         document.getElementById('filtroVariedad').addEventListener('change', aplicarFiltros);
 
         initMap();
+        document.addEventListener('languageChanged', function() { if (typeof translateDOM === 'function') translateDOM(); });
     </script>
 </body>
 </html>

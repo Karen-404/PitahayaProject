@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pedidos - Pitahaya Biotec</title>
+    <title data-i18n="pedidos.title">Pedidos - Pitahaya Biotec</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -16,7 +16,7 @@
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div>
-                    <h1>Solicitud de Cotizacion</h1>
+                    <h1 data-i18n="pedidos.title">Solicitud de Cotizacion</h1>
                 </div>
             </div>
         </div>
@@ -46,8 +46,8 @@
         <div class="chat-container oculto" id="chatContainer">
             <div id="chatBox" class="chat-box"></div>
             <div class="chat-input">
-                <input type="text" id="userInput" placeholder="Escribe...">
-                <button onclick="responder()">Enviar</button>
+                <input type="text" id="userInput" placeholder="Escribe..." data-i18n-placeholder="chat.write">
+                <button onclick="responder()" data-i18n="chat.send">Enviar</button>
             </div>
         </div>
     </div>
@@ -126,6 +126,7 @@
                 document.getElementById('pedidoForm').dispatchEvent(new Event('submit'));
             } catch(e) { document.getElementById('miniLoginError').textContent = 'Error de conexion'; document.getElementById('miniLoginError').style.display = 'block'; }
         });
+        document.addEventListener('languageChanged', function() { if (typeof translateDOM === 'function') translateDOM(); });
     </script>
 </body>
 </html>
